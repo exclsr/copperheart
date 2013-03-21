@@ -1,10 +1,14 @@
 {
   "name": "copperheart",
   "subdomain": "copperheart",
+  "domains": [
+    "copperheart.org",
+    "www.copperheart.org"
+  ],
   "scripts": {
     "start": "app.js"
   },
-  "version": "0.0.0-7",
+  "version": "0.0.0-12",
   "engines": {
     "node": "0.8.x"
   },

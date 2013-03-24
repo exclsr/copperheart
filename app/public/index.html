@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <title>Copper heart</title>
   <link rel="stylesheet" href="style/app.css"/>
+
+  <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+  <script type="text/javascript"> 
+  // This identifies your website in the createToken call below
+    Stripe.setPublishableKey('pk_test_aio1iYoLhdxdBI4IyiaRSDwA');
+  </script>
 </head>
 <body>
   <div ng-view></div>

@@ -3,10 +3,12 @@
 /* Controllers */
 
 
-function HelloCtrl($scope) {
+function HelloCtrl($scope, $http) {
 
 	$scope.submitPayment = function() {
 		
+		$scope.result = "...";
+
 		var creditCard = {
 			number: $scope.cc.number,
 			cvc: $scope.cc.cvc,
@@ -19,10 +21,21 @@ function HelloCtrl($scope) {
 				// Show the errors on the form
 				$scope.errorMessage = response.error.message;
 			} else {
-				var stripeToken = response.id;
-				$scope.stripeToken = stripeToken;
-				// Force the UI to update, like a sad person.
-				$scope.$apply(); 
+				var data = { stripeToken: response.id };
+				
+				// Put a charge for $1 on the card ...
+				var res = $http.put('/cc/charge/', data);
+				res.success(function(data) {
+					console.log(data);
+					// The server is happy.
+					$scope.result = ":-)";
+				});
+
+				res.error(function(data, status, headers, config) {
+					console.log(data);
+					// The server is sad.
+					$scope.result = ":-("
+				});
 			}
 		};
 
@@ -30,6 +43,6 @@ function HelloCtrl($scope) {
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-HelloCtrl.$inject = ['$scope'];
+HelloCtrl.$inject = ['$scope', '$http'];
 
 

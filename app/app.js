@@ -9,6 +9,9 @@ var express = require('express')
   , http = require('http')
   , path = require('path');
 
+var apiKey = process.env.STRIPE_API_KEY || 'missing stripe api key';
+var stripe = require('stripe')(apiKey);
+
 var app = express();
 
 app.configure(function(){
@@ -32,6 +35,32 @@ app.configure('development', function(){
 // 
 // app.get('/', routes.index);
 // app.get('/users', user.list);
+
+app.put('/cc/charge/', function (req, res) {
+
+  var stripeToken = req.body.stripeToken;
+  console.log(stripeToken);
+
+  var chargeRequest = {
+    amount: 10000,
+    currency: 'usd',
+    card: stripeToken,
+    description: 'among the first tests'
+  };
+
+  stripe.charges.create(chargeRequest, function(err, chargeResponse) {
+    if (err) {
+      // TODO: Obviously ...
+      console.log(err);
+      res.send(500);
+    }
+    else {
+      console.log(chargeResponse);
+      res.send("Ok");
+    }
+  });
+
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

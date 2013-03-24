@@ -7,15 +7,16 @@ var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
   , http = require('http')
-  , path = require('path');
+  , path = require('path')
+  , config = require('./config.js');
 
-var apiKey = process.env.STRIPE_API_KEY || 'missing stripe api key';
+var apiKey = config.stripeApiTest(); 
 var stripe = require('stripe')(apiKey);
 
 var app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', config.port());
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -42,7 +43,7 @@ app.put('/cc/charge/', function (req, res) {
   console.log(stripeToken);
 
   var chargeRequest = {
-    amount: 10000,
+    amount: 100,
     currency: 'usd',
     card: stripeToken,
     description: 'among the first tests'

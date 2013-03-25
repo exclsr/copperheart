@@ -31,6 +31,12 @@ catch (err) {
 	overrides = false; 
 }
 
+// TODO: There is probably a way to make this cool, so
+// that the code below doesn't have to be copied and
+// added to every time a new field is added -- or we
+// can at least make it a lot smaller. Maybe putting
+// everything in one config object (json) that is exported
+// is the way to start ...
 exports.port = function() {
 	return overrides.port || port;
 };

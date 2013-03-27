@@ -6,3 +6,71 @@ body {
 a {
   color: #00B7FF;
 }
+
+.profile, .things {
+	margin-left: 0;
+}
+
+body {
+	background: #96401E;
+	padding: 0;
+}
+.container {
+	background: white;
+	border: solid 1px #555;
+	border-top: 0;
+	border-bottom: 0;
+}
+
+.view {
+	padding: 8em;
+	padding-top: 4em;
+}
+
+.footer {
+	clear: left;
+	background: #333;
+	color: white;
+	margin: 0;
+	padding: 3em;
+	padding-left: 8em;
+}
+
+.choice-group {
+	border-top: solid #888 1px;
+	margin: 0 !important;
+	padding: 2em;
+}
+.choice-group .glyph, .choice-group span {
+	padding-left: 7px;
+}
+.choice-group .glyph {
+	vertical-align: top;
+}
+.choice-group:hover {
+	background: #eee;
+	cursor: pointer;
+}
+
+.glyph {
+	background-image: url(/img/glyphicons-halflings.png);	
+	background-repeat: no-repeat;
+	width: 15px;
+	height: 15px;
+	display: inline-block;
+	margin-top: 3px;
+	margin-left: 10px;
+}
+
+.drink {
+	background-position: 0 0;
+}
+.internet {	
+	background-position: -335px -145px;
+}
+.rent {
+	background-position: 0 -25px;
+}
+.groceries {
+	background-position: -360px -120px;
+}

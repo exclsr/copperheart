@@ -1,32 +1,21 @@
 <h2>Hello!</h2>
 
-<form novalidate id="payment-form" class="css-form">
-	<span class="payment-errors">{{errorMessage}}</span>
+<div class="profile span7">
+	<div id="profileImg">:-)</div>
 
-	<div class="form-row">
-	<label>
-		<span>Card Number</span>
-		<input type="text" size="20" data-stripe="number" ng-model="cc.number"/>
-	</label>
+	<!-- TODO: This is going to come from a database, clearly :-)-->
+	<div class="present">My name is Phil. I am a software maker, dance instructor, swing DJ, and community volunteer. I'm a co-founder of <a href="http://corvallisswing.com">Corvallis Swing</a>, putting together events such as <a href="http://swingandblues.org">Swing and Blues Weekend</a>.</div>
+
+	<!-- -->
+	<div class="things">
+		<h4>Here are some things</h4>
+			<div class="question-section">
+				<label ng-repeat="thing in things" class="checkbox choice-group">
+					<input type="checkbox" ng-model="thing.canHaz" id="{{thing.id}}"/>
+					<span>{{thing.name}}</span>
+					<div class="glyph {{thing.id}}"></div>
+				</label>
+			</div>
 	</div>
-
-	<div class="form-row">
-	<label>
-		<span>CVC</span>
-		<input type="text" size="4" data-stripe="cvc" ng-model="cc.cvc"/>
-	</label>
-	</div>
-
-	<div class="form-row">
-	<label>
-		<span>Expiration (MM/YYYY)</span>
-		<input type="text" size="2" data-stripe="exp-month" ng-model="cc.expMonth"/>
-	</label>
-	<span> / </span>
-	<input type="text" size="4" data-stripe="exp-year" ng-model="cc.expYear"/>
-	</div>
-
-	<button ng-click="submitPayment()">Submit Payment</button>
-	{{result}}
-</form>
+</div>
 

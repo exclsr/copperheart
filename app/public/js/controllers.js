@@ -2,8 +2,32 @@
 
 /* Controllers */
 
-
 function HelloCtrl($scope, $http) {
+
+	$scope.things = [
+		{
+			id: "drink",
+			name: "A drink"
+		},
+		{
+			id: "internet",
+			name: "Internet"
+		},
+		{
+			id: "groceries",
+			name: "Groceries"
+		},
+		{
+			id: "rent",
+			name: "Rent"
+		},
+	];
+
+
+}
+HelloCtrl.$inject = ['$scope', '$http'];
+
+function ContributeCtrl($scope, $http) {
 
 	$scope.submitPayment = function() {
 		
@@ -43,6 +67,6 @@ function HelloCtrl($scope, $http) {
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-HelloCtrl.$inject = ['$scope', '$http'];
+ContributeCtrl.$inject = ['$scope', '$http'];
 
 

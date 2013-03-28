@@ -46,7 +46,13 @@
 		</div>
 
 		<div class="total span3">
-			<h4>:-)</h4>
+			<h4>
+				<span ng-repeat="thing in things">
+					<span class="heart" ng-show="thing.canHaz && !thing.recurring">♥</span>
+					<span class="recurringHeart" 
+						ng-show="thing.canHaz && thing.recurring">♥</span>
+				</span>&nbsp;
+			</h4>
 			<p>You've selected things that come to <strong>${{priceNow()}}</strong> now, and
 			${{pricePerMonth()}} each month after that.</p>
 			<div id="contributeButton">

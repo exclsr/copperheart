@@ -6,24 +6,46 @@ function HelloCtrl($scope, $http) {
 
 	$scope.things = [
 		{
-			id: "drink",
-			name: "A drink"
+			id: "wine",
+			name: "wine",
+			unit: 'glass',
+			price: 5,
+			frequency: 'month'
 		},
 		{
 			id: "internet",
-			name: "Internet"
+			name: "Internet",
+			unit: 'day',
+			price: 2,
+			frequency: 'month'
 		},
 		{
 			id: "groceries",
-			name: "Groceries"
+			name: "groceries",
+			unit: 'day',
+			price: 10,
+			frequency: 'month'
 		},
 		{
 			id: "rent",
-			name: "Rent"
+			name: "rent",
+			unit: 'day',
+			price: 30,
+			frequency: 'month'
 		},
 	];
 
+	$scope.totalPrice = function() {
+		var totalPrice = 0;
 
+		angular.forEach($scope.things, function (thing) {
+			if (thing.canHaz) {
+				totalPrice += thing.price;
+			}
+		});
+
+		return totalPrice;
+	};
 }
 HelloCtrl.$inject = ['$scope', '$http'];
 

@@ -1,20 +1,13 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+body {	
+	background: #96401E;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	padding: 0;
 }
 
 a {
-  color: #00B7FF;
+	color: #00B7FF;
 }
 
-.profile, .things {
-	margin-left: 0;
-}
-
-body {
-	background: #96401E;
-	padding: 0;
-}
 .container {
 	background: white;
 	border: solid 1px #555;
@@ -23,7 +16,7 @@ body {
 }
 
 .view {
-	padding: 8em;
+	padding: 6em;
 	padding-top: 4em;
 }
 
@@ -33,11 +26,25 @@ body {
 	color: white;
 	margin: 0;
 	padding: 3em;
-	padding-left: 8em;
+	padding-left: 6em;
+}
+
+.profile, .things {
+	margin-left: 0;
+}
+
+.present {
+	margin-top: 1.5em;
+}
+
+
+
+.process {
+	margin-top: 1.5em;
 }
 
 .choice-group {
-	border-top: solid #888 1px;
+	border-top: solid #ccc 1px;
 	margin: 0 !important;
 	padding: 2em;
 }
@@ -52,6 +59,7 @@ body {
 	cursor: pointer;
 }
 
+/* Contribution */
 .glyph {
 	background-image: url(/img/glyphicons-halflings.png);	
 	background-repeat: no-repeat;
@@ -74,3 +82,55 @@ body {
 .groceries {
 	background-position: -360px -120px;
 }
+
+.price {
+	font-size: 10pt;
+	color: #888;
+}
+
+
+/* Frequency */
+.frequency .choice-group {
+	padding-top: 1.80em;
+	padding-bottom: 2.25em;
+	padding-right: 0;
+}
+
+.turnOnRecurring {
+	color: #888;
+}
+.turnOnRecurring.true {
+	color: black;
+}
+
+.eachWhat {
+	margin-left: 0;
+	margin-top: -0.5ex;
+}
+
+.frequency select {
+	margin: 0;
+	padding: 0;
+	width: 90px;
+	margin-left: 1ex;
+}
+
+
+/* Total / :-) */;
+.total h4 {
+
+}
+
+.total p {
+	padding: 2em;
+	padding-left: 0.5ex;
+	padding-bottom: 0;
+	border-top: solid #ccc 1px;
+}
+
+.total #contributeButton {
+	text-align: center;
+	margin-left: auto;
+	margin-top: 2em;
+}
+

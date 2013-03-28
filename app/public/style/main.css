@@ -103,9 +103,13 @@ a {
 	color: black;
 }
 
+.recurring {
+	cursor: default !important;
+}
+
 .eachWhat {
 	margin-left: 0;
-	margin-top: -0.5ex;
+	margin-top: -0.5ex;	
 }
 
 .frequency select {

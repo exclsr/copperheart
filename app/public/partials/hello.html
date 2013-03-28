@@ -30,7 +30,7 @@
 						<span>(more than once?)</span>
 					</label>
 
- 					<div class="choice-group checkbox" ng-show="thing.recurring">
+ 					<div class="choice-group checkbox recurring" ng-show="thing.recurring">
 						<input type="checkbox" ng-model="thing.recurring"/>
 						<label class="span2 eachWhat">
 							<span>each</span>
@@ -47,7 +47,8 @@
 
 		<div class="total span3">
 			<h4>:-)</h4>
-			<p>You've selected things that come to ${{totalPrice()}}.</p>
+			<p>You've selected things that come to <strong>${{priceNow()}}</strong> now, and
+			${{pricePerMonth()}} each month after that.</p>
 			<div id="contributeButton">
 				<button class="btn btn-inverse" ng-click="">Contribute</button>
 			</div>

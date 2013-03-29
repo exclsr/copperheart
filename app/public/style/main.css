@@ -142,3 +142,21 @@ a {
 	margin-top: 2em;
 }
 
+
+
+.cardNumberRow, .expirationRow {
+	width: 34ex;
+}
+.cardNumber {
+	width: 32ex !important;
+}
+
+.expMonth, .expYear {
+	text-align: right;
+}
+.expMonth {
+	width: 8ex !important;
+}
+.expYear {
+	width: 10ex !important;
+}

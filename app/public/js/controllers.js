@@ -107,6 +107,20 @@ function ContributeCtrl($scope, $http, activeContribution) {
 	$scope.priceNow = activeContribution.priceNow;
 	$scope.pricePerMonth = activeContribution.pricePerMonth;
 
+	$scope.cc = {};
+	$scope.cc.expMonth = '01';
+
+	$scope.months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+	$scope.years = [];
+
+	// TODO: Inject date, so we can test.
+	var currentYear = new Date().getFullYear(); 
+	$scope.cc.expYear = currentYear;
+	for (var i=0; i < 25; i++) {
+		$scope.years.push(currentYear);
+		currentYear++;
+	}
+
 	$scope.submitPayment = function() {
 		
 		$scope.result = "...";

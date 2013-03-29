@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-function HelloCtrl($scope, $http) {
+function HelloCtrl($scope, $http, $location, activeContribution) {
 
 	$scope.things = [
 		{
@@ -36,7 +36,6 @@ function HelloCtrl($scope, $http) {
 	];
 
 	var perMonthMultiplier = function (frequency) {
-
 		switch (frequency) {
 			case 'day': 
 				return 365.0 / 12.0;
@@ -50,7 +49,6 @@ function HelloCtrl($scope, $http) {
 			default:
 				return 1.0;
 		}
-
 	};
 
 	$scope.priceNow = function() {
@@ -89,10 +87,25 @@ function HelloCtrl($scope, $http) {
 
 		return pricePerMonth.toFixed(2);
 	};
-}
-HelloCtrl.$inject = ['$scope', '$http'];
 
-function ContributeCtrl($scope, $http) {
+	$scope.toContribute = function() {
+		// TODO: Maybe make a contribution object, for fun.
+		// TODO: Maybe filter out the things that have been selected.
+		activeContribution.things = $scope.things;
+		activeContribution.priceNow = $scope.priceNow();
+		activeContribution.pricePerMonth = $scope.pricePerMonth();
+
+		$location.path('contribute');
+	};
+}
+HelloCtrl.$inject = ['$scope', '$http', '$location', 'activeContribution'];
+
+
+function ContributeCtrl($scope, $http, activeContribution) {
+
+	$scope.things = activeContribution.things;
+	$scope.priceNow = activeContribution.priceNow;
+	$scope.pricePerMonth = activeContribution.pricePerMonth;
 
 	$scope.submitPayment = function() {
 		
@@ -132,6 +145,6 @@ function ContributeCtrl($scope, $http) {
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-ContributeCtrl.$inject = ['$scope', '$http'];
+ContributeCtrl.$inject = ['$scope', '$http', 'activeContribution'];
 
 

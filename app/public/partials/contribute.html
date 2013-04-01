@@ -3,36 +3,45 @@
 <form novalidate id="payment-form" class="css-form">
 	<span class="payment-errors">{{errorMessage}}</span>
 
-	<div class="form-row cardNumberRow">
-		<input class="cardNumber pull-right" type="text" size="20" data-stripe="number" 
-		ng-model="cc.number" placeholder="Credit or debit card number"/>
-	</div>
+	<div class="card pull-left well" style="clear: both">
+		<div class="form-row cardNumberRow">
+			<input class="cardNumber pull-right" type="text" size="20" data-stripe="number" 
+			ng-model="cc.number" placeholder="Credit or debit card number"/>
+		</div>
 
-	<div class="form-row expirationRow">
-		<div class="pull-right">
-			<span>Expiration date </span>
-			<select class="expMonth" data-stripe="exp-month" ng-model="cc.expMonth">
-				<option ng-repeat="month in months">{{month}}</option>
-			</select>
-			<span>/</span>
-			<select class="expYear" data-stripe="exp-year" ng-model="cc.expYear">
-				<option ng-repeat="year in years">{{year}}</option>
-			</select>		
+		<div class="form-row expirationRow">
+			<div class="pull-right">
+				<span>Expiration date </span>
+				<select class="expMonth" data-stripe="exp-month" ng-model="cc.expMonth">
+					<option ng-repeat="month in months">{{month}}</option>
+				</select>
+				<span>/</span>
+				<select class="expYear" data-stripe="exp-year" ng-model="cc.expYear">
+					<option ng-repeat="year in years">{{year}}</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-row cvcRow">
+			<div class="pull-right">
+				<input class="cvcNumber" type="text" size="4" data-stripe="cvc" 
+				ng-model="cc.cvc" placeholder="cvc"/>
+			</div>
 		</div>
 	</div>
 
-	<div class="form-row" style="clear: left">
-	<label>
-		<span>CVC</span>
-		<input type="text" size="4" data-stripe="cvc" ng-model="cc.cvc"/>
-	</label>
+	<div style="clear: both">
+	<div class="form-row" style="clear: both">
+	<p>The price now is {{priceNow}} and the price per month is {{pricePerMonth}}.</p>
 	</div>
 
-
-	<button ng-click="submitPayment()">Submit Payment</button>
-	{{result}}
+	<div class="form-row" style="clear: right">
+		<button class="btn" ng-click="submitPayment()">Submit Payment</button>
+	</div>
+	<div>{{result}}</div>
+</div>
 </form>
 
-<p>The price now is {{priceNow}} and the price per month is {{pricePerMonth}}.
+
 <pre>{{things | json}}</pre>
 

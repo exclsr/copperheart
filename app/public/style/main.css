@@ -143,9 +143,14 @@ a {
 }
 
 
+.card {
+	border: solid 3px #999;
+	background: #f3f3f3;
+	padding: 20px;
+}
 
-.cardNumberRow, .expirationRow {
-	width: 34ex;
+.cardNumberRow, .expirationRow, .cvcRow {
+	width: 35ex;
 }
 .cardNumber {
 	width: 32ex !important;
@@ -159,4 +164,7 @@ a {
 }
 .expYear {
 	width: 10ex !important;
+}
+.cvcNumber {
+	width: 5ex !important;
 }

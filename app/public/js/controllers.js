@@ -4,46 +4,31 @@
 
 function HelloCtrl($scope, $http, $location, session, activeContribution) {
 
-	if (!session.things || session.things.length < 1) {
-		session.things = [
-			{
-				id: "wine",
-				name: "wine",
-				unit: 'glass',
-				price: 5,
-				frequency: 'month'
-			},
-			{
-				id: "internet",
-				name: "Internet",
-				unit: 'day',
-				price: 2,
-				frequency: 'month'
-			},
-			{
-				id: "groceries",
-				name: "groceries",
-				unit: 'day',
-				price: 10,
-				frequency: 'month'
-			},
-			{
-				id: "rent",
-				name: "rent",
-				unit: 'day',
-				price: 30,
-				frequency: 'month'
-			},
-		];
+	// TODO: We'll prob want to call things when traversing from
+	// another page, such as going back from the 'contribute' page.
+	// But that will be a problem for future self ...
+	var initialize = function (data) {
+		$scope.things = session.things = data;
+
+		// When our local 'things' changes, update our session.
+		$scope.$watch('things', function() {
+			session.things = $scope.things;
+		});
 	};
 
-	$scope.things = session.things;
+	if (!session.things || session.things.length < 1) {
+		// TODO: Obviously, will want to make this URL adaptive to 
+		// whatever profile we're looking at.
+		var res = $http.get('/things/phil/');
+		res.success(function(data) {
+			initialize(data);
+		});
 
-	// When our local 'things' changes, update our session.
-	$scope.$watch('things', function() {
-		session.things = $scope.things;
-	});
-
+		res.error(function(data, status, headers, config) {
+			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
+		});
+	};
 
 	var perMonthMultiplier = function (frequency) {
 		switch (frequency) {
@@ -174,9 +159,6 @@ function ContributeCtrl($scope, $http, activeContribution) {
 
 	$scope.submitPayment = function() {
 		
-		console.log($scope.paymentDay);
-		return;
-
 		$scope.result = "...";
 
 		var creditCard = {

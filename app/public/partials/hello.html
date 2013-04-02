@@ -53,8 +53,8 @@
 						ng-show="thing.canHaz && thing.recurring">♥</span>
 				</span>&nbsp;
 			</h4>
-			<p>You've selected things that come to <strong>${{priceNow()}}</strong> now, and
-			${{pricePerMonth()}} each month after that.</p>
+			<p>You've selected things that come to <strong>{{priceNow() | currency}}</strong> now, and
+			{{pricePerMonth() | currency}} each month after that.</p>
 			<div id="contributeButton">
 				<button class="btn btn-inverse" ng-click="toContribute()">Contribute</button>
 			</div>

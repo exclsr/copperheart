@@ -60,8 +60,8 @@ a {
 }
 
 /* Contribution */
-.glyph {
-	background-image: url(/img/glyphicons-halflings.png);	
+.glyph, .drink, .internet, .rent, .groceries {
+	background-image: url(/img/glyphicons-halflings.png);
 	background-repeat: no-repeat;
 	width: 15px;
 	height: 15px;
@@ -143,8 +143,41 @@ a {
 }
 
 
+/* Contribution page */
+/* TODO: Move to its own file */
+.firstColumn {
+	background: pink;
+	margin-left: 0;
+	padding-left: 1.5em;
+}
+.secondColumn {
+	background: #ffc;
+	margin-left: 0;
+	padding-left: 1.5em;
+}
+.thirdColumn {
+	background: #cfc;
+	margin-left: 0;
+	padding-left: 1.5em;
+	padding-right: 1.5em;
+}
+
+ul.contributionList {
+	list-style: none;
+	margin-left: 0;
+}
+
+ul.contributionList .glyph {
+	vertical-align: top;
+	margin-right: 0.5ex;
+}
+
+ul.contributionList .contribution {
+	line-height: 1.5em;
+}
+
 .card {
-	border: solid 3px #999;
+	border: solid 1px #999;
 	background: #f3f3f3;
 	padding: 20px;
 }
@@ -167,4 +200,8 @@ a {
 }
 .cvcNumber {
 	width: 5ex !important;
+}
+
+select.paymentDay {
+	width: 9ex !important;
 }

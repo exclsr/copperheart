@@ -2,38 +2,48 @@
 
 /* Controllers */
 
-function HelloCtrl($scope, $http, $location, activeContribution) {
+function HelloCtrl($scope, $http, $location, session, activeContribution) {
 
-	$scope.things = [
-		{
-			id: "wine",
-			name: "wine",
-			unit: 'glass',
-			price: 5,
-			frequency: 'month'
-		},
-		{
-			id: "internet",
-			name: "Internet",
-			unit: 'day',
-			price: 2,
-			frequency: 'month'
-		},
-		{
-			id: "groceries",
-			name: "groceries",
-			unit: 'day',
-			price: 10,
-			frequency: 'month'
-		},
-		{
-			id: "rent",
-			name: "rent",
-			unit: 'day',
-			price: 30,
-			frequency: 'month'
-		},
-	];
+	if (!session.things || session.things.length < 1) {
+		session.things = [
+			{
+				id: "wine",
+				name: "wine",
+				unit: 'glass',
+				price: 5,
+				frequency: 'month'
+			},
+			{
+				id: "internet",
+				name: "Internet",
+				unit: 'day',
+				price: 2,
+				frequency: 'month'
+			},
+			{
+				id: "groceries",
+				name: "groceries",
+				unit: 'day',
+				price: 10,
+				frequency: 'month'
+			},
+			{
+				id: "rent",
+				name: "rent",
+				unit: 'day',
+				price: 30,
+				frequency: 'month'
+			},
+		];
+	};
+
+	$scope.things = session.things;
+
+	// When our local 'things' changes, update our session.
+	$scope.$watch('things', function() {
+		session.things = $scope.things;
+	});
+
 
 	var perMonthMultiplier = function (frequency) {
 		switch (frequency) {
@@ -54,18 +64,15 @@ function HelloCtrl($scope, $http, $location, activeContribution) {
 	$scope.priceNow = function() {
 		var totalPrice = 0;
 
+		// Angular figures out the data bindind dependencies
+		// here and calls 'priceNow' whenever necessary.
 		angular.forEach($scope.things, function (thing) {
 			if (thing.canHaz) {
 				totalPrice += thing.price;
 			}
 		});
 
-		// TODO: Not sure if formatting should be in here.
-		if (totalPrice === 0) {
-			return totalPrice;
-		}
-
-		return totalPrice.toFixed(2);
+		return totalPrice;
 	};
 
 	$scope.pricePerMonth = function() {
@@ -80,25 +87,28 @@ function HelloCtrl($scope, $http, $location, activeContribution) {
 			}
 		});
 
-		// TODO: Not sure if formatting should be in here.
-		if (pricePerMonth === 0) {
-			return pricePerMonth;
-		}
-
-		return pricePerMonth.toFixed(2);
+		return pricePerMonth;
 	};
 
 	$scope.toContribute = function() {
+
 		// TODO: Maybe make a contribution object, for fun.
-		// TODO: Maybe filter out the things that have been selected.
-		activeContribution.things = $scope.things;
+		activeContribution.things = [];
+
+		// TODO: Maybe use data binding to get this in real-time.
+		angular.forEach($scope.things, function (thing) {
+			if (thing.canHaz) {
+				activeContribution.things.push(thing);
+			}
+		});
+
 		activeContribution.priceNow = $scope.priceNow();
 		activeContribution.pricePerMonth = $scope.pricePerMonth();
 
 		$location.path('contribute');
 	};
 }
-HelloCtrl.$inject = ['$scope', '$http', '$location', 'activeContribution'];
+HelloCtrl.$inject = ['$scope', '$http', '$location', 'session', 'activeContribution'];
 
 
 function ContributeCtrl($scope, $http, activeContribution) {
@@ -107,6 +117,31 @@ function ContributeCtrl($scope, $http, activeContribution) {
 	$scope.priceNow = activeContribution.priceNow;
 	$scope.pricePerMonth = activeContribution.pricePerMonth;
 
+	// For testing ...
+	if (!activeContribution || !activeContribution.things.length > 0) {
+		$scope.things = [
+			{
+				"id": "wine",
+				"name": "wine",
+				"unit": "glass",
+				"price": 5,
+				"frequency": "month",
+				"canHaz": true,
+				"recurring": true
+			},
+			{
+				"id": "internet",
+				"name": "Internet",
+				"unit": "day",
+				"price": 2,
+				"frequency": "month",
+				"canHaz": true
+			}
+		];
+		$scope.priceNow = 7.00;
+		$scope.pricePerMonth = 5.00;
+	}
+
 	$scope.cc = {};
 	$scope.cc.expMonth = '01';
 
@@ -114,15 +149,34 @@ function ContributeCtrl($scope, $http, activeContribution) {
 	$scope.years = [];
 
 	// TODO: Inject date, so we can test.
-	var currentYear = new Date().getFullYear(); 
+	var today = new Date();
+	var currentYear = today.getFullYear(); 
 	$scope.cc.expYear = currentYear;
 	for (var i=0; i < 25; i++) {
 		$scope.years.push(currentYear);
 		currentYear++;
 	}
 
+	$scope.paymentDay = Math.min(today.getDate(), 28);
+	$scope.daysOfTheMonth = [];
+	for (var i=1; i < 29; i++) {
+		$scope.daysOfTheMonth.push(i);
+	}
+	// TODO: See if we can do this with our payment processor.
+	$scope.daysOfTheMonth.push('last');
+
+	var currentMonth = today.getMonth();
+	var nextMonth = currentMonth + 1;
+	if (nextMonth === 12) {
+		nextMonth = 1;
+	}
+	$scope.nextMonth = nextMonth;
+
 	$scope.submitPayment = function() {
 		
+		console.log($scope.paymentDay);
+		return;
+
 		$scope.result = "...";
 
 		var creditCard = {

@@ -11,5 +11,10 @@ angular.module('myApp.services', []).
   	return {
   		things: []
   	};
+  })
+  .factory('session', function() {
+  	return {
+  		things: []
+  	};
   });
 

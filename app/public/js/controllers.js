@@ -7,8 +7,10 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 	// TODO: We'll prob want to call things when traversing from
 	// another page, such as going back from the 'contribute' page.
 	// But that will be a problem for future self ...
-	var initialize = function (data) {
-		$scope.things = session.things = data;
+	var initialize = function (things, thingsReceived) {
+		$scope.things = session.things = things;
+		// TODO: Next step-ish ...
+		// $scope.thingsReceived = session.thingsReceived = thingsReceived;
 
 		// When our local 'things' changes, update our session.
 		$scope.$watch('things', function() {
@@ -168,26 +170,35 @@ function ContributeCtrl($scope, $http, activeContribution) {
 			exp_year: $scope.cc.expYear
 		};
 
+		var makeCharges = function (stripeToken, things) {
+
+			var data = { 
+				stripeToken: stripeToken,
+				things: things
+			};
+				
+			// Put a charge for $1 on the card ...
+			var res = $http.put('/cc/charge/', data);
+			res.success(function(data) {
+				console.log(data);
+				// The server is happy.
+				$scope.result = ":-)";
+			});
+
+			res.error(function(data, status, headers, config) {
+				console.log(data);
+				// The server is sad.
+				$scope.result = ":-("
+			});
+		};
+
 		var stripeResponseHandler = function(status, response) {
 			if (response.error) {
 				// Show the errors on the form
 				$scope.errorMessage = response.error.message;
-			} else {
-				var data = { stripeToken: response.id };
-				
-				// Put a charge for $1 on the card ...
-				var res = $http.put('/cc/charge/', data);
-				res.success(function(data) {
-					console.log(data);
-					// The server is happy.
-					$scope.result = ":-)";
-				});
-
-				res.error(function(data, status, headers, config) {
-					console.log(data);
-					// The server is sad.
-					$scope.result = ":-("
-				});
+			} 
+			else {
+				makeCharges(response.id, $scope.things);
 			}
 		};
 

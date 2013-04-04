@@ -72,13 +72,148 @@ app.get('/things/phil/', function (req, res) {
 // app.get('/', routes.index);
 // app.get('/users', user.list);
 
+// TODO: Figure out a way to share this price code
+// on both the client and the server (if practical).
+var priceNow = function(things) {
+	var totalPrice = 0;
+
+	things.forEach(function (thing) {
+		if (thing.canHaz) {
+			totalPrice += thing.price;
+		}
+	});
+
+	return totalPrice.toFixed(2);
+};
+
+// TODO: Figure out a way to share this price code
+// on both the client and the server (if practical).
+var perMonthMultiplier = function (frequency) {
+	switch (frequency) {
+		case 'day': 
+			return 365.0 / 12.0;
+
+		case 'week': 
+			// There are 4 and 1/3 weeks 
+			// each month, on average.
+			return 52.0 / 12.0;
+
+		case 'month':
+		default:
+			return 1.0;
+	}
+};
+
+// TODO: Figure out a way to share this price code
+// on both the client and the server (if practical).
+var pricePerMonth = function(things) {
+	var pricePerMonth = 0;
+
+	things.forEach(function (thing) {
+		var itemPrice = 0;
+
+		if (thing.canHaz && thing.recurring) {
+			itemPrice = thing.price * perMonthMultiplier(thing.frequency);
+			pricePerMonth += itemPrice;
+		}
+	});
+
+	return pricePerMonth;
+};
+
+
+var chargeSubscriptions = function (things, success, failure) {
+	// This is one person's monthly contribution into to
+	// the pool ....
+	// TODO: This is an important point. Will need to 
+	// refactor a bit of code to make this happen.
+
+	// TODO: Give each plan a a unique name
+	var planId = 'anon-contribution';
+	var planName = 'anon contribution';
+
+	var planRequest = {
+		id: planId, 
+		amount: 0,
+		currency: 'usd',
+		interval: 'month',
+		interval_count: 1,
+		name: planName,
+		trial_period_days: 2 
+		// TODO: calculate the trial period based on what day they want to pay.
+		// maybe. need to figure out how plans are first charged. a better way
+		// might be to just add things to a commit pool and take them out at
+		// a scheduled time (as per client's config).
+	};
+
+
+	var updatePlan = function (success, failure) {
+			// Delete the existing plan and create a new one with the same name.
+			stripe.plans.del(planId, function (err, deleteResponse) {
+				if (err) {
+					failure(err);
+				}
+				else {
+					// Plan was deleted. Create plan anew.
+					stripe.plans.create(planRequest, function (err, planResponse) {
+						if (err) {
+							failure(err);
+						}
+						else {
+							success(planResponse);
+						}
+					});
+				}
+			});
+	};
+
+	stripe.plans.create(planRequest, function (err, planResponse) {
+		if (err) {
+			if (err.name === 'invalid_request_error') {
+				// Probably already have a subscription.
+				// TODO: MVP: Confirm this before updating the plan.
+				updatePlan(success, failure);
+			}
+			else {
+				failure(err);
+			}
+		}
+		else {
+			success(planResponse);
+		}
+	});
+
+};
+
+
 app.put('/cc/charge/', function (req, res) {
 
 	var stripeToken = req.body.stripeToken;
-	console.log(stripeToken);
+	var things = req.body.things;
 
+	var success = function(planResponse) {
+		console.log(planResponse);
+		res.send("Ok!");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	chargeSubscriptions(things, success, failure);
+	return;
+
+	// TODO: MVP: Get things from our database, so that
+	// we use the prices in there and not the ones
+	// given to us by the client.
+
+	var oneTimeCharge = priceNow(things);
+	var oneTimeChargeInCents = oneTimeCharge * 100;
+
+	// TODO: MVP: Put email (or id) of backer in the description, below
 	var chargeRequest = {
-		amount: 100,
+		amount: oneTimeChargeInCents,
 		currency: 'usd',
 		card: stripeToken,
 		description: 'among the first tests'
@@ -91,6 +226,8 @@ app.put('/cc/charge/', function (req, res) {
 			res.send(500);
 		}
 		else {
+			// Success! 
+
 			console.log(chargeResponse);
 			res.send("Ok");
 		}

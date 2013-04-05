@@ -4,11 +4,12 @@
  */
 
 var express = require('express')
-	, routes = require('./routes')
-	, user = require('./routes/user')
-	, http = require('http')
-	, path = require('path')
-	, config = require('./config.js');
+	, routes  = require('./routes')
+	, user    = require('./routes/user')
+	, http    = require('http')
+	, path    = require('path')
+	, config  = require('./config.js')
+	, auth    = require('./lib/auth.js');
 
 var apiKey = config.stripeApiTest(); 
 var stripe = require('stripe')(apiKey);
@@ -22,6 +23,14 @@ app.configure(function(){
 	app.use(express.favicon());
 	app.use(express.logger('dev'));
 	app.use(express.bodyParser());
+	app.use(auth.firstRun); // TODO: Auth ...
+	// Required for auth:
+	// TODO: Consolidate these things somewhere appropriate.
+	app.use(express.cookieParser());
+	app.use(express.session({ secret: config.sessionSecret() }));
+	app.use(auth.initialize());
+	app.use(auth.session());
+	// end-required for auth.
 	app.use(express.methodOverride());
 	app.use(app.router);
 	app.use(express.static(path.join(__dirname, 'public')));
@@ -30,6 +39,49 @@ app.configure(function(){
 app.configure('development', function(){
 	app.use(express.errorHandler());
 });
+
+//----------------------------------------------------------------
+// Data: Authentication
+//----------------------------------------------------------------
+var loginFailureUrl = '/';
+
+// GET /auth/google
+//   Use auth.authenticate() as route middleware to authenticate the
+//   request. The first step in Google authentication will involve redirecting
+//   the user to google.com. After authenticating, Google will redirect the
+//   user back to this application at /auth/google/return
+app.get('/auth/google', 
+	auth.authenticate('google', { failureRedirect: loginFailureUrl }),
+		function(req, res) {
+			// This response doesn't matter, because we get redirected
+			// to /auth/google/return anyway.
+			res.send(':-)');
+		}
+);
+
+// GET /auth/google/return
+app.get(auth.googleReturnUrl, auth.authMiddleware);
+
+// Logout ...
+app.get('/auth/logout', function(req, res){
+	req.logout();
+	res.redirect('/');
+});
+
+// Simple route middleware to ensure user is authenticated.
+//   Use this route middleware on any resource that needs to be protected.  If
+//   the request is authenticated (typically via a persistent login session),
+//   the request will proceed.  Otherwise, the user will be given a 401.
+var ensureAuthenticated = function(req, res, next) {
+	if (req.isAuthenticated()) { 
+		return next(); 
+	}
+
+	// TODO: Make it so we don't get here, and we're just
+	// logged in as a guest or anonymous.
+	res.send(401, "Nope.");
+};
+
 
 app.get('/things/phil/', function (req, res) {
 	var things = [

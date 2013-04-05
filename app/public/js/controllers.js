@@ -16,6 +16,17 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 		$scope.$watch('things', function() {
 			session.things = $scope.things;
 		});
+
+		// TODO: Mawhhhhhh ...
+		var res = $http.get('/whoami');
+		res.success(function(data) {
+			$scope.whoami = session.whoami = data;
+		});
+
+		res.error(function(data, status, headers, config) {
+			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
+		});
 	};
 
 	if (!session.things || session.things.length < 1) {
@@ -98,8 +109,9 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 HelloCtrl.$inject = ['$scope', '$http', '$location', 'session', 'activeContribution'];
 
 
-function ContributeCtrl($scope, $http, activeContribution) {
+function ContributeCtrl($scope, $http, session, activeContribution) {
 
+	$scope.whoami = session.whoami;
 	$scope.things = activeContribution.things;
 	$scope.priceNow = activeContribution.priceNow;
 	$scope.pricePerMonth = activeContribution.pricePerMonth;
@@ -206,6 +218,6 @@ function ContributeCtrl($scope, $http, activeContribution) {
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-ContributeCtrl.$inject = ['$scope', '$http', 'activeContribution'];
+ContributeCtrl.$inject = ['$scope', '$http', 'session', 'activeContribution'];
 
 

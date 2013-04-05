@@ -122,7 +122,7 @@ var pricePerMonth = function(things) {
 };
 
 
-var chargeSubscriptions = function (things, success, failure) {
+var createSubscriptionPlan = function (things, success, failure) {
 	// This is one person's monthly contribution into to
 	// the pool ....
 	// TODO: This is an important point. Will need to 
@@ -185,14 +185,36 @@ var chargeSubscriptions = function (things, success, failure) {
 
 };
 
+var createCustomer = function (stripeToken, planId, success, failure) {
+
+	// TODO: Before we go much farther with this, we need to start
+	// talking about the notion of people logging in on the site, and
+	// looking up customer objects from the email address on our side 
+	// (and then looking up customers via stripe IDs).
+	var customerRequest = {
+		card: stripeToken,
+		description: 'anon customer', // TODO: ...
+		plan: planId
+	};
+
+	stripe.customers.create(customerRequest, function (err, customerResponse) {
+		if (err) {
+			failure(err);
+		}
+		else {
+			success(customerResponse);
+		}
+	});
+};
 
 app.put('/cc/charge/', function (req, res) {
 
 	var stripeToken = req.body.stripeToken;
 	var things = req.body.things;
 
-	var success = function(planResponse) {
-		console.log(planResponse);
+	var customerCreated = function (customer) {
+
+		console.log(customer);
 		res.send("Ok!");
 	};
 
@@ -201,7 +223,14 @@ app.put('/cc/charge/', function (req, res) {
 		res.send(500);
 	};
 
-	chargeSubscriptions(things, success, failure);
+	var success = function(planResponse) {
+		console.log(planResponse);
+
+		createCustomer(stripeToken, planResponse.id, customerCreated, failure);
+	};
+
+
+	createSubscriptionPlan(things, success, failure);
 	return;
 
 	// TODO: MVP: Get things from our database, so that

@@ -52,7 +52,7 @@ var loginFailureUrl = '/';
 //   user back to this application at /auth/google/return
 app.get('/auth/google', 
 	auth.authenticate('google', { failureRedirect: loginFailureUrl }),
-		function(req, res) {
+		function (req, res) {
 			// This response doesn't matter, because we get redirected
 			// to /auth/google/return anyway.
 			res.send(':-)');
@@ -63,7 +63,7 @@ app.get('/auth/google',
 app.get(auth.googleReturnUrl, auth.authMiddleware);
 
 // Logout ...
-app.get('/auth/logout', function(req, res){
+app.get('/auth/logout', function (req, res){
 	req.logout();
 	res.redirect('/');
 });
@@ -82,6 +82,16 @@ var ensureAuthenticated = function(req, res, next) {
 	res.send(401, "Nope.");
 };
 
+app.get('/whoami', function (req, res) {
+	if (req.user) {
+		// TODO: Edit the serialization methods inside
+		// auth.js so that we don't have to dig in like this.
+		res.send(req.user.emails[0].value);
+	}
+	else {
+		res.send("anonymous");
+	}
+});
 
 app.get('/things/phil/', function (req, res) {
 	var things = [

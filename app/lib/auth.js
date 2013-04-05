@@ -68,11 +68,11 @@ var firstRun = function(req, res, next) {
 //   the user by ID when deserializing.  However, since this example does not
 //   have a database of user records, the complete Google profile is serialized
 //   and deserialized.
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
 	done(null, user);
 });
 
-passport.deserializeUser(function(obj, done) {
+passport.deserializeUser(function (obj, done) {
 	done(null, obj);
 }); 
 

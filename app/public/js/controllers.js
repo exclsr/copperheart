@@ -17,7 +17,7 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 			session.things = $scope.things;
 		});
 
-		// TODO: Mawhhhhhh ...
+		// TODO: Mwahhhhhh ...
 		var res = $http.get('/whoami');
 		res.success(function(data) {
 			$scope.whoami = session.whoami = data;
@@ -182,11 +182,13 @@ function ContributeCtrl($scope, $http, session, activeContribution) {
 			exp_year: $scope.cc.expYear
 		};
 
-		var makeCharges = function (stripeToken, things) {
+		var makeCharges = function (username, things, stripeToken) {
 
+			// TODO: Revisit the names of these.
 			var data = { 
 				stripeToken: stripeToken,
-				things: things
+				things: things,
+				username: username
 			};
 				
 			// Put a charge for $1 on the card ...
@@ -210,7 +212,7 @@ function ContributeCtrl($scope, $http, session, activeContribution) {
 				$scope.errorMessage = response.error.message;
 			} 
 			else {
-				makeCharges(response.id, $scope.things);
+				makeCharges($scope.whoami, $scope.things, response.id);
 			}
 		};
 

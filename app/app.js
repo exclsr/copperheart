@@ -180,23 +180,26 @@ var pricePerMonth = function(things) {
 		}
 	});
 
-	return pricePerMonth;
+	return pricePerMonth.toFixed(2);
 };
 
 
-var createSubscriptionPlan = function (things, success, failure) {
+var createSubscriptionPlan = function (username, things, success, failure) {
 	// This is one person's monthly contribution into to
 	// the pool ....
 	// TODO: This is an important point. Will need to 
 	// refactor a bit of code to make this happen.
 
 	// TODO: Give each plan a a unique name
-	var planId = 'anon-contribution';
-	var planName = 'anon contribution';
+	var planId = username + '-contribution';
+	var planName = username + ' contribution';
+
+	var pricePerMonth = pricePerMonth(things);
+	var pricePerMonthInCents = pricePerMonth * 100;
 
 	var planRequest = {
 		id: planId, 
-		amount: 0,
+		amount: pricePerMonthInCents,
 		currency: 'usd',
 		interval: 'month',
 		interval_count: 1,
@@ -247,7 +250,15 @@ var createSubscriptionPlan = function (things, success, failure) {
 
 };
 
-var createCustomer = function (stripeToken, planId, success, failure) {
+var createCustomer = function (username, stripeToken, planId, success, failure) {
+
+	// TODO: 
+	// 1. Get user from our database.
+	// 2. See if that customer has a Stripe ID.
+	// 3. If they do, cool. 
+	// 4. If they don't, create the Stripe customer.
+	// 5. Save the Stripe ID in the user obj.
+	// 6. Save the user obj to our database.
 
 	// TODO: Before we go much farther with this, we need to start
 	// talking about the notion of people logging in on the site, and
@@ -255,7 +266,7 @@ var createCustomer = function (stripeToken, planId, success, failure) {
 	// (and then looking up customers via stripe IDs).
 	var customerRequest = {
 		card: stripeToken,
-		description: 'anon customer', // TODO: ...
+		description: username, 
 		plan: planId
 	};
 
@@ -273,9 +284,11 @@ app.put('/cc/charge/', function (req, res) {
 
 	var stripeToken = req.body.stripeToken;
 	var things = req.body.things;
+	// TODO: this is the customer id to look up 
+	// and get from the db 
+	var username = req.body.username; 
 
 	var customerCreated = function (customer) {
-
 		console.log(customer);
 		res.send("Ok!");
 	};
@@ -285,14 +298,13 @@ app.put('/cc/charge/', function (req, res) {
 		res.send(500);
 	};
 
-	var success = function(planResponse) {
+	var planCreated = function(planResponse) {
 		console.log(planResponse);
-
-		createCustomer(stripeToken, planResponse.id, customerCreated, failure);
+		createCustomer(username, stripeToken, planResponse.id, customerCreated, failure);
 	};
 
 
-	createSubscriptionPlan(things, success, failure);
+	createSubscriptionPlan(username, things, planCreated, failure);
 	return;
 
 	// TODO: MVP: Get things from our database, so that

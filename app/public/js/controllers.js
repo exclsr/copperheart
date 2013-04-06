@@ -41,7 +41,11 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 			// TODO: Something terrible went wrong. Deal with it.
 			console.log(data);
 		});
-	};
+	}
+	else {
+		$scope.things = session.things;
+		$scope.whoami = session.whoami;
+	}
 
 	var perMonthMultiplier = function (frequency) {
 		switch (frequency) {

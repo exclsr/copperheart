@@ -182,13 +182,13 @@ function ContributeCtrl($scope, $http, session, activeContribution) {
 			exp_year: $scope.cc.expYear
 		};
 
-		var makeCharges = function (username, things, stripeToken) {
+		var makeCharges = function (patronId, things, stripeToken) {
 
 			// TODO: Revisit the names of these.
 			var data = { 
 				stripeToken: stripeToken,
 				things: things,
-				username: username
+				patronId: patronId
 			};
 				
 			// Put a charge for $1 on the card ...

@@ -68,18 +68,20 @@ app.get('/auth/logout', function (req, res){
 	res.redirect('/');
 });
 
-// Simple route middleware to ensure user is authenticated.
+// Simple route middleware to ensure client is authenticated.
 //   Use this route middleware on any resource that needs to be protected.  If
 //   the request is authenticated (typically via a persistent login session),
-//   the request will proceed.  Otherwise, the user will be given a 401.
+//   the request will proceed.  Otherwise, the client will be given a 401.
 var ensureAuthenticated = function(req, res, next) {
 	if (req.isAuthenticated()) { 
 		return next(); 
 	}
 
-	// TODO: Make it so we don't get here, and we're just
-	// logged in as a guest or anonymous.
-	res.send(401, "Nope.");
+	res.header("WWW-Authenticate", "Google OpenID")
+	res.send(401,
+		"To get a more desirable response," +
+		" please first authenticate with the server," +
+		" and try again.");
 };
 
 app.get('/whoami', function (req, res) {
@@ -184,18 +186,26 @@ var pricePerMonth = function(things) {
 };
 
 
-var createSubscriptionPlan = function (username, things, success, failure) {
-	// This is one person's monthly contribution into to
-	// the pool ....
-	// TODO: This is an important point. Will need to 
-	// refactor a bit of code to make this happen.
+var getStripePlanId = function (patronId) {
+	return patronId + '-contribution';
+}
 
-	// TODO: Give each plan a a unique name
-	var planId = username + '-contribution';
-	var planName = username + ' contribution';
+var getStripePlanRequest = function (patronId, things) {
+	// This is one person's monthly contribution into to the pool.
+	//
+	// TODO: This is an important point if we ever want
+	// to have more than one person receiving money.
+	//
+	// Will need to update the things array to include 
+	// all other payments -- right now we're just working 
+	// with the active session. This will have to be taken 
+	// care of when there is more than one person receiving.
 
-	var pricePerMonth = pricePerMonth(things);
-	var pricePerMonthInCents = pricePerMonth * 100;
+	var planId = getStripePlanId(patronId);
+	var planName = patronId + ' contribution';
+
+	var price = pricePerMonth(things);
+	var pricePerMonthInCents = price * 100;
 
 	var planRequest = {
 		id: planId, 
@@ -211,100 +221,120 @@ var createSubscriptionPlan = function (username, things, success, failure) {
 		// a scheduled time (as per client's config).
 	};
 
-
-	var updatePlan = function (success, failure) {
-			// Delete the existing plan and create a new one with the same name.
-			stripe.plans.del(planId, function (err, deleteResponse) {
-				if (err) {
-					failure(err);
-				}
-				else {
-					// Plan was deleted. Create plan anew.
-					stripe.plans.create(planRequest, function (err, planResponse) {
-						if (err) {
-							failure(err);
-						}
-						else {
-							success(planResponse);
-						}
-					});
-				}
-			});
-	};
-
-	stripe.plans.create(planRequest, function (err, planResponse) {
-		if (err) {
-			if (err.name === 'invalid_request_error') {
-				// Probably already have a subscription.
-				// TODO: MVP: Confirm this before updating the plan.
-				updatePlan(success, failure);
-			}
-			else {
-				failure(err);
-			}
-		}
-		else {
-			success(planResponse);
-		}
-	});
-
+	return planRequest;
 };
 
-var createCustomer = function (username, stripeToken, planId, success, failure) {
 
-	// TODO: 
-	// 1. Get user from our database.
-	// 2. See if that customer has a Stripe ID.
-	// 3. If they do, cool. 
-	// 4. If they don't, create the Stripe customer.
-	// 5. Save the Stripe ID in the user obj.
-	// 6. Save the user obj to our database.
+app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 
-	// TODO: Before we go much farther with this, we need to start
-	// talking about the notion of people logging in on the site, and
-	// looking up customer objects from the email address on our side 
-	// (and then looking up customers via stripe IDs).
-	var customerRequest = {
-		card: stripeToken,
-		description: username, 
-		plan: planId
-	};
-
-	stripe.customers.create(customerRequest, function (err, customerResponse) {
-		if (err) {
-			failure(err);
-		}
-		else {
-			success(customerResponse);
-		}
-	});
-};
-
-app.put('/cc/charge/', function (req, res) {
-
+	var patronId = req.body.patronId;
 	var stripeToken = req.body.stripeToken;
 	var things = req.body.things;
-	// TODO: this is the customer id to look up 
-	// and get from the db 
-	var username = req.body.username; 
 
-	var customerCreated = function (customer) {
-		console.log(customer);
+	var patron = req.user;
+	// TODO: Update the server-side-patron schema to be better than this.
+	var serverSidePatronId = patron.emails[0].value
+
+	if (patronId !== serverSidePatronId) {
+		res.send(412, 
+			"The patron name specified in your request does not match" +
+			" who the server thinks is logged in." + 
+			" Can you help us solve this mystery?");
+		return;
+	}
+	//
+	// We are now authenticated, and have a user object.
+	//
+	var success = function(patronId) {
+		console.log(patronId);
 		res.send("Ok!");
-	};
+	}
 
 	var failure = function (err) {
 		console.log(err);
 		res.send(500);
 	};
 
-	var planCreated = function(planResponse) {
-		console.log(planResponse);
-		createCustomer(username, stripeToken, planResponse.id, customerCreated, failure);
-	};
+	// TODO: 
+	// 5. Save the Stripe ID in the patron obj.
+	// 6. Save the patron obj to our database.
 
 
-	createSubscriptionPlan(username, things, planCreated, failure);
+	// 1. See if our patron has a Stripe ID.
+	if (patron.stripeId) {
+		// If they do, cool. That means they've been here before, 
+		// and we need to update their subscription plan in Stripe.
+
+		// Furthermore, Stripe doesn't allow us to edit subscriptions
+		// once they've been created. That's fine. Let's delete
+		// the active subscription, and create a new one with the
+		// details that we want.
+		var createPlanAnew = function () {
+			var planRequest = getStripePlanRequest(patronId, things);
+			stripe.plans.create(planRequest, function (err, planResponse) {
+				// TODO: Do anything with the response?
+				err ? failure(err) : success(patronId);
+			});
+		};
+
+		var handleDeleteResponse = function (err, deleteResponse) {
+			// Plan was deleted. Create plan anew.
+			err ? failure(err) : createPlanAnew();
+		};
+
+		var deleteAndCreatePlan = function () {
+			var stripePlanId = getStripePlanId(patronId);
+			stripe.plans.del(stripePlanId, handleDeleteResponse);
+		};
+
+		deleteAndCreatePlan();
+	}
+	else {
+		// If the patron doesn't have a Stripe ID, cool. That 
+		// means we need to create a customer for them in Stripe, 
+		// create a subscription plan for them, and associate the two.
+		var stripeCustomerCreated = function (customerResponse) {
+			patron.stripeId = customerResponse.id;
+			// TODO: What if we fail at this point? That's not cool,
+			// because then we have some stuff on the Stripe servers
+			// that isn't referenced on ours. That would be bad.
+			//
+			// Possible solution: Run audits every night on the data.
+			// Every subscription in our Stripe database has a customer id
+			// associated with it, and so that customer id should be
+			// found in our data.
+
+			// TODO: Existing patrons will fail until the following is complete.
+			// db.patron.update(patron, success, failure);
+		};
+
+		var stripePlanCreated = function (planResponse) {
+			// After creating the Stripe plan, 
+			// make a Stripe customer to associate with the plan.
+			var customerRequest = {
+				card: stripeToken,
+				description: patronId, 
+				plan: planResponse.id
+			};
+
+			stripe.customers.create(customerRequest, function (err, customerResponse) {
+				err ? failure(err) : stripeCustomerCreated(customerResponse);
+			});
+		};
+
+		// It's more convenient to create a subscription plan,
+		// before creating a customer, so we can create a customer
+		// and associate them with a plan in one step.
+		var createPlanAndCustomer = function () {
+			var planRequest = getStripePlanRequest(patronId, things);
+			stripe.plans.create(planRequest, function (err, planResponse) {
+				err ? failure(err) : stripePlanCreated(planResponse);
+			});
+		};
+		
+		createPlanAndCustomer();
+	}
+
 	return;
 
 	// TODO: MVP: Get things from our database, so that

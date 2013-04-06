@@ -9,7 +9,8 @@ var express = require('express')
 	, http    = require('http')
 	, path    = require('path')
 	, config  = require('./config.js')
-	, auth    = require('./lib/auth.js');
+	, auth    = require('./lib/auth.js')
+	, db      = require('./lib/database.js').db;
 
 var apiKey = config.stripeApiTest(); 
 var stripe = require('stripe')(apiKey);
@@ -86,9 +87,8 @@ var ensureAuthenticated = function(req, res, next) {
 
 app.get('/whoami', function (req, res) {
 	if (req.user) {
-		// TODO: Edit the serialization methods inside
-		// auth.js so that we don't have to dig in like this.
-		res.send(req.user.emails[0].value);
+		var patron = req.user;
+		res.send(patron.id);
 	}
 	else {
 		res.send("anonymous");
@@ -232,8 +232,7 @@ app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 	var things = req.body.things;
 
 	var patron = req.user;
-	// TODO: Update the server-side-patron schema to be better than this.
-	var serverSidePatronId = patron.emails[0].value
+	var serverSidePatronId = patron.id;
 
 	if (patronId !== serverSidePatronId) {
 		res.send(412, 
@@ -246,7 +245,10 @@ app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 	// We are now authenticated, and have a user object.
 	//
 	var success = function(patronId) {
-		console.log(patronId);
+		if (patronId) {
+			console.log(patronId);
+		}
+		
 		res.send("Ok!");
 	}
 
@@ -254,11 +256,6 @@ app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 		console.log(err);
 		res.send(500);
 	};
-
-	// TODO: 
-	// 5. Save the Stripe ID in the patron obj.
-	// 6. Save the patron obj to our database.
-
 
 	// 1. See if our patron has a Stripe ID.
 	if (patron.stripeId) {
@@ -303,9 +300,7 @@ app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 			// Every subscription in our Stripe database has a customer id
 			// associated with it, and so that customer id should be
 			// found in our data.
-
-			// TODO: Existing patrons will fail until the following is complete.
-			// db.patron.update(patron, success, failure);
+			db.patrons.save(patron, success, failure);
 		};
 
 		var stripePlanCreated = function (planResponse) {
@@ -317,6 +312,9 @@ app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 				plan: planResponse.id
 			};
 
+			console.log("Creating customer ...");
+			// TODO: If we get a failure at this point, we have a data
+			// integrity issue, because it is likely a customer already exists.
 			stripe.customers.create(customerRequest, function (err, customerResponse) {
 				err ? failure(err) : stripeCustomerCreated(customerResponse);
 			});
@@ -327,6 +325,9 @@ app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 		// and associate them with a plan in one step.
 		var createPlanAndCustomer = function () {
 			var planRequest = getStripePlanRequest(patronId, things);
+			console.log("Creating plan ...");
+			// TODO: If we get a failure at this point, we have a data
+			// integrity issue, because it is likely a plan already exists.
 			stripe.plans.create(planRequest, function (err, planResponse) {
 				err ? failure(err) : stripePlanCreated(planResponse);
 			});

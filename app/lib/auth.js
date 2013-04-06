@@ -4,7 +4,8 @@
 // The thing that knows about authentication.
 //
 var passport = require('passport')
-  , GoogleStrategy = require('passport-google').Strategy;
+  , GoogleStrategy = require('passport-google').Strategy
+  , db = require('./database.js').db;
 
 var allowedUsers = []; // TODO: Get from db
 
@@ -69,11 +70,28 @@ var firstRun = function(req, res, next) {
 //   have a database of user records, the complete Google profile is serialized
 //   and deserialized.
 passport.serializeUser(function (user, done) {
-	done(null, user);
+	// Input: 'user' is what we get from Google when using OpenID.
+	// Output: we call 'done(error, userId)' to tell passport we're done.
+	var userEmail = user.emails[0].value;
+	done(null, userEmail);
 });
 
-passport.deserializeUser(function (obj, done) {
-	done(null, obj);
+passport.deserializeUser(function (userEmail, done) {
+	// Input: 'userEmail' is what we saved in the serializeUser step.
+	// --> TODO: confirm the above is true.
+	// Output: we call 'done(error, userId)' to tell passport we're done.
+		db.patrons.get(userEmail, 
+			function (data) {
+				// Success.
+				done(null, data);
+			},
+			function (error) {
+				// Failure.
+				var newPatron = {
+					id: userEmail
+				}
+				done(null, newPatron);
+		});
 }); 
 
 

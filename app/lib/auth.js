@@ -80,18 +80,24 @@ passport.deserializeUser(function (userEmail, done) {
 	// Input: 'userEmail' is what we saved in the serializeUser step.
 	// --> TODO: confirm the above is true.
 	// Output: we call 'done(error, userId)' to tell passport we're done.
-		db.patrons.get(userEmail, 
-			function (data) {
-				// Success.
-				done(null, data);
-			},
-			function (error) {
-				// Failure.
-				var newPatron = {
-					id: userEmail
-				}
-				done(null, newPatron);
-		});
+	var defaultNewUser = {
+		id: userEmail,
+		email: userEmail
+	};
+
+	db.patrons.get(userEmail, 
+		function (data) {
+			// Success.
+			if (!data || data === "" || data.length === 0) {
+				// Not found.
+				data = defaultNewUser;
+			}
+			done(null, data);
+		},
+		function (error) {
+			// Failure.
+			done(null, defaultNewUser);
+	});
 }); 
 
 

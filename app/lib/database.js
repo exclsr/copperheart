@@ -27,10 +27,10 @@ var db = function() {
 			url: '_design/patrons',
 			body: 
 			{
-				all: {
+				byEmail: {
 					map: function(doc) {
-						if (doc.name) {
-							emit(doc.name, doc);
+						if (doc.email) {
+							emit(doc.email, doc);
 						}
 					}
 				}
@@ -44,7 +44,7 @@ var db = function() {
 
 		database.get(patronsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
-				|| !doc.views.all
+				|| !doc.views.byEmail
 				|| forceDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
@@ -74,8 +74,17 @@ var db = function() {
 	var getView = function(viewUrl, success, failure, viewGenerationOptions) {
 		database.view(viewUrl, viewGenerationOptions, function (error, response) {
 			if (error) {
-				console.log(error);
 				failure(error);
+				return;
+			}
+
+			// Return the first row only, if the flag is indicated.
+			if (viewGenerationOptions 
+			&& viewGenerationOptions.firstOnly 
+			&& response.length > 0) {
+				// TODO: Ok, how should we really do something like this?
+				// The semantics are inconsistent with the other way.
+				success(response[0].value);
 				return;
 			}
 
@@ -92,15 +101,16 @@ var db = function() {
 		getView('patrons/all', success, failure);
 	};
 
+	var patronsByEmail = function (success, failure, options) {
+		getView('patrons/byEmail', success, failure, options);
+	};
+
 	var getPatron = function (patronId, success, failure) {
-		database.get(patronId, function (error, response) {
-			// TODO: Make sure this is the right data.
-			error ? failure(error) : success(response);
-		});
+		patronsByEmail(success, failure, {key: patronId, firstOnly: true});
 	};
 
 	var savePatron = function (patron, success, failure) {
-		database.save(patron.id, patron, function (error, response) {
+		database.save(patron, function (error, response) {
 			// TODO: What to do with response, if anything?
 			error ? failure(error) : success();
 		});

@@ -116,11 +116,20 @@ app.get('/contributions/:toUsername', function (req, res) {
 		res.send([]);
 		return;
 	}
-
+	//
+	// At this point, it's implied that we're logged in,
+	// and we're looking for the contributions from
+	// the logged-in patron to the person associated 
+	// with specified username.
+	//
 	var patron = req.user;
 
-	var success = function (contributions) {
-		res.send(contributions);
+	var success = function (rawContribution) {
+		// TODO: Probably want to modify our data
+		// layer so we don't have to do this all 
+		// the time.
+		var things = rawContribution[0].things;
+		res.send(things);
 	}
 
 	var failure = function (err) {
@@ -255,7 +264,7 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 			console.log(patronId);
 		}
 		
-		res.send("Ok!");
+		res.send("♥");
 	}
 
 	var failure = function (err) {
@@ -382,7 +391,6 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 		}
 		else {
 			// Success! 
-
 			console.log(chargeResponse);
 			res.send("Ok");
 		}

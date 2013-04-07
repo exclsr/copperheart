@@ -7,40 +7,82 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 	// TODO: We'll prob want to call things when traversing from
 	// another page, such as going back from the 'contribute' page.
 	// But that will be a problem for future self ...
-	var initialize = function (things, thingsReceived) {
-		$scope.things = session.things = things;
-		// TODO: Next step-ish ...
-		// $scope.thingsReceived = session.thingsReceived = thingsReceived;
+	var initialize = function () {
 
-		// When our local 'things' changes, update our session.
-		$scope.$watch('things', function() {
-			session.things = $scope.things;
+		var everythingAtOnce = function (things, contributions) {
+			if (things && contributions) {
+
+				// TODO: Make this look better. This is O(n^2), but
+				// that's probably ok in this situation, as n is probably
+				// less than 100.
+				var mergedThings = [];
+				angular.forEach(things, function (thing) {
+					var isContributionFound = false;
+
+					angular.forEach(contributions, function (contribution) {
+						if (contribution.id === thing.id) {
+							isContributionFound = true;
+							mergedThings.push(contribution);
+						}
+					});
+
+					if (!isContributionFound) {
+						mergedThings.push(thing);
+					}
+					
+				});
+
+				$scope.things = session.things = mergedThings;
+				// When our local 'things' changes, update our session.
+				$scope.$watch('things', function() {
+					session.things = $scope.things;
+				});
+			}
+		};
+
+		var profileName = "phil";
+		var blahThings, blahContributions; // TODO: Rename.
+
+		// TODO: Obviously, will want to make this URL adaptive to 
+		// whatever profile we're looking at.
+		var thingsRes = $http.get('/things/' + profileName + '/');
+
+		thingsRes.success(function (things) {
+			blahThings = things;
+			everythingAtOnce(blahThings, blahContributions);
 		});
 
-		// TODO: Mwahhhhhh ...
-		var res = $http.get('/whoami');
-		res.success(function(data) {
-			$scope.whoami = session.whoami = data;
+		thingsRes.error(function (data, status, headers, config) {
+			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
 		});
 
-		res.error(function(data, status, headers, config) {
+
+		var contributionsRes = $http.get('/contributions/' + profileName + '/');
+		contributionsRes.success(function (contributions) {
+			blahContributions = contributions;
+			everythingAtOnce(blahThings, blahContributions);
+		});
+
+		contributionsRes.error(function (data, status, headers, config) {
+			// TODO: Once again, need an error handling scheme.
+			console.log(data);
+		})
+
+
+		var whoRes = $http.get('/whoami');
+		whoRes.success(function (patronId) {
+			$scope.whoami = session.whoami = patronId;
+		});
+
+		whoRes.error(function(data, status, headers, config) {
 			// TODO: Something terrible went wrong. Deal with it.
 			console.log(data);
 		});
 	};
 
 	if (!session.things || session.things.length < 1) {
-		// TODO: Obviously, will want to make this URL adaptive to 
-		// whatever profile we're looking at.
-		var res = $http.get('/things/phil/');
-		res.success(function(data) {
-			initialize(data);
-		});
-
-		res.error(function(data, status, headers, config) {
-			// TODO: Something terrible went wrong. Deal with it.
-			console.log(data);
-		});
+		initialize();
 	}
 	else {
 		$scope.things = session.things;

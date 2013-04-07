@@ -157,7 +157,7 @@ var priceNow = function(things) {
 	var totalPrice = 0;
 
 	things.forEach(function (thing) {
-		if (thing.canHaz) {
+		if (thing.canHaz && !thing.recurring) {
 			totalPrice += thing.price;
 		}
 	});

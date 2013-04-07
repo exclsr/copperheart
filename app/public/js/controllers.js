@@ -111,7 +111,7 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 		// Angular figures out the data bindind dependencies
 		// here and calls 'priceNow' whenever necessary.
 		angular.forEach($scope.things, function (thing) {
-			if (thing.canHaz) {
+			if (thing.canHaz && !thing.recurring) {
 				totalPrice += thing.price;
 			}
 		});

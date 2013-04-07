@@ -86,6 +86,42 @@ var db = function() {
 			}
 		});
 
+
+		var contributionsDesignDoc = {
+			url: '_design/contributions',
+			body: 
+			{
+				byPatrons: {
+					map: function(doc) {
+						if (doc.type 
+						 && doc.backerId
+						 && doc.projectId
+						 && doc.type === "contribution") { 
+							emit(doc.backerId + "-" + doc.projectId, doc.things || []);
+						}
+					}
+				}
+			}
+      	};
+
+      	// Create or update the design doc if something we 
+      	// want is missing.
+      	// TODO: This is lame.
+      	// TODO: This is lame AND it is triplicate code with 
+      	// that stuff above.
+      	var forceContributionsDesignDocSave = false;
+
+		database.get(contributionsDesignDoc.url, function (err, doc) {
+			if (err || !doc.views 
+				|| !doc.views.byPatrons
+				|| forceContributionsDesignDocSave) {
+				// TODO: Add a mechanism for knowing when views
+				// themselves have updated, to save again at the
+				// appropriate times.
+				database.save(contributionsDesignDoc.url, contributionsDesignDoc.body); 
+			}
+		});
+
 	};
 
 	var createDatabaseAndViews = function() {
@@ -152,10 +188,18 @@ var db = function() {
 
 	var thingsByUsername = function (success, failure, options) {
 		getView('things/byUsername', success, failure, options);
-	}
+	};
 
 	var getThings = function (username, success, failure) {
 		thingsByUsername(success, failure, {key: username, firstOnly: true});
+	};
+
+	var contributionsByRel = function (success, failure, options) {
+		getView('contributions/byPatrons', success, failure, options);
+	};
+
+	var getContributions = function(fromId, toId, success, failure) {
+		contributionsByRel(success, failure, {key: fromId + "-" + toId});
 	};
 
 	createDatabaseAndViews();
@@ -166,6 +210,9 @@ var db = function() {
 		},
 		things : {
 			get : getThings
+		},
+		contributions : {
+			get : getContributions
 		}
 	};
 }(); // closure

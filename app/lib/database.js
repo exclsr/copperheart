@@ -52,6 +52,40 @@ var db = function() {
 				database.save(patronsDesignDoc.url, patronsDesignDoc.body); 
 			}
 		});
+
+
+		var thingsDesignDoc = {
+			url: '_design/things',
+			body: 
+			{
+				byUsername: {
+					map: function(doc) {
+						if (doc.username) {
+							emit(doc.username, doc.things || []);
+						}
+					}
+				}
+			}
+      	};
+
+      	// Create or update the design doc if something we 
+      	// want is missing.
+      	// TODO: This is lame.
+      	// TODO: This is lame AND it is duplicate code with 
+      	// that stuff above.
+      	var forceThingsDesignDocSave = false;
+
+		database.get(thingsDesignDoc.url, function (err, doc) {
+			if (err || !doc.views 
+				|| !doc.views.byUsername
+				|| forceThingsDesignDocSave) {
+				// TODO: Add a mechanism for knowing when views
+				// themselves have updated, to save again at the
+				// appropriate times.
+				database.save(thingsDesignDoc.url, thingsDesignDoc.body); 
+			}
+		});
+
 	};
 
 	var createDatabaseAndViews = function() {
@@ -116,11 +150,22 @@ var db = function() {
 		});
 	};
 
+	var thingsByUsername = function (success, failure, options) {
+		getView('things/byUsername', success, failure, options);
+	}
+
+	var getThings = function (username, success, failure) {
+		thingsByUsername(success, failure, {key: username, firstOnly: true});
+	};
+
 	createDatabaseAndViews();
 	return {
 		patrons : {
 			get : getPatron,
 			save : savePatron
+		},
+		things : {
+			get : getThings
 		}
 	};
 }(); // closure

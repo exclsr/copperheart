@@ -95,39 +95,19 @@ app.get('/whoami', function (req, res) {
 	}
 });
 
-app.get('/things/phil/', function (req, res) {
-	var things = [
-			{
-				id: "wine",
-				name: "wine",
-				unit: 'glass',
-				price: 5,
-				frequency: 'month'
-			},
-			{
-				id: "internet",
-				name: "Internet",
-				unit: 'day',
-				price: 2,
-				frequency: 'month'
-			},
-			{
-				id: "groceries",
-				name: "groceries",
-				unit: 'day',
-				price: 10,
-				frequency: 'month'
-			},
-			{
-				id: "rent",
-				name: "rent",
-				unit: 'day',
-				price: 30,
-				frequency: 'month'
-			},
-		];
+app.get('/things/:username/', function (req, res) {
 
+	var success = function (things) {
 		res.send(things);
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	db.things.get(req.params.username, success, failure);
 });
 
 // Some day we'll use jade for basic templating. 

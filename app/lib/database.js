@@ -21,6 +21,10 @@ var db = function() {
 		raw: false
 	}).database(databaseName);
 
+	var getContributionId = function (backerId, projectId) {
+		return backerId + "-" + projectId;
+	};
+
 	var createViews = function() {
 
 		var patronsDesignDoc = {
@@ -31,6 +35,13 @@ var db = function() {
 					map: function(doc) {
 						if (doc.email) {
 							emit(doc.email, doc);
+						}
+					}
+				},
+				byUsername: {
+					map: function(doc) {
+						if (doc.username) {
+							emit(doc.username, doc);
 						}
 					}
 				}
@@ -45,6 +56,7 @@ var db = function() {
 		database.get(patronsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
 				|| !doc.views.byEmail
+				|| !doc.views.byUsername
 				|| forceDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
@@ -93,11 +105,16 @@ var db = function() {
 			{
 				byPatrons: {
 					map: function(doc) {
+						var getContributionId = function (backerId, projectId) {
+							return backerId + "-" + projectId;
+						};
+
 						if (doc.type 
 						 && doc.backerId
 						 && doc.projectId
 						 && doc.type === "contribution") { 
-							emit(doc.backerId + "-" + doc.projectId, doc.things || []);
+						 	var id = getContributionId(doc.backerId, doc.projectId);
+							emit(id, doc);
 						}
 					}
 				}
@@ -175,8 +192,16 @@ var db = function() {
 		getView('patrons/byEmail', success, failure, options);
 	};
 
+	var patronsByUsername = function (success, failure, options) {
+		getView('patrons/byUsername', success, failure, options);
+	};
+
 	var getPatron = function (patronId, success, failure) {
 		patronsByEmail(success, failure, {key: patronId, firstOnly: true});
+	};
+
+	var getPatronByUsername = function (username, success, failure) {
+		patronsByUsername(success, failure, {key: username, firstOnly: true});
 	};
 
 	var savePatron = function (patron, success, failure) {
@@ -198,21 +223,51 @@ var db = function() {
 		getView('contributions/byPatrons', success, failure, options);
 	};
 
-	var getContributions = function(fromId, toId, success, failure) {
-		contributionsByRel(success, failure, {key: fromId + "-" + toId});
+	var getContribution = function(backerId, projectId, success, failure) {
+		var id = getContributionId(backerId, projectId);
+		contributionsByRel(success, failure, {key: id});
+	};
+
+	var saveContribution = function(contribution, success, failure) {
+		contribution.type = "contribution";
+
+		getContribution(contribution.backerId, contribution.projectId,
+			function (existingContribution) {
+				if (!existingContribution || existingContribution === []) {
+					// No existing contribution. Create doc.
+					database.save(contribution, function (error, response) {
+						error ? failure(error) : success();
+					});
+				}
+				else {
+					// TODO: Really need to set up a convention for 
+					// accessing single objects in our database.
+					existingContribution = existingContribution[0];
+					// Update the existing contribution.
+					database.save(existingContribution._id, existingContribution._rev,
+						contribution, 
+						function (error, response) {
+							error ? failure(error) : success();
+						});
+				}
+			},
+			failure
+		);
 	};
 
 	createDatabaseAndViews();
 	return {
 		patrons : {
 			get : getPatron,
+			getByUsername : getPatronByUsername,
 			save : savePatron
 		},
 		things : {
 			get : getThings
 		},
 		contributions : {
-			get : getContributions
+			get : getContribution,
+			save : saveContribution
 		}
 	};
 }(); // closure

@@ -110,6 +110,32 @@ app.get('/things/:username/', function (req, res) {
 	db.things.get(req.params.username, success, failure);
 });
 
+app.get('/contributions/:toUsername', function (req, res) {
+	if (!req.user) {
+		// 'Anonymous' doesn't have any contributions.
+		res.send([]);
+		return;
+	}
+
+	var patron = req.user;
+
+	var success = function (contributions) {
+		res.send(contributions);
+	}
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	var gotProject = function (project) {
+		db.contributions.get(patron.id, project.id, success, failure);
+	};
+
+	db.patrons.getByUsername(req.params.toUsername, gotProject, failure);
+});
+
 // Some day we'll use jade for basic templating. 
 // For now, AngularJS in /public. 
 // 
@@ -205,7 +231,7 @@ var getStripePlanRequest = function (patronId, things) {
 };
 
 
-app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
+app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 
 	var patronId = req.body.patronId;
 	var stripeToken = req.body.stripeToken;
@@ -237,84 +263,99 @@ app.put('/cc/charge/', ensureAuthenticated, function (req, res) {
 		res.send(500);
 	};
 
-	// 1. See if our patron has a Stripe ID.
-	if (patron.stripeId) {
-		// If they do, cool. That means they've been here before, 
-		// and we need to update their subscription plan in Stripe.
+	var doStripeStuff = function () {
+		// 1. See if our patron has a Stripe ID.
+		if (patron.stripeId) {
+			// If they do, cool. That means they've been here before, 
+			// and we need to update their subscription plan in Stripe.
 
-		// Furthermore, Stripe doesn't allow us to edit subscriptions
-		// once they've been created. That's fine. Let's delete
-		// the active subscription, and create a new one with the
-		// details that we want.
-		var createPlanAnew = function () {
-			var planRequest = getStripePlanRequest(patronId, things);
-			stripe.plans.create(planRequest, function (err, planResponse) {
-				// TODO: Do anything with the response?
-				err ? failure(err) : success(patronId);
-			});
-		};
-
-		var handleDeleteResponse = function (err, deleteResponse) {
-			// Plan was deleted. Create plan anew.
-			err ? failure(err) : createPlanAnew();
-		};
-
-		var deleteAndCreatePlan = function () {
-			var stripePlanId = getStripePlanId(patronId);
-			stripe.plans.del(stripePlanId, handleDeleteResponse);
-		};
-
-		deleteAndCreatePlan();
-	}
-	else {
-		// If the patron doesn't have a Stripe ID, cool. That 
-		// means we need to create a customer for them in Stripe, 
-		// create a subscription plan for them, and associate the two.
-		var stripeCustomerCreated = function (customerResponse) {
-			patron.stripeId = customerResponse.id;
-			// TODO: What if we fail at this point? That's not cool,
-			// because then we have some stuff on the Stripe servers
-			// that isn't referenced on ours. That would be bad.
-			//
-			// Possible solution: Run audits every night on the data.
-			// Every subscription in our Stripe database has a customer id
-			// associated with it, and so that customer id should be
-			// found in our data.
-			db.patrons.save(patron, success, failure);
-		};
-
-		var stripePlanCreated = function (planResponse) {
-			// After creating the Stripe plan, 
-			// make a Stripe customer to associate with the plan.
-			var customerRequest = {
-				card: stripeToken,
-				description: patronId, 
-				plan: planResponse.id
+			// Furthermore, Stripe doesn't allow us to edit subscriptions
+			// once they've been created. That's fine. Let's delete
+			// the active subscription, and create a new one with the
+			// details that we want.
+			var createPlanAnew = function () {
+				var planRequest = getStripePlanRequest(patronId, things);
+				stripe.plans.create(planRequest, function (err, planResponse) {
+					// TODO: Do anything with the response?
+					err ? failure(err) : success(patronId);
+				});
 			};
 
-			console.log("Creating customer ...");
-			// TODO: If we get a failure at this point, we have a data
-			// integrity issue, because it is likely a customer already exists.
-			stripe.customers.create(customerRequest, function (err, customerResponse) {
-				err ? failure(err) : stripeCustomerCreated(customerResponse);
-			});
-		};
+			var handleDeleteResponse = function (err, deleteResponse) {
+				// Plan was deleted. Create plan anew.
+				err ? failure(err) : createPlanAnew();
+			};
 
-		// It's more convenient to create a subscription plan,
-		// before creating a customer, so we can create a customer
-		// and associate them with a plan in one step.
-		var createPlanAndCustomer = function () {
-			var planRequest = getStripePlanRequest(patronId, things);
-			console.log("Creating plan ...");
-			// TODO: If we get a failure at this point, we have a data
-			// integrity issue, because it is likely a plan already exists.
-			stripe.plans.create(planRequest, function (err, planResponse) {
-				err ? failure(err) : stripePlanCreated(planResponse);
-			});
+			var deleteAndCreatePlan = function () {
+				var stripePlanId = getStripePlanId(patronId);
+				stripe.plans.del(stripePlanId, handleDeleteResponse);
+			};
+
+			deleteAndCreatePlan();
+		}
+		else {
+			// If the patron doesn't have a Stripe ID, cool. That 
+			// means we need to create a customer for them in Stripe, 
+			// create a subscription plan for them, and associate the two.
+			var stripeCustomerCreated = function (customerResponse) {
+				patron.stripeId = customerResponse.id;
+				// TODO: What if we fail at this point? That's not cool,
+				// because then we have some stuff on the Stripe servers
+				// that isn't referenced on ours. That would be bad.
+				//
+				// Possible solution: Run audits every night on the data.
+				// Every subscription in our Stripe database has a customer id
+				// associated with it, and so that customer id should be
+				// found in our data.
+				db.patrons.save(patron, success, failure);
+			};
+
+			var stripePlanCreated = function (planResponse) {
+				// After creating the Stripe plan, 
+				// make a Stripe customer to associate with the plan.
+				var customerRequest = {
+					card: stripeToken,
+					description: patronId, 
+					plan: planResponse.id
+				};
+
+				console.log("Creating customer ...");
+				// TODO: If we get a failure at this point, we have a data
+				// integrity issue, because it is likely a customer already exists.
+				stripe.customers.create(customerRequest, function (err, customerResponse) {
+					err ? failure(err) : stripeCustomerCreated(customerResponse);
+				});
+			};
+
+			// It's more convenient to create a subscription plan,
+			// before creating a customer, so we can create a customer
+			// and associate them with a plan in one step.
+			var createPlanAndCustomer = function () {
+				var planRequest = getStripePlanRequest(patronId, things);
+				console.log("Creating plan ...");
+				// TODO: If we get a failure at this point, we have a data
+				// integrity issue, because it is likely a plan already exists.
+				stripe.plans.create(planRequest, function (err, planResponse) {
+					err ? failure(err) : stripePlanCreated(planResponse);
+				});
+			};
+			
+			createPlanAndCustomer();
 		};
-		
-		createPlanAndCustomer();
 	}
+
+	
+	db.patrons.getByUsername(req.params.toUsername, 
+		function (project) {
+			// Save the contributions to our database, first.
+			var contribution = {};
+			contribution.backerId = patronId;
+			contribution.projectId = project.id;
+			contribution.things = things;
+
+			db.contributions.save(contribution, doStripeStuff, failure);
+		},
+		failure);
 
 	return;
 

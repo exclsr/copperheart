@@ -195,8 +195,7 @@ function ContributeCtrl($scope, $http, session, activeContribution) {
 				patronId: patronId
 			};
 				
-			// Put a charge for $1 on the card ...
-			var res = $http.put('/cc/charge/', data);
+			var res = $http.put('/commit/phil/', data);
 			res.success(function(data) {
 				console.log(data);
 				// The server is happy.

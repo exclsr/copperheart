@@ -71,9 +71,16 @@ a {
 	vertical-align: top;
 }
 .choice-group:hover {
-	background: #eee;
+	background: #fafafa;
 	cursor: pointer;
 }
+.choice-group.canHaz { 
+	color: #96401E;
+}
+.choice-group.canHaz .price, .choice-group.canHaz select {
+	color: #600;
+}
+
 
 /* Contribution */
 .glyph, .drink, .internet, .rent, .groceries {
@@ -115,7 +122,7 @@ a {
 .turnOnRecurring {
 	color: #888;
 }
-.turnOnRecurring.true {
+.turnOnRecurring.peerSelected {
 	color: black;
 }
 

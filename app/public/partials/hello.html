@@ -14,9 +14,10 @@
 	<!-- -->
 	<div class="process">
 		<div class="things span4">
-			<h4>Contribute</h4>	
+			<h4>Contribute</h4>
 			<div>
-				<label ng-repeat="thing in things" class="checkbox choice-group">
+				<label ng-repeat="thing in things" class="checkbox choice-group"
+					ng-class="{ canHaz: thing.canHaz }">
 					<input type="checkbox" ng-model="thing.canHaz" id="{{thing.id}}"/>
 					<span>A {{thing.unit}} of {{thing.name}}</span>
 					<div class="glyph {{thing.id}}"></div>
@@ -29,13 +30,15 @@
 			<h4>&nbsp;</h4>
 			<div>
 				<div ng-repeat="thing in things">
- 					<label class="choice-group checkbox turnOnRecurring {{thing.canHaz}}" 
+ 					<label class="choice-group checkbox turnOnRecurring"
+ 						ng-class="{ peerSelected: thing.canHaz}" 
  						ng-hide="thing.recurring">
  						<input type="checkbox" ng-model="thing.recurring"/>
 						<span>(more than once?)</span>
 					</label>
 
- 					<div class="choice-group checkbox recurring" ng-show="thing.recurring">
+ 					<div class="choice-group checkbox recurring" 
+ 						ng-show="thing.recurring" ng-class="{ canHaz: thing.canHaz }">
 						<input type="checkbox" ng-model="thing.recurring"/>
 						<label class="span2 eachWhat">
 							<span>each</span>

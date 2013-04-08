@@ -5,17 +5,69 @@
 </div>
 
 <div class="view">
-<div class="profile span10">
-	<div id="profileImg">:-)</div>
+<div class="profile span12" style="background: #888;">
 
-	<!-- TODO: This is going to come from a database, clearly :-)-->
-	<div class="present">My name is Phil. I am a software maker, dance instructor, swing DJ, and community volunteer. I'm a co-founder of <a href="http://corvallisswing.com">Corvallis Swing</a>, putting together events such as <a href="http://swingandblues.org">Swing and Blues Weekend</a>.</div>
+	<div class="span12" style="height: 300px">
+		<div class="span4" style="
+			background: #eee;
+			padding: 1em;
+			padding-top: 1ex;
+			font-family: 'Special Elite', cursive;
+			height: 100%">
+			<h3 id="patronName">Phil Manijak</h3>
+			<p>Hello. My name is Phil. I am a volunteer.</p>
+
+			<p>I created this site so I can devote all of my energy to our community, while giving everything I do away for free. 
+
+			<p>This is possible because I am supported by my friends, family, and the people who benefit from my work.</p>
+
+			<p>This is <a href="http://copperheart.org">Copper Heart</a>.</p>
+
+			<p>I am working on making this site available to a few friends, this month.</p>
+
+			<p>If you would like to help, please contact me, or make a contribution below.</p>
+
+		</div>
+		
+		<div class="span3" style="
+			background: #bbb;
+			padding: 1em;
+			padding-top: 1ex;
+			height: 100%;">
+			<h3>Projects</h3>
+			<ul>
+				<li><a href="http://corvallisswing.com">Corvallis Swing Dance Society</a></li>
+				<li><a href="http://copperheart.org">Copper Heart</a></li>
+				<li><a href="http://secretproject.org">Secret Project</a></li>
+			</ul>
+
+			<h4>Past</h4>
+			<ul>
+				<li><a href="http://swingandblues.org">Corvallis Swing &amp; Blues Weekend</a></li>
+				<li><a href="http://acm.cse.buffalo.edu/">Univ. at Buffalo, ACM chapter</a></li>
+			</ul>
+		</div>
+
+		<div class="span3" style="
+			background: #bbb;
+			padding: 1em;
+			padding-top: 1ex;
+			height: 100%">
+			<h3>Interests</h3>
+			<ul>
+				<li>computer programming</li>
+				<li>cognitive psychology</li>
+				<li>swing dancing</li>
+			</ul>
+		</div>
+	</div>
 
 	<!-- -->
-	<div class="process">
-		<div class="things span4">
-			<h4>Contribute</h4>
-			<div>
+	<div class="process span12">
+		<div class="things span4" style="padding: 1em;
+			padding-top: 1ex;">
+			<h3>Contribute</h3>
+			<div style="clear: left">
 				<label ng-repeat="thing in things" class="checkbox choice-group"
 					ng-class="{ canHaz: thing.canHaz }">
 					<input type="checkbox" ng-model="thing.canHaz" id="{{thing.id}}"/>
@@ -26,8 +78,9 @@
 			</div>
 		</div>
 
-		<div class="frequency span3">
-			<h4>&nbsp;</h4>
+		<div class="frequency span3" style="padding: 1em;
+			padding-top: 1ex;">
+			<h3>&nbsp;</h3>
 			<div>
 				<div ng-repeat="thing in things">
  					<label class="choice-group checkbox turnOnRecurring"
@@ -53,14 +106,15 @@
 			</div>
 		</div>
 
-		<div class="total span3">
-			<h4>
+		<div class="total span3" style="padding: 1em;
+			padding-top: 1ex;">
+			<h3>
 				<span ng-repeat="thing in things">
 					<span class="heart" ng-show="thing.canHaz && !thing.recurring">♥</span>
 					<span class="recurringHeart" 
 						ng-show="thing.canHaz && thing.recurring">♥</span>
 				</span>&nbsp;
-			</h4>
+			</h3>
 			<p>You've selected things that come to <strong>{{priceNow() | currency}}</strong> now, and
 			{{pricePerMonth() | currency}} each month after that.</p>
 			<div id="contributeButton">

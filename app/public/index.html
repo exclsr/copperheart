@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="style/app.css"/>  
   <link rel="stylesheet" href="style/bootstrap.min.css"/>
   <link rel="stylesheet" href="style/main.css"/>
+  <!-- TODO: Make configuring this part of the app -->
+  <link href='http://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
 
   <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
   <script type="text/javascript"> 
@@ -22,7 +24,7 @@
 <body>  
   <div class="container">
     <div ng-view></div>
-    <div class="footer">Copper heart: v<span app-version></span></div>  
+    <div class="footer"><span class="copper">♥</span> v<span app-version></span></div>  
   </div>
 
   <!-- In production use:

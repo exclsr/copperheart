@@ -1,28 +1,41 @@
-body {	
+body {
 	background: #96401E;
 	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 	padding: 0;
 }
 
 a {
-	color: #00B7FF;
+	color: #444;
+	background-color: white;
+}
+a:hover {
+	color: black;
+}
+
+.copper {
+	color: #96401E;
 }
 
 .container {
-	background: white;
+	background: inherit;
 	border: solid 1px #555;
 	border-top: 0;
 	border-bottom: 0;
+	min-width: 725px !important;
+
+	font-family: 'Special Elite', cursive;
+}
+select, button {
+	font-family: 'Special Elite', cursive;
 }
 
 .view {
-	padding: 6em;
-	padding-top: 4em;
+	padding-bottom: 6em;
 }
 
 .header {
-	background: #333;
-	color: white;
+	background: #181818;
+	color: #eee;
 	padding: 1.5ex;
 	padding-right: 2em;
 	text-align: right;
@@ -32,35 +45,41 @@ a {
 	font-weight: normal;
 }
 #login a {
-	color: white !important;
+	color: #eee !important;
+	background-color: #222;
 }
 
 
 .footer {
 	clear: left;
-	background: #333;
+	background: #181818;
 	color: white;
 	margin: 0;
 	padding: 3em;
-	padding-left: 6em;
+	text-align: center;
 }
 
-.profile, .things {
+h3 {
+	font-family: 'Special Elite', cursive;
+}
+
+.profile {
 	margin-left: 0;
 }
 
-.present {
-	margin-top: 1.5em;
+#patronName {
+	color: #96401E;
 }
-
 
 
 .process {
-	margin-top: 1.5em;
+	color: black;
+	padding-top: 2em;
+	border-bottom: dotted 1px #96401E;
 }
 
 .choice-group {
-	border-top: solid #ccc 1px;
+	border-top: dotted #1c1c1c 1px;
 	margin: 0 !important;
 	padding: 2em;
 }
@@ -71,14 +90,27 @@ a {
 	vertical-align: top;
 }
 .choice-group:hover {
-	background: #fafafa;
+	background: #444;
 	cursor: pointer;
+}
+.choice-group:hover .price {
+	color: #eee;
 }
 .choice-group.canHaz { 
 	color: #96401E;
+	background: #1e1e1e;
 }
+.choice-group.canHaz select {
+	background: #181818;
+}
+
 .choice-group.canHaz .price, .choice-group.canHaz select {
-	color: #600;
+	color: #888;
+}
+
+.process select {
+	color: black;
+	background-color: #888;
 }
 
 
@@ -108,11 +140,18 @@ a {
 
 .price {
 	font-size: 10pt;
-	color: #888;
+	color: #555;
+}
+
+.things {
+	margin-top: 3px;
 }
 
 
 /* Frequency */
+.frequency, .total {
+
+}
 .frequency .choice-group {
 	padding-top: 1.80em;
 	padding-bottom: 2.25em;
@@ -120,7 +159,7 @@ a {
 }
 
 .turnOnRecurring {
-	color: #888;
+	color: #444;
 }
 .turnOnRecurring.peerSelected {
 	color: black;
@@ -142,12 +181,7 @@ a {
 	margin-left: 1ex;
 }
 
-
-/* Total / :-) */;
-.total h4 {
-
-}
-
+/* Total column */
 .recurringHeart {
 	color: #96401E;
 }
@@ -156,7 +190,7 @@ a {
 	padding: 2em;
 	padding-left: 0.5ex;
 	padding-bottom: 0;
-	border-top: solid #ccc 1px;
+	border-top: dotted #1c1c1c 1px;
 }
 
 .total #contributeButton {
@@ -169,12 +203,10 @@ a {
 /* Contribution page */
 /* TODO: Move to its own file */
 .firstColumn {
-	/*background: pink;*/
 	margin-left: 0;
 	padding-left: 1.5em;	
 }
 .secondColumn {
-	/*background: #ffc;*/
 	margin-left: 0;
 	padding-left: 1.5em;
 	border-left: solid 1px #ccc;
@@ -182,7 +214,6 @@ a {
 
 }
 .thirdColumn {
-	/*background: #cfc;*/
 	margin-left: 0;
 	padding-left: 1.5em;
 	padding-right: 1.5em;

@@ -29,7 +29,7 @@ a:hover {
 	border-right: 0;
 	min-width: 725px !important;
 }
-.container, select, button {
+.container, select, button, .eachWhat {
 	/*
 	 * TODO: Possibly use Solomon, if our
 	 * license allows us to keep it in a 
@@ -194,9 +194,8 @@ ul {
 
 .things {
 	margin-top: 3px;
-	padding: 1.5em; padding-top: 1ex; padding-left: 0;	
+	padding: 1.5em; padding-top: 1ex; padding-left: 0;
 }
-
 
 /* Frequency */
 .frequency, .total {
@@ -204,11 +203,15 @@ ul {
 }
 .frequency {
 	padding: 0.8em; padding-top: 1.3ex;
+	margin-top: 1px;
+}
+.freqThing {
+/*	padding-top: 3px;*/
 }
 
 .frequency .choice-group {
-	padding-top: 1.80em;
-	padding-bottom: 2.25em;
+	padding-top: 1.95em;
+	padding-bottom: 2.12em;
 	padding-right: 0;
 }
 
@@ -243,6 +246,7 @@ ul {
 	color: #96401E;
 }
 .total {
+	margin-top: 1px;
 	padding: 1em; padding-top: 1.3ex;
 }
 

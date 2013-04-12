@@ -66,6 +66,10 @@ ul {
 	text-align: right;
 	margin-bottom: 1em;
 }
+.copperHeartImg {
+	margin-top: 0.5ex; margin-left: 6ex;
+	float: left;
+}
 #login {
 	margin: 0;
 	font-weight: normal;
@@ -190,7 +194,7 @@ ul {
 
 .things {
 	margin-top: 3px;
-	padding: 1.5em; padding-top: 1ex; padding-left: 0;
+	padding: 1.5em; padding-top: 1ex; padding-left: 0;	
 }
 
 
@@ -238,7 +242,6 @@ ul {
 .recurringHeart {
 	color: #96401E;
 }
-
 .total {
 	padding: 1em; padding-top: 1.3ex;
 }

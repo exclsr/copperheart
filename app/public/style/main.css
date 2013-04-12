@@ -1,12 +1,18 @@
 body {
-	background: #96401E;
-	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	/*background: #96401E;*/
+	background: #eee;
+	font: 12pt "Solomon", "Open Sans", Helvetica, Arial, sans-serif;
+	font-size: 12pt;
 	padding: 0;
+}
+.btn {
+	font-size: 12pt !important;
 }
 
 a {
 	color: #444;
-	background-color: white;
+	color: #500;
+	color: #96401E;
 }
 a:hover {
 	color: black;
@@ -18,70 +24,101 @@ a:hover {
 
 .container {
 	background: inherit;
-	border: solid 1px #555;
 	border-top: 0;
 	border-bottom: 0;
+	border-right: 0;
 	min-width: 725px !important;
+}
+.container, select, button {
+	/*
+	 * TODO: Possibly use Solomon, if our
+	 * license allows us to keep it in a 
+	 * public Github repository. Otherwise,
+	 * we'll have to save it elsewhere, which
+	 * might not be worth it.
+	 */
+	font-family: "Solomon", sans-serif;
+	font-family: "Source Sans Pro", sans-serif;
+	font-size: 13pt;
+}
+h3, h4 {
+	font-family: "Bree Serif", serif;
+	font-weight: normal;
+	font-size: 18pt;
+}
+h4 {
+	font-size: 11pt;
+}
 
-	font-family: 'Special Elite', cursive;
+ul {
+	list-style: circle;
 }
-select, button {
-	font-family: 'Special Elite', cursive;
-}
+
 
 .view {
 	padding-bottom: 6em;
 }
 
 .header {
-	background: #181818;
-	color: #eee;
+	border-bottom: dotted #888 1px;
 	padding: 1.5ex;
 	padding-right: 2em;
 	text-align: right;
+	margin-bottom: 1em;
 }
 #login {
 	margin: 0;
 	font-weight: normal;
 }
 #login a {
-	color: #eee !important;
-	background-color: #222;
+
 }
 
 
 .footer {
 	clear: left;
-	background: #181818;
-	color: white;
+	/*background: #181818;*/
+	border-top: #181818 dotted 1px;
 	margin: 0;
 	padding: 3em;
 	text-align: center;
 }
 
-h3 {
-	font-family: 'Special Elite', cursive;
-}
-
 .profile {
 	margin-left: 0;
+	background: #eee;
 }
 
+.who, .projects {
+	background: #fff;
+	padding: 1em;
+	padding-top: 1ex;
+	height: 100%;
+}
+.projects {
+	background: #f3f3f3;
+}
+.whoContainer {
+	height: 300px;
+}
+
+
 #patronName {
-	color: #96401E;
+	/*color: #96401E;*/
 }
 
 
 .process {
 	color: black;
 	padding-top: 2em;
-	border-bottom: dotted 1px #96401E;
 }
 
 .choice-group {
 	border-top: dotted #1c1c1c 1px;
 	margin: 0 !important;
 	padding: 2em;
+	padding-left: 2.25em;
+	font-size: 12pt !important;
 }
 .choice-group .glyph, .choice-group span {
 	padding-left: 7px;
@@ -91,6 +128,7 @@ h3 {
 }
 .choice-group:hover {
 	background: #444;
+	color: #fff;
 	cursor: pointer;
 }
 .choice-group:hover .price {
@@ -115,6 +153,13 @@ h3 {
 
 
 /* Contribution */
+.contributeTitle {
+	padding-left: 1.85em;
+}
+.contributeHearts {
+	padding-left: 2.40em;
+}
+
 .glyph, .drink, .internet, .rent, .groceries {
 	background-image: url(/img/glyphicons-halflings.png);
 	background-repeat: no-repeat;
@@ -139,12 +184,13 @@ h3 {
 }
 
 .price {
-	font-size: 10pt;
+	font-size: 11pt;
 	color: #555;
 }
 
 .things {
 	margin-top: 3px;
+	padding: 1.5em; padding-top: 1ex; padding-left: 0;
 }
 
 
@@ -152,17 +198,24 @@ h3 {
 .frequency, .total {
 
 }
+.frequency {
+	padding: 0.8em; padding-top: 1.3ex;
+}
+
 .frequency .choice-group {
 	padding-top: 1.80em;
 	padding-bottom: 2.25em;
 	padding-right: 0;
 }
 
-.turnOnRecurring {
-	color: #444;
+.turnOnRecurring, .turnOnRecurring:hover {
+	color: #bbb;
 }
 .turnOnRecurring.peerSelected {
 	color: black;
+}
+.turnOnRecurring.peerSelected:hover {
+	color: white;
 }
 
 .recurring {
@@ -184,6 +237,10 @@ h3 {
 /* Total column */
 .recurringHeart {
 	color: #96401E;
+}
+
+.total {
+	padding: 1em; padding-top: 1.3ex;
 }
 
 .total p {

@@ -21,10 +21,27 @@ function EditCtrl($scope, $http, session) {
 			$scope.email = patron.email;
 			$scope.username = patron.username;
 			$scope.things = patron.things;
+			$scope.name = patron.name;
+			$scope.present = patron.present;
 		});
 
 		patronRes.error(function(data, status, headers, config) {
 			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
+		});
+	};
+
+	$scope.saveWho = function() {
+		var who = {};
+		who.name = $scope.name;
+		who.present = $scope.present;
+
+		var putWho = $http.put('/patron/who', who);
+		putWho.success(function (data) {
+			console.log("<3");
+		});
+		putWho.error(function (data, status, headers, config) { 
+			// TODO: Oh ... no.
 			console.log(data);
 		});
 	};

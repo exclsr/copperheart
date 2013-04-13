@@ -9,7 +9,16 @@
 <div class="span12">
 	<h3>{{username}} <small>:: {{email}}</small></h3>
 
-	<div class="things">
+	<div class="currentlyDoing" style="padding-top: 1em">
+		<h3>who are you, what are you working on?</h3>
+		<div class="who span6" style="height: 315px">
+			<input ng-model="name" class="name" type="text"/>
+			<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
+			<button class="btn" ng-click="saveWho()">Save</button>
+		</div>
+	</div>
+
+	<div class="things" style="clear: left">
 		<h3 style="padding-top: 1em">add a thing</h3>
 		<div class="newThingContainer span10">
 			<label class="span3">

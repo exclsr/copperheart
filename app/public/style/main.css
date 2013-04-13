@@ -29,7 +29,7 @@ a:hover {
 	border-right: 0;
 	min-width: 725px !important;
 }
-.container, select, button, .eachWhat {
+.container, select, button, .eachWhat, input, textarea {
 	/*
 	 * TODO: Possibly use Solomon, if our
 	 * license allows us to keep it in a 
@@ -41,7 +41,7 @@ a:hover {
 	font-family: "Source Sans Pro", sans-serif;
 	font-size: 13pt;
 }
-h3, h4 {
+h3, h4, .name {
 	font-family: "Bree Serif", serif;
 	font-weight: normal;
 	font-size: 18pt;
@@ -332,6 +332,11 @@ select.paymentDay {
 }
 
 /* Edit page */
+.name {
+	font-size: 18pt !important;
+	height: 26px !important;
+}
+
 .newThingContainer {
 	padding-bottom: 0;
 	color: #eee;

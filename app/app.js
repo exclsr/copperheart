@@ -162,6 +162,8 @@ app.get('/patron', ensureAuthenticated, function (req, res) {
 		patron.email = patronData.email;
 		patron.username = patronData.username;
 		patron.things = patronData.things;
+		patron.name = patronData.name;
+		patron.present = patronData.present;
 
 		res.send(patron);
 	};
@@ -188,6 +190,26 @@ app.put('/patron/things', ensureAuthenticated, function (req, res) {
 	db.things.save(patron.username, things, success, failure);
 	res.send(things);
 });
+
+app.put('/patron/who', ensureAuthenticated, function (req, res) {
+	var patron = req.user;
+	var who = req.body;
+
+	var success = function (things) {
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	patron.name = who.name;
+	patron.present = who.present;
+	db.patrons.save(patron, success, failure);
+});
+
 
 // Some day we'll use jade for basic templating. 
 // For now, AngularJS in /public. 

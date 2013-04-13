@@ -29,28 +29,77 @@ function EditCtrl($scope, $http, session) {
 		});
 	};
 
-	$scope.addThing = function() {
-
-		var things = $scope.things;
-		var newThing = {};
-		newThing.id = $scope.thing.id; // TODO: Need to make this unique.
-		newThing.name = $scope.thing.name;
-		newThing.unit = $scope.thing.unit;
-		newThing.price = $scope.thing.price;
-		newThing.frequency = "month"; // TODO: Don't need this.
-
-		things.push(newThing);
-
+	var saveThings = function (things) {
 		var putThings = $http.put('/patron/things', things);
-		
+
 		putThings.success(function (data) {
 			console.log(data);
+			// TODO: Where should this be? Here?
+			$scope.things = things;
 		});
 
 		putThings.error(function (data, status, headers, config) { 
 			// TODO: Oh ... no.
 			console.log(data);
 		});
+	};
+
+	var createThingId = function (thingName, things) {
+		// TODO: I guess we could do this on the server 
+		// side, but why not distribute the computing, eh?
+		var newThingId = thingName;
+		var canUseThingId = false;
+		var loopCount = 1;
+
+		while (!canUseThingId) {
+			var duplicateIdFound = false;
+
+			angular.forEach(things, function (thing) {
+				// If our proposed newThingId is already
+				// being used, try again.
+				if (thing.id === newThingId) {
+					duplicateIdFound = true;
+					loopCount++;
+					newThingId = thingName + loopCount.toString();
+					return;
+				}
+			});
+
+			if (!duplicateIdFound) {
+				canUseThingId = true;
+			}
+		}
+
+		return newThingId;
+	};
+
+
+	$scope.addThing = function() {
+		var things = $scope.things;
+		var newThing = {};
+		newThing.id = createThingId($scope.thing.name, things);
+		newThing.name = $scope.thing.name;
+		newThing.unit = $scope.thing.unit;
+		newThing.price = $scope.thing.price;
+		newThing.frequency = "month"; // TODO: Don't need this?
+
+		things.push(newThing);
+		saveThings(things);
+	};
+
+
+	$scope.deleteThing = function(thingToDelete) {
+		var thingsToKeep = [];
+		// TODO: Rumor is that animations are coming in the next
+		// release of AngularJS for this sort of thing, so hold
+		// tight for now.
+		angular.forEach($scope.things, function(thing) {
+			if (thing.id !== thingToDelete.id) {
+				thingsToKeep.push(thing);
+			}
+		});
+
+		saveThings(thingsToKeep);
 	};
 
 	initialize();

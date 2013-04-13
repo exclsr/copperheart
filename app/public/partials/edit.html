@@ -10,13 +10,13 @@
 	<h3>{{username}} <small>:: {{email}}</small></h3>
 
 	<div class="things">
-		<h3 style="padding-top: 1em">add thing</h3>
+		<h3 style="padding-top: 1em">add a thing</h3>
 		<div class="newThingContainer span10">
 			<label class="span3">
 				A <input ng-model="thing.unit" class="span2" placeholder="(unit of measure)" type="text" /> 
 			</label>
 			<label class="span3">
-				of <input ng-model="thing.name" placeholder="(thing I would like)" type="text" />, 
+				of <input ng-model="thing.name" placeholder="(thing I would appreciate)" type="text" />, 
 			</label>
 			<label class="span2">
 				for <input ng-model="thing.price" class="span1" type="text" /> dollars.
@@ -33,6 +33,9 @@
 				<span class="span3">A {{thing.unit}}</span>
 				<span class="span3">of {{thing.name}},</span>
 				<span class="span2">for {{thing.price}} dollars.</span> 
+				<span class="span1 thingTrashIcon" style="text-align: right">
+					<i class="icon-trash" ng-click="deleteThing(thing)" style="padding-right: 1.1em"></i>
+				</span>
 			</div>
 		</div>
 	</div>

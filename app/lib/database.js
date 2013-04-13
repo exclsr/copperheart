@@ -219,6 +219,16 @@ var db = function() {
 		thingsByUsername(success, failure, {key: username, firstOnly: true});
 	};
 
+	var saveThings = function (username, things, success, failure) {
+		var patronFound = function (patron) {
+			patron.things = things;
+			database.save(patron, function (error, response) {
+				error ? failure(error) : success();
+			})
+		};
+		patronsByUsername(patronFound, failure, {key: username, firstOnly: true});
+	};
+
 	var contributionsByRel = function (success, failure, options) {
 		getView('contributions/byPatrons', success, failure, options);
 	};
@@ -263,7 +273,8 @@ var db = function() {
 			save : savePatron
 		},
 		things : {
-			get : getThings
+			get : getThings,
+			save : saveThings
 		},
 		contributions : {
 			get : getContribution,

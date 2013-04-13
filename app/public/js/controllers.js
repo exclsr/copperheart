@@ -1,6 +1,61 @@
 'use strict';
 
 /* Controllers */
+function EditCtrl($scope, $http, session) {
+
+	var initialize = function () {
+
+		var whoRes = $http.get('/whoami');
+		whoRes.success(function (patronId) {
+			$scope.whoami = session.whoami = patronId;
+		});
+
+		whoRes.error(function(data, status, headers, config) {
+			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
+		});
+
+		var patronRes = $http.get('/patron');
+		patronRes.success(function (patron) {
+			$scope.patron = patron;
+			$scope.email = patron.email;
+			$scope.username = patron.username;
+			$scope.things = patron.things;
+		});
+
+		patronRes.error(function(data, status, headers, config) {
+			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
+		});
+	};
+
+	$scope.addThing = function() {
+
+		var things = $scope.things;
+		var newThing = {};
+		newThing.id = $scope.thing.id; // TODO: Need to make this unique.
+		newThing.name = $scope.thing.name;
+		newThing.unit = $scope.thing.unit;
+		newThing.price = $scope.thing.price;
+		newThing.frequency = "month"; // TODO: Don't need this.
+
+		things.push(newThing);
+
+		var putThings = $http.put('/patron/things', things);
+		
+		putThings.success(function (data) {
+			console.log(data);
+		});
+
+		putThings.error(function (data, status, headers, config) { 
+			// TODO: Oh ... no.
+			console.log(data);
+		});
+	};
+
+	initialize();
+}
+EditCtrl.$inject = ['$scope', '$http', 'session'];
 
 function HelloCtrl($scope, $http, $location, session, activeContribution) {
 

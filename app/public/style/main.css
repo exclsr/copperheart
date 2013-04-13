@@ -330,3 +330,33 @@ ul.contributionList .contribution {
 select.paymentDay {
 	width: 9ex !important;
 }
+
+/* Edit page */
+.newThingContainer {
+	padding-bottom: 0;
+	color: #eee;
+	background-color: #333;
+
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+.newThingContainer input {
+	margin-left: 1ex; margin-right: 1ex;
+	margin-bottom: 0;
+}
+
+.editThingContainer, .newThingContainer {
+	padding: 2ex;
+	padding-left: 4ex;
+	/*padding-top: 0.5ex;
+	padding-bottom: 0.5ex;*/
+
+}
+.editThingContainer.odd {
+	background-color: #bbb;
+}
+.things .span1 {
+/*	width: 5ex !important;
+	border: solid 1px red;
+*/}

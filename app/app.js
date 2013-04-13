@@ -145,6 +145,50 @@ app.get('/contributions/:toUsername', function (req, res) {
 	db.patrons.getByUsername(req.params.toUsername, gotProject, failure);
 });
 
+
+app.get('/patron', ensureAuthenticated, function (req, res) {
+	// TODO: Maybe not do 'ensureAuthenticated' here, and instead
+	// send back something empty if we're not logged in, and have 
+	// the client deal with that scenario.
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	var gotPatron = function (patronData) {
+		var patron = {};
+		patron.email = patronData.email;
+		patron.username = patronData.username;
+		patron.things = patronData.things;
+
+		res.send(patron);
+	};
+
+	db.patrons.get(req.user.email, gotPatron, failure);
+});
+
+app.put('/patron/things', ensureAuthenticated, function (req, res) {
+	var patron = req.user;
+	var things = req.body;
+
+	var success = function (things) {
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	// TODO: Do we have to do anything with 'things' to be 
+	// on the safe side?
+	db.things.save(patron.username, things, success, failure);
+	res.send(things);
+});
+
 // Some day we'll use jade for basic templating. 
 // For now, AngularJS in /public. 
 // 

@@ -1,0 +1,44 @@
+<div class="header">
+	<!-- TODO: Move this into some sort of template -->
+	<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
+	{{whoami}}
+	<h6 id="login"><a href="/auth/google">log in</a> | <a href="/auth/logout">log out</a></h6>
+</div>
+
+<div class="view">
+<div class="span12">
+	<h3>{{username}} <small>:: {{email}}</small></h3>
+
+	<div class="things">
+		<h3 style="padding-top: 1em">add thing</h3>
+		<div class="newThingContainer span10">
+			<label class="span3">
+				A <input ng-model="thing.unit" class="span2" placeholder="(unit of measure)" type="text" /> 
+			</label>
+			<label class="span3">
+				of <input ng-model="thing.name" placeholder="(thing I would like)" type="text" />, 
+			</label>
+			<label class="span2">
+				for <input ng-model="thing.price" class="span1" type="text" /> dollars.
+			</label>
+
+			<div class="span1" style="text-align: right">
+				<button class="btn" ng-click="addThing()">Add</button>
+			</div>
+		</div>
+
+		<h3 style="clear: left; padding-top: 1.5em">things <small>:: {{things.length}}</h3>
+		<div ng-repeat="thing in things">
+			<div ng-class-odd="'odd'" class="editThingContainer span10">
+				<span class="span3">A {{thing.unit}}</span>
+				<span class="span3">of {{thing.name}},</span>
+				<span class="span2">for {{thing.price}} dollars.</span> 
+			</div>
+		</div>
+	</div>
+
+	<div style="clear: both; margin-bottom: 2em">
+		&nbsp;
+	</div>
+</div>
+</div>

@@ -145,7 +145,28 @@ app.get('/contributions/:toUsername', function (req, res) {
 	db.patrons.getByUsername(req.params.toUsername, gotProject, failure);
 });
 
+// Public data of a person
+app.get('/who/:username', function (req, res) {
+	var success = function (who) {
+		var publicWho = {};
+		publicWho.name = who.name;
+		publicWho.present = who.present;
 
+		res.send(publicWho);
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	db.patrons.getByUsername(req.params.username, success, failure);
+});
+
+
+// Public and private data of a patron
+// TODO: Rename?
 app.get('/patron', ensureAuthenticated, function (req, res) {
 	// TODO: Maybe not do 'ensureAuthenticated' here, and instead
 	// send back something empty if we're not logged in, and have 

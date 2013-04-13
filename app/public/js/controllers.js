@@ -190,19 +190,30 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 			console.log(data);
 		})
 
+		var whoRes = $http.get('/who/' + profileName + '/');
+		whoRes.success(function (who) {
+			$scope.who = {};
+			$scope.who.name = who.name;
+			$scope.who.present = who.present;
+		});
+		whoRes.error(function (data, status, headers, config) {
+			// TODO: :-(
+			console.log(data);
+		});
 
-		var whoRes = $http.get('/whoami');
-		whoRes.success(function (patronId) {
+
+		var idRes = $http.get('/whoami');
+		idRes.success(function (patronId) {
 			$scope.whoami = session.whoami = patronId;
 		});
 
-		whoRes.error(function(data, status, headers, config) {
+		idRes.error(function(data, status, headers, config) {
 			// TODO: Something terrible went wrong. Deal with it.
 			console.log(data);
 		});
 	};
 
-	if (!session.things || session.things.length < 1) {
+	if (!session.things || session.things.length < 1 || !$scope.who) {
 		initialize();
 	}
 	else {

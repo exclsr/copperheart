@@ -9,14 +9,9 @@
 <div class="profile span12">
 	<div class="whoContainer span12">
 		<div class="who span6">
-			<h3 id="patronName">Phil Manijak</h3>
-			<p>Hello. My name is Phil. I'm a volunteer.</p>
-
-			<p>I created this site so I can devote all of my energy to our community, while giving everything I do away for free. This is possible because I am supported by my friends, family, and the people who benefit from my work.</p>
-
-			<p>This is <a href="http://copperheart.org">Copper Heart</a>.</p>
-
-			<p>I'm working on making this site available to a few friends. If you would like to help, please contact me, or make a contribution below.</p>
+			<h3 id="whoName">{{who.name}}</h3>
+			<div id="whoPresent" ng-bind-html="who.present">
+			</div>
 		</div>
 		
 		<div class="projects span4">

@@ -151,6 +151,7 @@ app.get('/who/:username', function (req, res) {
 		var publicWho = {};
 		publicWho.name = who.name;
 		publicWho.present = who.present;
+		publicWho.passions = who.passions;
 
 		res.send(publicWho);
 	};

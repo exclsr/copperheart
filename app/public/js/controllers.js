@@ -245,6 +245,7 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 			$scope.who = {};
 			$scope.who.name = who.name;
 			$scope.who.present = who.present;
+			$scope.who.passions = who.passions;
 		});
 		whoRes.error(function (data, status, headers, config) {
 			// TODO: :-(

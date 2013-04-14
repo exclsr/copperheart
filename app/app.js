@@ -182,9 +182,10 @@ app.get('/patron', ensureAuthenticated, function (req, res) {
 		var patron = {};
 		patron.email = patronData.email;
 		patron.username = patronData.username;
-		patron.things = patronData.things;
-		patron.name = patronData.name;
-		patron.present = patronData.present;
+		patron.things = patronData.things || [];
+		patron.name = patronData.name || "";
+		patron.present = patronData.present || "";
+		patron.passions = patronData.passions || [];
 
 		res.send(patron);
 	};
@@ -212,6 +213,7 @@ app.put('/patron/things', ensureAuthenticated, function (req, res) {
 	res.send(things);
 });
 
+
 app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	var patron = req.user;
 	var who = req.body;
@@ -228,6 +230,25 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 
 	patron.name = who.name;
 	patron.present = who.present;
+	db.patrons.save(patron, success, failure);
+});
+
+app.put('/patron/passions', ensureAuthenticated, function (req, res) {
+	// TODO: Obvi refactoring with the code above.
+	var patron = req.user;
+	var passions = req.body;
+
+	var success = function (things) {
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	patron.passions = passions;
 	db.patrons.save(patron, success, failure);
 });
 

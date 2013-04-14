@@ -337,6 +337,19 @@ select.paymentDay {
 	height: 26px !important;
 }
 
+.passionContainer:hover {
+	background: #bbb;
+}
+.passionContainer .thingTrashIcon {
+	display: none;
+}
+.passionContainer:hover .thingTrashIcon {
+	/*
+	 * TODO: How does this work for iPad? 
+	 */
+	display: inline;
+}
+
 .newThingContainer {
 	padding-bottom: 0;
 	color: #eee;

@@ -16,6 +16,34 @@
 			<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
 			<button class="btn" ng-click="saveWho()">Save</button>
 		</div>
+
+		<div class="projects span4">
+			<h3>Communities</h3>
+			<!--
+			TODO: Soon ...
+ 			<input type="text"/>
+			<input class="span4" type="text"/>
+ 			-->
+			<h3>Passions</h3>
+			<ul style="margin-bottom: 0">
+				<li ng-repeat="passion in passions" class="passionContainer">
+					<span class="">{{passion}}</span>
+					<span class="thingTrashIcon" ng-click="deletePassion(passion)">
+						<i class="icon-trash" 
+						style="margin-left: 1.5ex; margin-bottom: 2px; vertical-align: bottom"></i>
+					</span>
+				</li>
+			</ul>
+
+			<ul ng-hide="isAtPassionLimit()" style="margin-top: 0">
+				<li>
+					<form ng-submit="savePassion()">
+						<input ng-model="newPassion" type="text" style="margin-top: 10px"/>
+						<button type="submit" class="btn">Add</button>
+					</form>
+				</li>
+			</ul>
+		</div>
 	</div>
 
 	<div class="things" style="clear: left">

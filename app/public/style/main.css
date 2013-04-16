@@ -337,13 +337,13 @@ select.paymentDay {
 	height: 26px !important;
 }
 
-.passionContainer:hover {
+.passionContainer:hover, .communityContainer:hover {
 	background: #bbb;
 }
-.passionContainer .thingTrashIcon {
+.passionContainer .thingTrashIcon, .communityContainer .thingTrashIcon {
 	display: none;
 }
-.passionContainer:hover .thingTrashIcon {
+.passionContainer:hover .thingTrashIcon, .communityContainer:hover .thingTrashIcon {
 	/*
 	 * TODO: How does this work for iPad? 
 	 */

@@ -128,8 +128,13 @@ app.get('/contributions/:toUsername', function (req, res) {
 		// TODO: Probably want to modify our data
 		// layer so we don't have to do this all 
 		// the time.
-		var things = rawContribution[0].things;
-		res.send(things);
+		if (rawContribution && rawContribution[0]) {
+			var things = rawContribution[0].things;
+			res.send(things);
+		}
+		else {
+			res.send([]);
+		}
 	}
 
 	var failure = function (err) {
@@ -275,6 +280,26 @@ app.put('/patron/communities', ensureAuthenticated, function (req, res) {
 	db.patrons.save(patron, success, failure);
 });
 
+
+app.put('/patron/username', ensureAuthenticated, function (req, res) {
+	// TODO: Obvi refactoring with the code above.
+	var patron = req.user;
+	var username = req.body.username;
+
+	var success = function (things) {
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	// TODO: Need to check for dups.
+	patron.username = username;
+	db.patrons.save(patron, success, failure);
+});
 
 
 // Some day we'll use jade for basic templating. 

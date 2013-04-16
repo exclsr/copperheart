@@ -49,6 +49,21 @@ function EditCtrl($scope, $http, session) {
 	};
 
 
+	$scope.saveUsername = function() {
+		var data = {};
+		data.username = $scope.username;
+
+		var putUsername = $http.put('/patron/username', data);
+		putUsername.success(function (data) {
+			console.log("<3");
+		});
+		putUsername.error(function (data, status, headers, config) { 
+			// TODO: Oh ... no.
+			console.log(data);
+		});
+	};
+
+
 	$scope.isAtCommunityLimit = function() {
 		var communities = $scope.communities || [];
 		return communities.length >= 5;
@@ -99,9 +114,6 @@ function EditCtrl($scope, $http, session) {
 
 		saveCommunities(communitiesToKeep);
 	};
-
-
-
 
 
 	$scope.isAtPassionLimit = function() {
@@ -231,7 +243,7 @@ function EditCtrl($scope, $http, session) {
 }
 EditCtrl.$inject = ['$scope', '$http', 'session'];
 
-function HelloCtrl($scope, $http, $location, session, activeContribution) {
+function HelloCtrl($scope, $http, $location, $routeParams, session, activeContribution) {
 
 	// TODO: We'll prob want to call things when traversing from
 	// another page, such as going back from the 'contribute' page.
@@ -269,7 +281,7 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 			}
 		};
 
-		var profileName = "phil";
+		var profileName = $routeParams.who || "phil";
 		var blahThings, blahContributions; // TODO: Rename.
 
 		// TODO: Obviously, will want to make this URL adaptive to 
@@ -323,6 +335,8 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 		});
 	};
 
+	// TODO: Re-init when appropriate ... gets more complicated
+	// now that the 'who' can changed based on the url, maybe. 
 	if (!session.things || session.things.length < 1 || !$scope.who) {
 		initialize();
 	}
@@ -394,7 +408,7 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 		$location.path('contribute');
 	};
 }
-HelloCtrl.$inject = ['$scope', '$http', '$location', 'session', 'activeContribution'];
+HelloCtrl.$inject = ['$scope', '$http', '$location', '$routeParams', 'session', 'activeContribution'];
 
 
 function ContributeCtrl($scope, $http, session, activeContribution) {

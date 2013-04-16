@@ -9,8 +9,6 @@
 
 <div class="view">
 <div class="span12">
-	<h3>{{username}} <small>:: {{email}}</small></h3>
-
 	<div class="currentlyDoing" style="padding-top: 1em">
 		<h3>who are you, what are you working on?</h3>
 		<div class="who span6" style="height: 315px">
@@ -101,7 +99,18 @@
 		</div>
 	</div>
 
-	<div style="clear: both; margin-bottom: 2em">
+	<h3 style="clear: left; padding-top: 1.5em">profile name</h3>
+	<div class="span7">
+		<form ng-submit="saveUsername()">
+			<input ng-model="username" class="name" type="text"/> 
+			<h3 style="display: inline"><small>:: {{email}}</small></h3>
+			<div style="margin-bottom: 1.5em">
+				<button type="submit" class="btn">Save</button>
+			</div>
+		</form>
+	</div>
+
+	<div style="margin-bottom: 2em">
 		&nbsp;
 	</div>
 </div>

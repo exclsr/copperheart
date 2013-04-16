@@ -24,6 +24,7 @@ function EditCtrl($scope, $http, session) {
 			$scope.name = patron.name;
 			$scope.present = patron.present;
 			$scope.passions = patron.passions;
+			$scope.communities = patron.communities;
 		});
 
 		patronRes.error(function(data, status, headers, config) {
@@ -47,6 +48,62 @@ function EditCtrl($scope, $http, session) {
 		});
 	};
 
+
+	$scope.isAtCommunityLimit = function() {
+		var communities = $scope.communities || [];
+		return communities.length >= 5;
+	};
+
+	var saveCommunities = function (communities, callback) {
+		var putCommunities = $http.put('/patron/communities', communities);
+		putCommunities.success(function (data) {
+			$scope.communities = communities;
+			console.log("<3");
+			callback();
+		});
+		putCommunities.error(function (data, status, headers, config) { 
+			// TODO: Oh ... no.
+			console.log(data);
+		});
+	};
+
+	$scope.saveCommunity = function() {
+		var communities = [];
+		// Prepare passions for the server, while keeping our
+		// UI the same. TODO: What do we want to do -- wait
+		// to hear from the server before updating the UI,
+		// or to be "responsive." Let's start with being
+		// honest about what is happening, then go from there.
+		angular.forEach($scope.communities, function (community) {
+			communities.push(community);
+		});
+		communities.push($scope.newCommunity);
+
+		saveCommunities(communities, function() {
+			$scope.newCommunity = {};
+			$scope.newCommunity.url = "";
+			$scope.newCommunity.name = "";
+		});
+	};
+
+	$scope.deleteCommunity = function(communityToDelete) {
+		var communitiesToKeep = [];
+		// TODO: Rumor is that animations are coming in the next
+		// release of AngularJS for this sort of thing, so hold
+		// tight for now.
+		angular.forEach($scope.communities, function (community) {
+			if (community !== communityToDelete) {
+				communitiesToKeep.push(community);
+			}
+		});
+
+		saveCommunities(communitiesToKeep);
+	};
+
+
+
+
+
 	$scope.isAtPassionLimit = function() {
 		var passions = $scope.passions || [];
 		return passions.length >= 3;
@@ -57,6 +114,7 @@ function EditCtrl($scope, $http, session) {
 		putPassions.success(function (data) {
 			$scope.passions = passions;
 			console.log("<3");
+			callback();
 		});
 		putPassions.error(function (data, status, headers, config) { 
 			// TODO: Oh ... no.
@@ -246,6 +304,7 @@ function HelloCtrl($scope, $http, $location, session, activeContribution) {
 			$scope.who.name = who.name;
 			$scope.who.present = who.present;
 			$scope.who.passions = who.passions;
+			$scope.who.communities = who.communities;
 		});
 		whoRes.error(function (data, status, headers, config) {
 			// TODO: :-(

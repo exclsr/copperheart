@@ -19,6 +19,28 @@
 
 		<div class="projects span4">
 			<h3>Communities</h3>
+			<ul style="margin-bottom: 0">
+				<li ng-repeat="community in communities" class="communityContainer">
+					<span class=""><a href="{{community.url}}">{{community.name}}</a></span>
+					<span class="thingTrashIcon" ng-click="deleteCommunity(community)">
+						<i class="icon-trash" 
+						style="margin-left: 1.5ex; margin-bottom: 2px; vertical-align: bottom"></i>
+					</span>
+				</li>
+			</ul>
+
+			<ul ng-hide="isAtCommunityLimit()" style="margin-top: 0">
+				<li>
+					<form ng-submit="saveCommunity()">
+						<input ng-model="newCommunity.url" type="text" style="margin-top: 10px" 
+						placeholder="web address (url)" />
+						<input ng-model="newCommunity.name" type="text" style="margin-top: -8px"
+						placeholder="friendly name" />
+						<button type="submit" class="btn" style="margin-top: -18px">Add</button>
+					</form>
+				</li>
+			</ul>
+
 			<!--
 			TODO: Soon ...
  			<input type="text"/>

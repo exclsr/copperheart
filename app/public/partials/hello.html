@@ -17,15 +17,14 @@
 		<div class="projects span4">
 			<h3>Communities</h3>
 			<ul>
-				<li><a href="http://corvallisswing.com">Corvallis Swing Dance Society</a></li>
-				<li><a href="http://copperheart.org">Copper Heart</a></li>
-				<li><a href="http://secretproject.org">Secret Project</a></li>
+				<!-- TODO: Is data binding to the href based on 
+					 user input an injection-attack issue? -->
+				<li ng-repeat="community in who.communities">
+					<a href="{{community.url}}">{{community.name}}</a>
+				</li>
 			</ul>
 
-			<ul>
-				<li><a href="http://swingandblues.org">Corvallis Swing &amp; Blues Weekend</a></li>
-				<li><a href="http://acm.cse.buffalo.edu/">Univ. at Buffalo, ACM chapter</a></li>
-			</ul>
+			<!-- TODO: Have a list of past projects in here, somehow. -->
 
 			<h3>Passions</h3>
 			<ul>

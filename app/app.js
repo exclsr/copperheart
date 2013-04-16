@@ -152,6 +152,7 @@ app.get('/who/:username', function (req, res) {
 		publicWho.name = who.name;
 		publicWho.present = who.present;
 		publicWho.passions = who.passions;
+		publicWho.communities = who.communities;
 
 		res.send(publicWho);
 	};
@@ -187,6 +188,7 @@ app.get('/patron', ensureAuthenticated, function (req, res) {
 		patron.name = patronData.name || "";
 		patron.present = patronData.present || "";
 		patron.passions = patronData.passions || [];
+		patron.communities = patronData.communities || [];
 
 		res.send(patron);
 	};
@@ -252,6 +254,27 @@ app.put('/patron/passions', ensureAuthenticated, function (req, res) {
 	patron.passions = passions;
 	db.patrons.save(patron, success, failure);
 });
+
+
+app.put('/patron/communities', ensureAuthenticated, function (req, res) {
+	// TODO: Obvi refactoring with the code above.
+	var patron = req.user;
+	var communities = req.body;
+
+	var success = function (things) {
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	patron.communities = communities;
+	db.patrons.save(patron, success, failure);
+});
+
 
 
 // Some day we'll use jade for basic templating. 

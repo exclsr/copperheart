@@ -1,79 +1,97 @@
 <div class="header">
 	<!-- TODO: Move this into some sort of template -->
+	<a href="/">
+		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
+	</a>
 	{{whoami}}
 	<h6 id="login"><a href="/auth/google">log in</a> | <a href="/auth/logout">log out</a></h6>
 </div>
 
-<div class="view">
-<!-- <h2><span ng-repeat="thing in things">
-	<span class="heart" ng-show="thing.canHaz && !thing.recurring">♥</span>
-	<span class="recurringHeart" 
-		ng-show="thing.canHaz && thing.recurring">♥</span>
-	</span>&nbsp;</h2> -->
-<h4>(making it happen ...)</h4>
+<div class="view span12">
+	<div class="whatContribution span11">
+		<div class="span4">
+			<h3>contributing</h3>
+			<ul class="contributionList">
+				<li class="contribution" ng-repeat="thing in things">
+					<span>A {{thing.unit}} of {{thing.name}}</span>
+					<span ng-show="thing.recurring">each {{thing.frequency}}</span>
+					<span class="glyph {{thing.id}}"></span>
+				</li>
+			</ul>
+		</div>
 
+		<div class="span3">
+			<h3>to</h3>
+			{{who.name}}
+		</div>
 
-<form novalidate id="payment-form" class="css-form">
-	<span class="payment-errors">{{errorMessage}}</span>
-
-	<div class="firstColumn pull-left span3">
-		<h4>(what ...)</h4>
-		<ul class="contributionList">
-			<li class="contribution" ng-repeat="thing in things">
-				<span>A {{thing.unit}} of {{thing.name}}</span>
-				<span ng-show="thing.recurring">each {{thing.frequency}}</span>
-				<span class="glyph {{thing.id}}"></span>
-			</li>
-		</ul>
-	</div>
-
-	<div class="secondColumn pull-left span4">
-		<h4>(how ...)</h4>
-		<div class="card pull-left well">
-			<div class="form-row cardNumberRow">
-				<input class="cardNumber pull-right" type="text" size="20" data-stripe="number" 
-				ng-model="cc.number" placeholder="Credit or debit card number"/>
-			</div>
-
-			<div class="form-row expirationRow">
-				<div class="pull-right">
-					<span>Expiration date </span>
-					<select class="expMonth" data-stripe="exp-month" ng-model="cc.expMonth">
-						<option ng-repeat="month in months">{{month}}</option>
-					</select>
-					<span>/</span>
-					<select class="expYear" data-stripe="exp-year" ng-model="cc.expYear">
-						<option ng-repeat="year in years">{{year}}</option>
-					</select>
-				</div>
-			</div>
-
-			<div class="form-row cvcRow">
-				<div class="pull-right">
-					<input class="cvcNumber" type="text" size="4" data-stripe="cvc" 
-					ng-model="cc.cvc" placeholder="cvc"/>
-				</div>
-			</div>
+		<div class="span3">
+			<h3>from</h3>
+			{{whoami}}
 		</div>
 	</div>
 
-	<div class="thirdColumn span3">
-		<h4>(when ...)</h4>
-		<p>{{priceNow | currency}} now.</p>
-		<p>{{pricePerMonth | currency}} each month, starting on the 
-			<select class="paymentDay" ordinal ng-model='paymentDay'>
-				<option ng-repeat="day in daysOfTheMonth">{{day | ordinal}}<option>
-			</select>
-			day of {{nextMonth | month}}.</p>
-		<div class="form-row" style="text-align: center">
-			<button class="btn" ng-click="submitPayment()">Submit Payment</button>
+	<form novalidate id="payment-form" class="css-form">
+		<div class="whenContribution span11">
+			<div class="span10">
+				<h3>when</h3>
+				<div><span class="heart">♥</span> {{priceNow | currency}} now.</div>
+				<div><span class="copper heart">♥</span> {{pricePerMonth | currency}} each month, starting on the 
+					<select class="paymentDay" ordinal ng-model='paymentDay'>
+						<option ng-repeat="day in daysOfTheMonth">{{day | ordinal}}<option>
+					</select>
+					day of {{nextMonth | month}}.</div>
+			</div>
 		</div>
-		<div>{{result}}</div>
-	</div>
 
+		<div class="howContribution span11">
+			<div class="span10">
+			<h3>how</h3>
+				<div class="card pull-left well">
+					<div class="form-row cardNumberRow">
+						<input class="cardNumber pull-right" type="text" size="20" data-stripe="number" 
+						ng-model="cc.number" placeholder="Credit or debit card number"/>
+					</div>
 
-</form>
+					<div class="form-row expirationRow">
+						<div class="pull-right">
+							<span class="expText">Expiration date </span>
+							<select class="expMonth" data-stripe="exp-month" ng-model="cc.expMonth">
+								<option ng-repeat="month in months">{{month}}</option>
+							</select>
+							<span>/</span>
+							<select class="expYear" data-stripe="exp-year" ng-model="cc.expYear">
+								<option ng-repeat="year in years">{{year}}</option>
+							</select>
+						</div>
+					</div>
 
+					<div class="form-row cvcRow">
+						<div class="pull-right">
+							<input class="cvcNumber" type="text" size="4" data-stripe="cvc" 
+							ng-model="cc.cvc" placeholder="cvc"/>
+						</div>
+					</div>
+				</div><!-- end card -->
 
-<pre style="clear: both; margin-top: 40em">{{things | json}}</pre>
+				<!-- <h2><span ng-repeat="thing in things">
+					<span class="heart" ng-show="thing.canHaz && !thing.recurring">♥</span>
+					<span class="recurringHeart" 
+						ng-show="thing.canHaz && thing.recurring">♥</span>
+					</span>&nbsp;</h2> -->
+
+				<div>
+					<span class="payment-errors">{{errorMessage}}</span>
+				</div>
+
+				<div style="clear: left">
+					<button class="btn" ng-click="submitPayment()">Contribute</button>
+					{{result}}
+				</div>
+			</div>
+		</div>
+	</form>
+
+<!-- <pre style="clear: both; margin-top: 40em">{{things | json}}</pre>
+ -->
 </div>

@@ -243,6 +243,8 @@ function EditCtrl($scope, $http, session) {
 }
 EditCtrl.$inject = ['$scope', '$http', 'session'];
 
+
+
 function HelloCtrl($scope, $http, $location, $routeParams, session, activeContribution) {
 
 	// TODO: We'll prob want to call things when traversing from
@@ -281,7 +283,7 @@ function HelloCtrl($scope, $http, $location, $routeParams, session, activeContri
 			}
 		};
 
-		var profileName = $routeParams.who || "phil";
+		var profileName = $scope.profileName = $routeParams.who || "phil";
 		var blahThings, blahContributions; // TODO: Rename.
 
 		// TODO: Obviously, will want to make this URL adaptive to 
@@ -405,43 +407,68 @@ function HelloCtrl($scope, $http, $location, $routeParams, session, activeContri
 		activeContribution.priceNow = $scope.priceNow();
 		activeContribution.pricePerMonth = $scope.pricePerMonth();
 
-		$location.path('contribute');
+		$location.path('contribute/' + $scope.profileName);
 	};
 }
 HelloCtrl.$inject = ['$scope', '$http', '$location', '$routeParams', 'session', 'activeContribution'];
 
 
-function ContributeCtrl($scope, $http, session, activeContribution) {
+
+
+function ContributeCtrl($scope, $http, $routeParams, session, activeContribution) {
 
 	$scope.whoami = session.whoami;
 	$scope.things = activeContribution.things;
 	$scope.priceNow = activeContribution.priceNow;
 	$scope.pricePerMonth = activeContribution.pricePerMonth;
 
-	// For testing ...
-	if (!activeContribution || !activeContribution.things.length > 0) {
-		$scope.things = [
-			{
-				"id": "wine",
-				"name": "wine",
-				"unit": "glass",
-				"price": 5,
-				"frequency": "month",
-				"canHaz": true,
-				"recurring": true
-			},
-			{
-				"id": "internet",
-				"name": "Internet",
-				"unit": "day",
-				"price": 2,
-				"frequency": "month",
-				"canHaz": true
-			}
-		];
-		$scope.priceNow = 7.00;
-		$scope.pricePerMonth = 5.00;
-	}
+	var initialize = function () {
+
+		var contributingTo = $routeParams.who;
+		
+		// TODO: refactor dup code
+		var whoRes = $http.get('/who/' + contributingTo);
+		whoRes.success(function (who) {
+			$scope.who = {};
+			$scope.who.name = who.name;
+			$scope.who.present = who.present;
+			$scope.who.passions = who.passions;
+			$scope.who.communities = who.communities;
+		});
+		whoRes.error(function (data, status, headers, config) {
+			// TODO: :-(
+			console.log(data);
+		});
+
+		// For testing ...
+		if (!activeContribution || !activeContribution.things.length > 0) {
+			$scope.whoami = "anonymous";
+			$scope.things = [
+				{
+					"id": "wine",
+					"name": "wine",
+					"unit": "glass",
+					"price": 5,
+					"frequency": "month",
+					"canHaz": true,
+					"recurring": true
+				},
+				{
+					"id": "internet",
+					"name": "Internet",
+					"unit": "day",
+					"price": 2,
+					"frequency": "month",
+					"canHaz": true
+				}
+			];
+			$scope.priceNow = 7.00;
+			$scope.pricePerMonth = 5.00;
+		}
+	};
+
+	initialize();
+
 
 	$scope.cc = {};
 	$scope.cc.expMonth = '01';
@@ -521,6 +548,6 @@ function ContributeCtrl($scope, $http, session, activeContribution) {
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-ContributeCtrl.$inject = ['$scope', '$http', 'session', 'activeContribution'];
+ContributeCtrl.$inject = ['$scope', '$http', '$routeParams', 'session', 'activeContribution'];
 
 

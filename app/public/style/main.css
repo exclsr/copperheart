@@ -56,7 +56,7 @@ ul {
 
 
 .view {
-	padding-bottom: 6em;
+	padding-bottom: 1.5em;
 }
 
 .header {
@@ -270,21 +270,19 @@ ul {
 
 /* Contribution page */
 /* TODO: Move to its own file */
-.firstColumn {
-	margin-left: 0;
-	padding-left: 1.5em;	
+.whatContribution {
+	padding-top: 1ex;
+	background-color: white;
+	padding-bottom: 1.5em;
 }
-.secondColumn {
-	margin-left: 0;
-	padding-left: 1.5em;
-	border-left: solid 1px #ccc;
-	border-right: solid 1px #ccc;
-
+.whenContribution {
+	margin-top: 1.5em;
+	padding-bottom: 1.5em;
 }
-.thirdColumn {
-	margin-left: 0;
-	padding-left: 1.5em;
-	padding-right: 1.5em;
+.howContribution {
+	background-color: #f3f3f3;
+	margin-top: 1.5em;
+	padding-bottom: 1em;
 }
 
 ul.contributionList {
@@ -304,6 +302,8 @@ ul.contributionList .contribution {
 .card {
 	border: solid 1px #999;
 	background: #f3f3f3;
+	background: #eee;
+	color: #333;
 	padding: 20px;
 }
 
@@ -311,7 +311,12 @@ ul.contributionList .contribution {
 	width: 35ex;
 }
 .cardNumber {
-	width: 32ex !important;
+	font-size: 12pt !important;
+	width: 25ex !important;
+	text-align: right;
+}
+.expText {
+	padding-right: 1ex;
 }
 
 .expMonth, .expYear {
@@ -324,12 +329,15 @@ ul.contributionList .contribution {
 	width: 10ex !important;
 }
 .cvcNumber {
+	font-size: 12pt !important;
 	width: 5ex !important;
+	text-align: right;
 }
 
 select.paymentDay {
 	width: 9ex !important;
 }
+
 
 /* Edit page */
 .name {

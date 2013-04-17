@@ -32,10 +32,10 @@
 			<ul ng-hide="isAtCommunityLimit()" style="margin-top: 0">
 				<li>
 					<form ng-submit="saveCommunity()">
-						<input ng-model="newCommunity.url" type="text" style="margin-top: 10px" 
+						<input ng-model="newCommunity.name" type="text" style="margin-top: 10px"
+						placeholder="community name" />
+						<input ng-model="newCommunity.url" type="text" style="margin-top: -8px" 
 						placeholder="web address (url)" />
-						<input ng-model="newCommunity.name" type="text" style="margin-top: -8px"
-						placeholder="friendly name" />
 						<button type="submit" class="btn" style="margin-top: -18px">Add</button>
 					</form>
 				</li>

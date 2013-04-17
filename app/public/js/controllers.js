@@ -469,6 +469,32 @@ function ContributeCtrl($scope, $http, $routeParams, session, activeContribution
 
 	initialize();
 
+	$scope.isLoggedIn = function() {
+		if (session && session.whoami && session.whoami !== "anonymous") {
+			return true;
+		}
+
+		return false;
+	};
+
+	$scope.isLoginNeeded = function () {
+		// The patron needs to log in if there
+		// is a recurring payment.
+		var isLoginNeeded = false;
+		if ($scope.isLoggedIn()) {
+			return false;
+		}
+
+		angular.forEach($scope.things, function (thing) {
+			if (thing.recurring && thing.canHaz) {
+				isLoginNeeded = true;
+				return;
+			}
+		});
+
+		return isLoginNeeded;
+	};
+
 
 	$scope.cc = {};
 	$scope.cc.expMonth = '01';

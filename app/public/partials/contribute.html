@@ -4,7 +4,10 @@
 		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
 	</a>
 	{{whoami}}
-	<h6 id="login"><a href="/auth/google">log in</a> | <a href="/auth/logout">log out</a></h6>
+	<h6 id="login">
+		<a ng-show="!isLoggedIn()" href="/auth/google">log in</a>
+		<a ng-show="isLoggedIn()" href="/auth/logout">log out</a>
+	</h6>
 </div>
 
 <div class="view span12">
@@ -28,6 +31,7 @@
 		<div class="span3">
 			<h3>from</h3>
 			{{whoami}}
+			<span ng-show="isLoginNeeded()"> | <a href="/auth/google">log in</a></span>
 		</div>
 	</div>
 
@@ -36,7 +40,7 @@
 			<div class="span10">
 				<h3>when</h3>
 				<div><span class="heart">♥</span> {{priceNow | currency}} now.</div>
-				<div><span class="copper heart">♥</span> {{pricePerMonth | currency}} each month, starting on the 
+				<div ng-hide="pricePerMonth <= 0"><span class="copper heart">♥</span> {{pricePerMonth | currency}} each month, starting on the 
 					<select class="paymentDay" ordinal ng-model='paymentDay'>
 						<option ng-repeat="day in daysOfTheMonth">{{day | ordinal}}<option>
 					</select>

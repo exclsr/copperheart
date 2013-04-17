@@ -3,8 +3,14 @@
 //
 var port = process.env.PORT || 3000;
 
-var stripeApiTest = process.env.STRIPE_API_TEST || 'missing api key';
-var stripeApiLive = process.env.STRIPE_API_LIVE || 'missing api key';
+var stripeApiTest  = process.env.STRIPE_API_TEST || 'missing api key';
+var stripeApiLive  = process.env.STRIPE_API_LIVE || 'missing api key';
+
+// If multiple developers are working with the same
+// Stripe account, there can be data conflicts during test.
+// Set this to be a unique value for you, like 
+// your GitHub name, and relax.
+var stripeTestClientId = undefined;
 
 // TODO: These keys are used on the client side, so we're
 // going to want to use a templating engine like jade sooner
@@ -47,6 +53,10 @@ exports.stripeApiTest = function() {
 
 exports.stripeApiLive = function() {
 	return overrides.stripeApiLive || stripeApiLive;
+};
+
+exports.stripeTestClientId = function() {
+	return overrides.stripeTestClientId || stripeTestClientId;
 };
 
 exports.sessionSecret = function() {

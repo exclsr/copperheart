@@ -359,8 +359,14 @@ var pricePerMonth = function(things) {
 
 
 var getStripePlanId = function (patronId) {
-	return patronId + '-contribution';
-}
+	var planId = patronId + '-contribution';
+
+	if (config.stripeTestClientId()) {
+		planId += '-' + config.stripeTestClientId();
+	}
+
+	return planId;
+};
 
 var getStripePlanRequest = function (patronId, things) {
 	// This is one person's monthly contribution into to the pool.
@@ -375,6 +381,10 @@ var getStripePlanRequest = function (patronId, things) {
 
 	var planId = getStripePlanId(patronId);
 	var planName = patronId + ' contribution';
+
+	if (config.stripeTestClientId()) {
+		planName += ' created by ' + config.stripeTestClientId();
+	}
 
 	var price = pricePerMonth(things);
 	var pricePerMonthInCents = price * 100;
@@ -502,6 +512,15 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 				// TODO: If we get a failure at this point, we have a data
 				// integrity issue, because it is likely a plan already exists.
 				stripe.plans.create(planRequest, function (err, planResponse) {
+					if (err && err.name === 'invalid_request_error') {
+						// At this point, there is a plan in the Stripe 
+						// database that our database doesn't know about.
+						//
+						// This is very bad, because there are existing, 
+						// recurring charges that we don't know about.
+						//
+						// TODO: Freak out, appropriately.
+					}
 					err ? failure(err) : stripePlanCreated(planResponse);
 				});
 			};

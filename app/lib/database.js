@@ -243,7 +243,7 @@ var db = function() {
 
 		getContribution(contribution.backerId, contribution.projectId,
 			function (existingContribution) {
-				if (!existingContribution || existingContribution === []) {
+				if (!existingContribution || existingContribution.length < 1) {
 					// No existing contribution. Create doc.
 					database.save(contribution, function (error, response) {
 						error ? failure(error) : success();

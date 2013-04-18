@@ -14,7 +14,8 @@ angular.module('myApp.services', []).
   })
   .factory('session', function() {
   	return {
-  		things: []
+      patron: {},
+      contributions: []
   	};
   });
 

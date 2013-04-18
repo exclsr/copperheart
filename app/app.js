@@ -85,17 +85,45 @@ var ensureAuthenticated = function(req, res, next) {
 		" and try again.");
 };
 
-app.get('/whoami', function (req, res) {
+var anonymousPatron = "anonymous";
+
+// Patron data that patrons want to know about
+// as they're wandering through the site.
+app.get('/whoami/id', function (req, res) {
 	if (req.user) {
 		var patron = req.user;
 		res.send(patron.id);
 	}
 	else {
-		res.send("anonymous");
+		res.send(anonymousPatron);
 	}
 });
 
-app.get('/things/:username/', function (req, res) {
+app.get('/whoami', function (req, res) {
+	if (req.user) {
+		var failure = function (err) {
+			console.log(err);
+			// TODO: Figure out an error message scheme.
+			res.send(500);
+		};
+
+		var gotPatron = function (patronData) {
+			var patron = {};
+			patron.email = patronData.email;
+			patron.username = patronData.username;
+			patron.name = patronData.name || "";
+
+			res.send(patron);
+		};
+
+		db.patrons.get(req.user.email, gotPatron, failure);
+	}
+	else {
+		res.send(anonymousPatron);
+	}
+});
+
+app.get('/things/:username', function (req, res) {
 
 	var success = function (things) {
 		res.send(things);

@@ -1,106 +1,183 @@
 'use strict';
 
-function HelloCtrl($scope, $http, $location, $routeParams, session, activeContribution) {
+function HelloCtrl(session, $scope, $http, $location, $routeParams, activeContribution) {
 
-	// TODO: We'll prob want to call things when traversing from
-	// another page, such as going back from the 'contribute' page.
-	// But that will be a problem for future self ...
-	var initialize = function () {
+	var profile = {};
+	var patron = {};
 
-		var everythingAtOnce = function (things, contributions) {
+	var initialize = function (success) {
+
+		var hadSuccess = false;
+		var defaultProfileName = "phil"; // TODO: Will be going away, soon.
+		profile.username = $routeParams.who || defaultProfileName;
+
+		var isInitialized = function () {
+			return profile
+				&& profile.name
+				&& profile.username
+				&& profile.present
+				&& profile.passions
+				&& profile.communities
+				&& profile.things
+				&& patron.contributions;
+		};
+
+		var maybeSuccess = function() {
+			if (!hadSuccess && isInitialized()) {
+				hadSuccess = true;
+				success();
+			}
+		};
+
+		var onWhoReady = function (who) {
+			profile.name = who.name;
+			profile.present = who.present;
+			profile.passions = who.passions;
+			profile.communities = who.communities;
+			maybeSuccess();
+		};
+
+		var onThingsReady = function (things) {
+			profile.things = things;
+			maybeSuccess();
+		}
+
+		var onContributionsReady = function (contributions) {
+			patron.contributions = contributions;
+			maybeSuccess();
+		};
+
+		$http.get('/who/' + profile.username)
+		.success(onWhoReady)
+		.error(function (data, status, headers, config) {
+			// TODO: :-(
+			console.log(data);
+		});
+
+		$http.get('/things/' + profile.username)
+		.success(onThingsReady)
+		.error(function (data, status, headers, config) {
+			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
+		});
+
+		$http.get('/contributions/' + profile.username)
+		.success(onContributionsReady)
+		.error(function (data, status, headers, config) {
+			// TODO: Once again, need an error handling scheme.
+			console.log(data);
+		});
+	};
+
+
+	var loadSession = function (success) {
+
+		var hadSuccess = false;
+
+		var isSessionLoaded = function() {
+			return session.patron
+				&& session.contributions
+				&& session.contributions[profile.username];
+		};
+
+		var maybeSuccess = function() {
+			if (!hadSuccess && isSessionLoaded()) {
+				hadSuccess = true;
+				success();
+			}
+		};
+
+		var mergeThingsAndContributions = function (things, contributions) {
+
 			if (things && contributions) {
-
 				// TODO: Make this look better. This is O(n^2), but
 				// that's probably ok in this situation, as n is probably
 				// less than 100.
-				var mergedThings = [];
+				var mergedContributions = [];
 				angular.forEach(things, function (thing) {
 					var isContributionFound = false;
 
 					angular.forEach(contributions, function (contribution) {
 						if (contribution.id === thing.id) {
 							isContributionFound = true;
-							mergedThings.push(contribution);
+							mergedContributions.push(contribution);
 						}
 					});
 
 					if (!isContributionFound) {
-						mergedThings.push(thing);
+						mergedContributions.push(thing);
 					}
 					
 				});
 
-				$scope.things = session.things = mergedThings;
-				// When our local 'things' changes, update our session.
-				$scope.$watch('things', function() {
-					session.things = $scope.things;
-				});
+				session.contributions[profile.username] = mergedContributions;
+				maybeSuccess();
 			}
 		};
 
-		var profileName = $scope.profileName = $routeParams.who || "phil";
-		var blahThings, blahContributions; // TODO: Rename.
+		if (!session.patron.username) {
+			$http.get('/whoami')
+			.success(function (patron) {
+					session.patron = patron;
+					maybeSuccess();
+			})
+			.error(function(data, status, headers, config) {
+				// TODO: Something terrible went wrong. Deal with it.
+				console.log(data);
+			});
+		}
 
-		// TODO: Obviously, will want to make this URL adaptive to 
-		// whatever profile we're looking at.
-		var thingsRes = $http.get('/things/' + profileName + '/');
+		if (!session.contributions[profile.username]) {
+			mergeThingsAndContributions(profile.things, patron.contributions);
+		}
 
-		thingsRes.success(function (things) {
-			blahThings = things;
-			everythingAtOnce(blahThings, blahContributions);
-		});
-
-		thingsRes.error(function (data, status, headers, config) {
-			// TODO: Something terrible went wrong. Deal with it.
-			console.log(data);
-		});
-
-
-		var contributionsRes = $http.get('/contributions/' + profileName + '/');
-		contributionsRes.success(function (contributions) {
-			blahContributions = contributions;
-			everythingAtOnce(blahThings, blahContributions);
-		});
-
-		contributionsRes.error(function (data, status, headers, config) {
-			// TODO: Once again, need an error handling scheme.
-			console.log(data);
-		})
-
-		var whoRes = $http.get('/who/' + profileName + '/');
-		whoRes.success(function (who) {
-			$scope.who = {};
-			$scope.who.name = who.name;
-			$scope.who.present = who.present;
-			$scope.who.passions = who.passions;
-			$scope.who.communities = who.communities;
-		});
-		whoRes.error(function (data, status, headers, config) {
-			// TODO: :-(
-			console.log(data);
-		});
+		maybeSuccess();
+	};
 
 
-		var idRes = $http.get('/whoami');
-		idRes.success(function (patronId) {
-			$scope.whoami = session.whoami = patronId;
-		});
-
-		idRes.error(function(data, status, headers, config) {
-			// TODO: Something terrible went wrong. Deal with it.
-			console.log(data);
+	var bindToSession = function() {
+		$scope.contributions = session.contributions[profile.username];
+		// When our local 'contributions' changes, update our session.
+		$scope.$watch('contributions', function() {
+			session.contributions[profile.username] = $scope.contributions;
 		});
 	};
 
-	// TODO: Re-init when appropriate ... gets more complicated
-	// now that the 'who' can changed based on the url, maybe. 
-	if (!session.things || session.things.length < 1 || !$scope.who) {
-		initialize();
+	initialize(function() {
+		loadSession(bindToSession);
+	});
+
+	//-----------------------------------------------------------
+	// $scope things
+	//
+	$scope.profile = {};
+	$scope.patron = {};
+
+	// TODO: This is one way to do things, with
+	// only using very simple getters for our
+	// $scope properties. 
+	//
+	// How do we feel about that?
+	$scope.patron.getUsername = function () {
+		if (session && session.patron && session.patron.username) {
+			return session.patron.username;
+		}
+		return "anonymous";
+	};
+
+	$scope.profile.getName = function() {
+	 	return profile.name;
+	};
+	$scope.profile.getPresent = function() {
+		return profile.present;
 	}
-	else {
-		$scope.things = session.things;
-		$scope.whoami = session.whoami;
-	}
+	$scope.profile.getCommunities = function() {
+		return profile.communities;
+	};
+	$scope.profile.getPassions = function() {
+		return profile.passions;
+	};
+
 
 	var perMonthMultiplier = function (frequency) {
 		switch (frequency) {
@@ -123,7 +200,7 @@ function HelloCtrl($scope, $http, $location, $routeParams, session, activeContri
 
 		// Angular figures out the data bindind dependencies
 		// here and calls 'priceNow' whenever necessary.
-		angular.forEach($scope.things, function (thing) {
+		angular.forEach($scope.contributions, function (thing) {
 			if (thing.canHaz && !thing.recurring) {
 				totalPrice += thing.price;
 			}
@@ -135,7 +212,7 @@ function HelloCtrl($scope, $http, $location, $routeParams, session, activeContri
 	$scope.pricePerMonth = function() {
 		var pricePerMonth = 0;
 
-		angular.forEach($scope.things, function (thing) {
+		angular.forEach($scope.contributions, function (thing) {
 			var itemPrice = 0;
 
 			if (thing.canHaz && thing.recurring) {
@@ -153,7 +230,7 @@ function HelloCtrl($scope, $http, $location, $routeParams, session, activeContri
 		activeContribution.things = [];
 
 		// TODO: Maybe use data binding to get this in real-time.
-		angular.forEach($scope.things, function (thing) {
+		angular.forEach($scope.contributions, function (thing) {
 			if (thing.canHaz) {
 				activeContribution.things.push(thing);
 			}
@@ -162,7 +239,7 @@ function HelloCtrl($scope, $http, $location, $routeParams, session, activeContri
 		activeContribution.priceNow = $scope.priceNow();
 		activeContribution.pricePerMonth = $scope.pricePerMonth();
 
-		$location.path('contribute/' + $scope.profileName);
+		$location.path('contribute/' + profile.username);
 	};
 }
-HelloCtrl.$inject = ['$scope', '$http', '$location', '$routeParams', 'session', 'activeContribution'];
+HelloCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams', 'activeContribution'];

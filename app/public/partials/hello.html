@@ -3,7 +3,7 @@
 	<a href="/">
 		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
 	</a>
-	{{whoami}} [<a href="#/edit">edit</a>]
+	{{patron.getUsername()}} [<a href="#/edit">edit</a>]
 	<h6 id="login"><a href="/auth/google">log in</a> | <a href="/auth/logout">log out</a></h6>
 </div>
 
@@ -11,8 +11,8 @@
 <div class="profile span12">
 	<div class="whoContainer span12">
 		<div class="who span6">
-			<h3 id="whoName">{{who.name}}</h3>
-			<div id="whoPresent" ng-bind-html="who.present">
+			<h3 id="whoName">{{profile.getName()}}</h3>
+			<div id="whoPresent" ng-bind-html="profile.getPresent()">
 			</div>
 		</div>
 		
@@ -21,7 +21,7 @@
 			<ul>
 				<!-- TODO: Is data binding to the href based on 
 					 user input an injection-attack issue? -->
-				<li ng-repeat="community in who.communities">
+				<li ng-repeat="community in profile.getCommunities()">
 					<a href="{{community.url}}">{{community.name}}</a>
 				</li>
 			</ul>
@@ -30,7 +30,7 @@
 
 			<h3>Passions</h3>
 			<ul>
-				<li ng-repeat="passion in who.passions">{{passion}}</li>
+				<li ng-repeat="passion in profile.getPassions()">{{passion}}</li>
 			</ul>
 		</div>
 	</div>
@@ -41,7 +41,7 @@
 			<h3 class="contributeTitle span7">Contribute to Copper Heart</h3>
 			<!-- hearts -->
 			<h3 class="contributeHearts span3">
-				<span ng-repeat="thing in things">
+				<span ng-repeat="thing in contributions">
 					<span class="heart" ng-show="thing.canHaz && !thing.recurring">♥</span>
 					<span class="recurringHeart" 
 						ng-show="thing.canHaz && thing.recurring">♥</span>
@@ -51,7 +51,7 @@
 
 		<div class="things span4">
 			<div style="clear: left">
-				<label ng-repeat="thing in things" class="checkbox choice-group"
+				<label ng-repeat="thing in contributions" class="checkbox choice-group"
 					ng-class="{ canHaz: thing.canHaz }">
 					<input type="checkbox" ng-model="thing.canHaz" id="{{thing.id}}"/>
 					<span>A {{thing.unit}} of {{thing.name}}</span>
@@ -63,7 +63,7 @@
 
 		<div class="frequency span3">
 			<div>
-				<div class="freqThing" ng-repeat="thing in things">
+				<div class="freqThing" ng-repeat="thing in contributions">
  					<label class="choice-group checkbox turnOnRecurring"
  						ng-class="{ peerSelected: thing.canHaz}" 
  						ng-hide="thing.recurring">

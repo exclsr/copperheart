@@ -143,9 +143,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		// When our local 'contributions' changes, update our session.
 		$scope.$watch('contributions', function() {
 			session.contributions[profile.username] = $scope.contributions;
-			// TODO: Can we $watch on the functions?
-			session.activeContribution.priceNow = $scope.priceNow();
-			session.activeContribution.pricePerMonth = $scope.pricePerMonth();
 		});
 	};
 
@@ -231,6 +228,10 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 
 	$scope.toContribute = function() {
+		// TODO: Can we $watch on the functions?
+		session.activeContribution.priceNow = $scope.priceNow();
+		session.activeContribution.pricePerMonth = $scope.pricePerMonth();
+
 		$location.path('contribute');
 	};
 }

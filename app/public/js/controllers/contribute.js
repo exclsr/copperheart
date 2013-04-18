@@ -14,7 +14,7 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			}
 		});
 
-		$scope.whoami = session.patron.username;
+		$scope.whoami = session.patron.username || "anonymous";
 		$scope.priceNow = session.activeContribution.priceNow;
 		$scope.pricePerMonth = session.activeContribution.pricePerMonth;
 		$scope.who = session.activeContribution.profile;

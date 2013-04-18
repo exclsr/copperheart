@@ -1,32 +1,28 @@
 'use strict';
 
-function ContributeCtrl($scope, $http, $routeParams, session, activeContribution) {
+function ContributeCtrl(session, $scope, $http, $routeParams) {
 
-	$scope.whoami = session.whoami;
-	$scope.things = activeContribution.things;
-	$scope.priceNow = activeContribution.priceNow;
-	$scope.pricePerMonth = activeContribution.pricePerMonth;
+	var bindToSession = function() {
 
-	var initialize = function () {
+		var contributionTo = session.activeContribution.profile.username;
+		var contributions = session.contributions[contributionTo];
 
-		var contributingTo = $routeParams.who;
-		
-		// TODO: refactor dup code
-		var whoRes = $http.get('/who/' + contributingTo);
-		whoRes.success(function (who) {
-			$scope.who = {};
-			$scope.who.name = who.name;
-			$scope.who.present = who.present;
-			$scope.who.passions = who.passions;
-			$scope.who.communities = who.communities;
-		});
-		whoRes.error(function (data, status, headers, config) {
-			// TODO: :-(
-			console.log(data);
+		$scope.things = [];
+		angular.forEach(contributions, function (thing) {
+			if (thing.canHaz) {
+				$scope.things.push(thing);
+			}
 		});
 
+		$scope.whoami = session.patron.username;
+		$scope.priceNow = session.activeContribution.priceNow;
+		$scope.pricePerMonth = session.activeContribution.pricePerMonth;
+		$scope.who = session.activeContribution.profile;
+	}
+
+	var maybeMakeFakeDataForTesting = function () {
 		// For testing ...
-		if (!activeContribution || !activeContribution.things.length > 0) {
+		if (!$scope.things || !$scope.things.length > 0) {
 			$scope.whoami = "anonymous";
 			$scope.things = [
 				{
@@ -52,10 +48,11 @@ function ContributeCtrl($scope, $http, $routeParams, session, activeContribution
 		}
 	};
 
-	initialize();
+	bindToSession();
+	maybeMakeFakeDataForTesting();
 
 	$scope.isLoggedIn = function() {
-		if (session && session.whoami && session.whoami !== "anonymous") {
+		if (session.patron.username) {
 			return true;
 		}
 
@@ -159,4 +156,4 @@ function ContributeCtrl($scope, $http, $routeParams, session, activeContribution
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-ContributeCtrl.$inject = ['$scope', '$http', '$routeParams', 'session', 'activeContribution'];
+ContributeCtrl.$inject = ['session', '$scope', '$http', '$routeParams'];

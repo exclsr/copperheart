@@ -1,10 +1,12 @@
 'use strict';
 
-function HelloCtrl(session, $scope, $http, $location, $routeParams, activeContribution) {
+function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	var profile = {};
 	var patron = {};
 
+	// TODO: Rename to something related to binding
+	// to route params, as that's what we're really doing.
 	var initialize = function (success) {
 
 		var hadSuccess = false;
@@ -131,6 +133,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams, activeContri
 			mergeThingsAndContributions(profile.things, patron.contributions);
 		}
 
+		session.activeContribution.profile = profile;
 		maybeSuccess();
 	};
 
@@ -140,6 +143,9 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams, activeContri
 		// When our local 'contributions' changes, update our session.
 		$scope.$watch('contributions', function() {
 			session.contributions[profile.username] = $scope.contributions;
+			// TODO: Can we $watch on the functions?
+			session.activeContribution.priceNow = $scope.priceNow();
+			session.activeContribution.pricePerMonth = $scope.pricePerMonth();
 		});
 	};
 
@@ -225,21 +231,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams, activeContri
 	};
 
 	$scope.toContribute = function() {
-
-		// TODO: Maybe make a contribution object, for fun.
-		activeContribution.things = [];
-
-		// TODO: Maybe use data binding to get this in real-time.
-		angular.forEach($scope.contributions, function (thing) {
-			if (thing.canHaz) {
-				activeContribution.things.push(thing);
-			}
-		});
-
-		activeContribution.priceNow = $scope.priceNow();
-		activeContribution.pricePerMonth = $scope.pricePerMonth();
-
-		$location.path('contribute/' + profile.username);
+		$location.path('contribute');
 	};
 }
-HelloCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams', 'activeContribution'];
+HelloCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams'];

@@ -8,8 +8,7 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
     $routeProvider.when('/:who/hello', {templateUrl: 'partials/hello.html', controller: HelloCtrl});
     $routeProvider.when('/hello/:who', {templateUrl: 'partials/hello.html', controller: HelloCtrl});
     $routeProvider.when('/hello', {templateUrl: 'partials/hello.html', controller: HelloCtrl});
-    $routeProvider.when('/:who/contribute', {templateUrl: 'partials/contribute.html', controller: ContributeCtrl});
-    $routeProvider.when('/contribute/:who', {templateUrl: 'partials/contribute.html', controller: ContributeCtrl});
+    $routeProvider.when('/contribute', {templateUrl: 'partials/contribute.html', controller: ContributeCtrl});
     $routeProvider.when('/edit', {templateUrl: 'partials/edit.html', controller: EditCtrl});
-    $routeProvider.otherwise({redirectTo: '/phil/hello/'});
+    $routeProvider.otherwise({redirectTo: '/hello/phil'});
   }]);

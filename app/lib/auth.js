@@ -140,16 +140,15 @@ var authenticate = function(req, success, failure) {
 var authMiddleware = function(req, res, next) {
 
 	var success = function() {
-		// TODO: How does the client know whether it is authenticated?
-		// TODO: Why are we redirecting here? Do something better.
-		res.redirect(hostUrl());
-//		res.send(200, "Login successul");
+		req.isAuthenticated = true;
+		next();
 	};
 
 	var failure = function(error) {
 		console.log(error);
 		// TODO: What is failure, anyway?
-		res.send(200, "..."); 
+		req.isAuthenticated = false;
+		next();
 	};
 
 	// The auth library provides middleware that

@@ -51,8 +51,16 @@ var loginFailureUrl = '/';
 //   request. The first step in Google authentication will involve redirecting
 //   the user to google.com. After authenticating, Google will redirect the
 //   user back to this application at /auth/google/return
+var authMiddlewareSaveWhereFrom = 
+	[
+		function (req, res, next) {
+			req.session.loginFrom = req.query["from"];
+			next();
+		},
+		auth.authenticate('google', { failureRedirect: loginFailureUrl })
+	];
 app.get('/auth/google', 
-	auth.authenticate('google', { failureRedirect: loginFailureUrl }),
+	authMiddlewareSaveWhereFrom,
 		function (req, res) {
 			// This response doesn't matter, because we get redirected
 			// to /auth/google/return anyway.
@@ -61,7 +69,18 @@ app.get('/auth/google',
 );
 
 // GET /auth/google/return
-app.get(auth.googleReturnUrl, auth.authMiddleware);
+//   We get here when we're done authenticating through Google OpenID.
+app.get(auth.googleReturnUrl, auth.authMiddleware, function (req, res) {
+	if (req.isAuthenticated) {
+		// TODO: Is this a security hole?
+		res.redirect('/' + req.session.loginFrom || "");
+	}
+	else {
+		// TODO: Do we want to go to the root on failure?
+		// We might want to go to some login failure page.
+		res.redirect('/');
+	}
+});
 
 // Logout ...
 app.get('/auth/logout', function (req, res){

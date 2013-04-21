@@ -231,6 +231,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		// TODO: Can we $watch on the functions?
 		session.activeContribution.priceNow = $scope.priceNow();
 		session.activeContribution.pricePerMonth = $scope.pricePerMonth();
+		session.save();
 
 		$location.path('contribute');
 	};

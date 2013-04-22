@@ -299,6 +299,10 @@ ul.contributionList .contribution {
 	line-height: 1.5em;
 }
 
+.notPossible {
+	opacity: 0.25;
+}
+
 /* chat bubble from http://ilikepixels.co.uk/drop/bubbler/ */
 .bubble 
 {

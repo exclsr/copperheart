@@ -6,9 +6,11 @@
 			<h3>contributing</h3>
 			<ul class="contributionList">
 				<li class="contribution" ng-repeat="thing in things">
-					<span>A {{thing.unit}} of {{thing.name}}</span>
-					<span ng-show="thing.recurring">each {{thing.frequency}}</span>
-					<span class="glyph {{thing.id}}"></span>
+					<div ng-class="{ notPossible: thing.recurring && isLoginNeeded() }">
+						<span>A {{thing.unit}} of {{thing.name}}</span>
+						<span ng-show="thing.recurring">each {{thing.frequency}}</span>
+						<span class="glyph {{thing.id}}"></span>
+					</div>
 				</li>
 			</ul>
 		</div>
@@ -36,7 +38,7 @@
 			<div class="span10">
 				<h3>when</h3>
 				<div><span class="heart">♥</span> {{priceNow | currency}} now.</div>
-				<div ng-hide="pricePerMonth <= 0"><span class="copper heart">♥</span> {{pricePerMonth | currency}} each month, starting on the 
+				<div ng-hide="pricePerMonth <= 0 || isLoginNeeded()"><span class="copper heart">♥</span> {{pricePerMonth | currency}} each month, starting on the 
 					<select class="paymentDay" ordinal ng-model='paymentDay'>
 						<option ng-repeat="day in daysOfTheMonth">{{day | ordinal}}<option>
 					</select>

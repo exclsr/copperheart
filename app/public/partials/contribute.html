@@ -1,14 +1,4 @@
-<div class="header">
-	<!-- TODO: Move this into some sort of template -->
-	<a href="/">
-		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
-	</a>
-	{{whoami}}
-	<h6 id="login">
-		<a ng-show="!isLoggedIn()" href="/auth/google?from=#contribute">log in</a>
-		<a ng-show="isLoggedIn()" href="/auth/logout">log out</a>
-	</h6>
-</div>
+<div ng-include src="'/partials/header.html'"></div>
 
 <div class="view span12">
 	<div class="whatContribution span11">

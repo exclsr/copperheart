@@ -1,23 +1,15 @@
 'use strict';
 
 /* Controllers */
-function EditCtrl($scope, $http, session) {
+function EditCtrl(session, $scope, $http) {
+
+	$scope.pageName = "edit";
 
 	var initialize = function () {
 
-		var whoRes = $http.get('/whoami');
-		whoRes.success(function (patronId) {
-			$scope.whoami = session.whoami = patronId;
-		});
-
-		whoRes.error(function(data, status, headers, config) {
-			// TODO: Something terrible went wrong. Deal with it.
-			console.log(data);
-		});
-
 		var patronRes = $http.get('/patron');
 		patronRes.success(function (patron) {
-			$scope.patron = patron;
+			// $scope.patron = patron; // TODO: What is this?
 			$scope.email = patron.email;
 			$scope.username = patron.username;
 			$scope.things = patron.things;
@@ -31,6 +23,16 @@ function EditCtrl($scope, $http, session) {
 			// TODO: Something terrible went wrong. Deal with it.
 			console.log(data);
 		});
+	};
+
+	// TODO: This is in all the controllers. Need to
+	// refactor in a way that makes sense.
+	$scope.patron = {};
+	$scope.patron.getUsername = function () {
+		if (session && session.patron && session.patron.username) {
+			return session.patron.username;
+		}
+		return "anonymous";
 	};
 
 	$scope.saveWho = function() {
@@ -241,4 +243,4 @@ function EditCtrl($scope, $http, session) {
 
 	initialize();
 }
-EditCtrl.$inject = ['$scope', '$http', 'session'];
+EditCtrl.$inject = ['session', '$scope', '$http'];

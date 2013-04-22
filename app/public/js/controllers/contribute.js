@@ -2,6 +2,8 @@
 
 function ContributeCtrl(session, $scope, $http, $routeParams) {
 
+	$scope.pageName = "contribute";
+
 	var bindToSession = function() {
 
 		var contributionTo = session.activeContribution.profile.username;
@@ -14,7 +16,6 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			}
 		});
 
-		$scope.whoami = session.patron.username || "anonymous";
 		$scope.priceNow = session.activeContribution.priceNow;
 		$scope.pricePerMonth = session.activeContribution.pricePerMonth;
 		$scope.who = session.activeContribution.profile;
@@ -50,6 +51,15 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 
 	bindToSession();
 	maybeMakeFakeDataForTesting();
+
+	// TODO: This is in all the controllers. Refactor.
+	$scope.patron = {};
+	$scope.patron.getUsername = function () {
+		if (session && session.patron && session.patron.username) {
+			return session.patron.username;
+		}
+		return "anonymous";
+	};
 
 	$scope.isLoggedIn = function() {
 		if (session.patron.username) {

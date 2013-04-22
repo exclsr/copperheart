@@ -1,0 +1,16 @@
+<div class="header">
+	<a href="/">
+		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
+	</a>
+	{{patron.getUsername()}} [<a href="#/edit">edit</a>]
+
+	<h6 id="login">
+		<!-- TODO:
+			<a ng-show="!isLoggedIn()" href="/auth/google?from=#contribute">log in</a>
+			<a ng-show="isLoggedIn()" href="/auth/logout">log out</a>
+		-->
+
+		<a href="/auth/google?from=#/{{pageName}}">log in</a> | 
+		<a href="/auth/logout">log out</a>
+	</h6>
+</div>

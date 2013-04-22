@@ -118,18 +118,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			}
 		};
 
-		if (!session.patron.username) {
-			$http.get('/whoami')
-			.success(function (patron) {
-					session.patron = patron;
-					maybeSuccess();
-			})
-			.error(function(data, status, headers, config) {
-				// TODO: Something terrible went wrong. Deal with it.
-				console.log(data);
-			});
-		}
-
 		if (!session.contributions[profile.username]) {
 			mergeThingsAndContributions(profile.things, patron.contributions);
 		}
@@ -227,7 +215,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		session.activeContribution.pricePerMonth = $scope.pricePerMonth();
 		session.save();
 
-		$location.path('contribute');
+		$location.path('/contribute');
 	};
 }
 HelloCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams'];

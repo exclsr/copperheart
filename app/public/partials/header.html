@@ -2,10 +2,11 @@
 	<a href="/">
 		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
 	</a>
-	{{patron.getUsername()}} [<a href="#/edit">edit</a>]
+	{{patron.getUsername()}}
+	<span ng-show="isLoggedIn()">[<a href="#/edit">edit</a>]</span>
 
 	<h6 id="login">
 		<a ng-show="!isLoggedIn()" href="/auth/google?from=#/{{pageName}}">log in</a>
-		<a ng-show="isLoggedIn()" href="/auth/logout">log out</a>
+		<a ng-show="isLoggedIn()" ng-click="logout()" style="cursor:pointer">log out</a>
 	</h6>
 </div>

@@ -85,7 +85,7 @@ app.get(auth.googleReturnUrl, auth.authMiddleware, function (req, res) {
 // Logout ...
 app.get('/auth/logout', function (req, res){
 	req.logout();
-	res.redirect('/');
+	res.send(204); // no content
 });
 
 // Simple route middleware to ensure client is authenticated.

@@ -1,6 +1,17 @@
 'use strict';
 
-function TopLevelCtrl(session, $scope) {
+function TopLevelCtrl(session, $scope, $http) {
+
+	if (!session.patron.username) {
+		$http.get('/whoami')
+		.success(function (patron) {
+				session.patron = patron;
+		})
+		.error(function(data, status, headers, config) {
+			// TODO: Something terrible went wrong. Deal with it.
+			console.log(data);
+		});
+	}
 
 	$scope.patron = {};
 
@@ -19,4 +30,4 @@ function TopLevelCtrl(session, $scope) {
 		return false;
 	};
 }
-TopLevelCtrl.$inject = ['session', '$scope'];
+TopLevelCtrl.$inject = ['session', '$scope', '$http'];

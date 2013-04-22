@@ -52,15 +52,6 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 	bindToSession();
 	maybeMakeFakeDataForTesting();
 
-	// TODO: This is in all the controllers. Refactor.
-	$scope.patron = {};
-	$scope.patron.getUsername = function () {
-		if (session && session.patron && session.patron.username) {
-			return session.patron.username;
-		}
-		return "anonymous";
-	};
-
 	$scope.isLoggedIn = function() {
 		if (session.patron.username) {
 			return true;

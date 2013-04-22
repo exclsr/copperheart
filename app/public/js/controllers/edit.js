@@ -25,15 +25,6 @@ function EditCtrl(session, $scope, $http) {
 		});
 	};
 
-	// TODO: This is in all the controllers. Need to
-	// refactor in a way that makes sense.
-	$scope.patron = {};
-	$scope.patron.getUsername = function () {
-		if (session && session.patron && session.patron.username) {
-			return session.patron.username;
-		}
-		return "anonymous";
-	};
 
 	$scope.saveWho = function() {
 		var who = {};

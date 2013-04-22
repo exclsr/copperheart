@@ -162,13 +162,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	// $scope properties. 
 	//
 	// How do we feel about that?
-	$scope.patron.getUsername = function () {
-		if (session && session.patron && session.patron.username) {
-			return session.patron.username;
-		}
-		return "anonymous";
-	};
-
+	//
 	$scope.profile.getName = function() {
 	 	return profile.name;
 	};

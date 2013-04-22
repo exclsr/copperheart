@@ -73,7 +73,7 @@ app.get('/auth/google',
 app.get(auth.googleReturnUrl, auth.authMiddleware, function (req, res) {
 	if (req.isAuthenticated) {
 		// TODO: Is this a security hole?
-		res.redirect('/' + req.session.loginFrom || "");
+		res.redirect('/' + (req.session.loginFrom || ""));
 	}
 	else {
 		// TODO: Do we want to go to the root on failure?

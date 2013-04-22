@@ -21,7 +21,10 @@
 		<div class="span3">
 			<h3>from</h3>
 			{{patron.getUsername()}}
-			<span ng-show="isLoginNeeded()"> | <a href="/auth/google">log in</a></span>
+			<span ng-show="isLoginNeeded()"> 
+				| 
+				<a href="/auth/google?from=#/{{pageName}}">log in</a>
+			</span>
 		</div>
 	</div>
 

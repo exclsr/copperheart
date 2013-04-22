@@ -21,37 +21,7 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		$scope.who = session.activeContribution.profile;
 	}
 
-	var maybeMakeFakeDataForTesting = function () {
-		// For testing ...
-		if (!$scope.things || !$scope.things.length > 0) {
-			$scope.whoami = "anonymous";
-			$scope.things = [
-				{
-					"id": "wine",
-					"name": "wine",
-					"unit": "glass",
-					"price": 5,
-					"frequency": "month",
-					"canHaz": true,
-					"recurring": true
-				},
-				{
-					"id": "internet",
-					"name": "Internet",
-					"unit": "day",
-					"price": 2,
-					"frequency": "month",
-					"canHaz": true
-				}
-			];
-			$scope.priceNow = 7.00;
-			$scope.pricePerMonth = 5.00;
-		}
-	};
-
 	bindToSession();
-	maybeMakeFakeDataForTesting();
-
 
 	$scope.isLoginNeeded = function () {
 		// The patron needs to log in if there

@@ -155,7 +155,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	// $scope things
 	//
 	$scope.profile = {};
-	$scope.patron = {};
 
 	// TODO: This is one way to do things, with
 	// only using very simple getters for our

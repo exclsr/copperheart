@@ -82,8 +82,25 @@
 						ng-show="thing.canHaz && thing.recurring">♥</span>
 					</span>&nbsp;</h2> -->
 
-				<div>
-					<span class="payment-errors">{{errorMessage}}</span>
+				<div class="payment-errors errorBubble span5" ng-show="isErrorHappening()">
+					<div class="cardError" ng-show="errors.isCard">
+						<p>Sorry, it seems the card isn't working. Maybe
+						different numbers are needed.</p>
+					</div>
+
+					<div class="stripeApiError" ng-show="errors.isApi">
+						<p>Sorry, our credit card processor seems to be
+						having some issues at the moment.</p>
+
+						<p>Please try pressing the button again. But if 
+						that doesn't work, you might have to come back 
+						in a bit.</p>
+					</div>
+
+					<div class="programmerError" ng-show="errors.isProgrammer">
+						<p>Hey, check your console for errors, because
+						there is a misconfiguration.</p>
+					</div>
 				</div>
 
 				<div style="clear: left">

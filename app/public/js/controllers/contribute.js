@@ -21,7 +21,44 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		$scope.who = session.activeContribution.profile;
 	}
 
+	var initialize = function() {
+		$scope.cc = {};
+		$scope.cc.expMonth = '01';
+
+		$scope.months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+		$scope.years = [];
+
+		// TODO: Inject date, so we can test.
+		var today = new Date();
+		var currentYear = today.getFullYear(); 
+		$scope.cc.expYear = currentYear;
+		for (var i=0; i < 25; i++) {
+			$scope.years.push(currentYear);
+			currentYear++;
+		}
+
+		$scope.paymentDay = Math.min(today.getDate(), 28);
+		$scope.daysOfTheMonth = [];
+		for (var i=1; i < 29; i++) {
+			$scope.daysOfTheMonth.push(i);
+		}
+		// TODO: See if we can do this with our payment processor.
+		$scope.daysOfTheMonth.push('last');
+
+		var currentMonth = today.getMonth();
+		var nextMonth = currentMonth + 1;
+		if (nextMonth === 12) {
+			nextMonth = 1;
+		}
+		$scope.nextMonth = nextMonth;
+	};
+
 	bindToSession();
+	initialize();
+
+	//---------------------------------------------------------
+	// $scope methods
+	//---------------------------------------------------------
 
 	$scope.isLoginNeeded = function () {
 		// The patron needs to log in if there
@@ -41,41 +78,22 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		return isLoginNeeded;
 	};
 
+	$scope.isErrorHappening = function() {
+		if ($scope.errors) {
+			return ($scope.errors.isCard ||
+				$scope.errors.isApi ||
+				$scope.errors.isProgrammer);
+		}
 
-	$scope.cc = {};
-	$scope.cc.expMonth = '01';
-
-	$scope.months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
-	$scope.years = [];
-
-	// TODO: Inject date, so we can test.
-	var today = new Date();
-	var currentYear = today.getFullYear(); 
-	$scope.cc.expYear = currentYear;
-	for (var i=0; i < 25; i++) {
-		$scope.years.push(currentYear);
-		currentYear++;
+		return false;
 	}
-
-	$scope.paymentDay = Math.min(today.getDate(), 28);
-	$scope.daysOfTheMonth = [];
-	for (var i=1; i < 29; i++) {
-		$scope.daysOfTheMonth.push(i);
-	}
-	// TODO: See if we can do this with our payment processor.
-	$scope.daysOfTheMonth.push('last');
-
-	var currentMonth = today.getMonth();
-	var nextMonth = currentMonth + 1;
-	if (nextMonth === 12) {
-		nextMonth = 1;
-	}
-	$scope.nextMonth = nextMonth;
 
 	$scope.submitPayment = function() {
 		
 		$scope.result = "...";
-
+		$scope.errors = {}; // clear error flags
+		
+		
 		var creditCard = {
 			number: $scope.cc.number,
 			cvc: $scope.cc.cvc,
@@ -83,7 +101,12 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			exp_year: $scope.cc.expYear
 		};
 
-		var makeCharges = function (patronId, things, stripeToken) {
+		var refreshView = function() {
+			// TODO: Why do we need this?
+			$scope.$digest();
+		};
+
+		var makeRecurringCharges = function (patronId, things, stripeToken) {
 
 			// TODO: Revisit the names of these.
 			var data = { 
@@ -106,13 +129,57 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			});
 		};
 
+		var handleTokenCreated = function (response) {
+			$scope.result = ":-)";
+			// makeRecurringCharges($scope.whoami, $scope.things, response.id);
+			refreshView();
+		};
+
+		var handleCardError = function (response) {
+			$scope.errors.isCard = true;
+			refreshView();
+		};
+
+		var handleProgrammerError = function (status, response) {
+			$scope.errors.isProgrammer = true;
+			console.log(status);
+			console.log(response);
+			refreshView();
+		};
+
+		var handleStripeApiError = function (response) {
+			$scope.errors.isApi = true;
+			refreshView();
+		} 
+
+		var handleUnknownResponse = function (status, response) {
+			// TODO: Update the UI, maybe?
+			handleProgrammerError(status, response);
+		};
+
 		var stripeResponseHandler = function(status, response) {
-			if (response.error) {
-				// Show the errors on the form
-				$scope.errorMessage = response.error.message;
-			} 
-			else {
-				makeCharges($scope.whoami, $scope.things, response.id);
+			switch (status) {
+				case 200: // ok!
+					handleTokenCreated(response);
+					break;
+
+				case 402: // request failed 
+					handleCardError(response);
+					break;
+
+				case 400: case 401: 
+					// bad request | unauthorized
+					handleProgrammerError(status, response);
+					break;
+
+				case 500: case 502: case 503: case 504: 
+					// stripe errors
+					handleStripeApiError(response);
+					break;
+
+				default:
+					handleUnknownResponse(status, response);
+					break;
 			}
 		};
 

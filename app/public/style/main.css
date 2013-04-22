@@ -306,44 +306,43 @@ ul.contributionList .contribution {
 /* chat bubble from http://ilikepixels.co.uk/drop/bubbler/ */
 .bubble 
 {
-position: relative;
-width: 240px;
-height: 70px;
-padding: 15px;
-margin-top: 16px;
-background: #eee;
-border: #999 solid 1px;
--webkit-border-radius: 4px;
--moz-border-radius: 4px;
-border-radius: 4px;
+	position: relative;
+	width: 240px;
+	padding: 15px;
+	margin-top: 16px;
+	background: #eee;
+	border: #999 solid 1px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 }
 
 .bubble:after 
 {
-content: "";
-position: absolute;
-top: -10px;
-left: 100px;
-border-style: solid;
-border-width: 0 10px 10px;
-border-color: #eee transparent;
-display: block;
-width: 0;
-z-index: 1;
+	content: "";
+	position: absolute;
+	top: -10px;
+	left: 100px;
+	border-style: solid;
+	border-width: 0 10px 10px;
+	border-color: #eee transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
 }
 
 .bubble:before 
 {
-content: "";
-position: absolute;
-top: -11px;
-left: 100px;
-border-style: solid;
-border-width: 0 10px 10px;
-border-color: #999 transparent;
-display: block;
-width: 0;
-z-index: 0;
+	content: "";
+	position: absolute;
+	top: -11px;
+	left: 100px;
+	border-style: solid;
+	border-width: 0 10px 10px;
+	border-color: #999 transparent;
+	display: block;
+	width: 0;
+	z-index: 0;
 }
 
 

@@ -9,4 +9,12 @@ function HeaderCtrl(session, $scope) {
 		}
 		return "anonymous";
 	};
+
+	$scope.isLoggedIn = function() {
+		if (session.patron.username) {
+			return true;
+		}
+
+		return false;
+	};
 }

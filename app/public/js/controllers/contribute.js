@@ -52,13 +52,6 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 	bindToSession();
 	maybeMakeFakeDataForTesting();
 
-	$scope.isLoggedIn = function() {
-		if (session.patron.username) {
-			return true;
-		}
-
-		return false;
-	};
 
 	$scope.isLoginNeeded = function () {
 		// The patron needs to log in if there

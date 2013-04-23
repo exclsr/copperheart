@@ -346,6 +346,15 @@ ul.contributionList .contribution {
 }
 
 
+/* change behavior of the light-blue borders
+that bootstrap creates on focus, and the yellow
+outlines that Chrome creates on select elements */
+input:focus, select:focus {
+	border-color: #666 !important;
+	box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	outline: none !important;
+}
 
 .card {
 	border: solid 1px #999;
@@ -358,7 +367,7 @@ ul.contributionList .contribution {
 .cardNumberRow, .expirationRow, .cvcRow {
 	width: 35ex;
 }
-.cardNumber {
+.cardNumber, .cardName {
 	font-size: 12pt !important;
 	width: 25ex !important;
 	text-align: right;
@@ -375,6 +384,9 @@ ul.contributionList .contribution {
 }
 .expYear {
 	width: 10ex !important;
+}
+.cardName {
+	text-align: left;
 }
 .cvcNumber {
 	font-size: 12pt !important;

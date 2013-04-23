@@ -70,6 +70,8 @@
 
 					<div class="form-row cvcRow">
 						<div class="pull-right">
+							<input class="cardName" type="text" size="20" data-stripe="name"
+							ng-mode="cc.name" placeholder="Name on card"/>
 							<input class="cvcNumber" type="text" size="4" data-stripe="cvc" 
 							ng-model="cc.cvc" placeholder="cvc"/>
 						</div>

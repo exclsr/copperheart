@@ -145,6 +145,7 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		}(); // closure
 
 		var creditCard = {
+			name: $scope.cc.name,
 			number: $scope.cc.number,
 			cvc: $scope.cc.cvc,
 			exp_month: $scope.cc.expMonth,

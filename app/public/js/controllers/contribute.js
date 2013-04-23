@@ -3,10 +3,12 @@
 function ContributeCtrl(session, $scope, $http, $routeParams) {
 
 	$scope.pageName = "contribute";
+	var contributionTo = undefined;
+	var patron = undefined;
 
 	var bindToSession = function() {
 
-		var contributionTo = session.activeContribution.profile.username;
+		contributionTo = session.activeContribution.profile.username;
 		var contributions = session.contributions[contributionTo];
 
 		$scope.things = [];
@@ -19,7 +21,9 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		$scope.priceNow = session.activeContribution.priceNow;
 		$scope.pricePerMonth = session.activeContribution.pricePerMonth;
 		$scope.who = session.activeContribution.profile;
-	}
+
+		patron = session.patron;
+	};
 
 	var initialize = function() {
 		$scope.cc = {};
@@ -88,12 +92,58 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		return false;
 	}
 
-	$scope.submitPayment = function() {
+	$scope.makeContribution = function() {
 		
-		$scope.result = "...";
+		$scope.status = "...";
 		$scope.errors = {}; // clear error flags
+
+		var things = $scope.things;
 		
-		
+		var canHazRecurring = function() {
+			var canHaz = false;
+
+			if (!$scope.isLoggedIn()) {
+				return false;
+			}
+
+			angular.forEach(things, function (thing) {
+				if (thing.canHaz) {
+					if (thing.recurring) {
+						canHaz = true;
+					}
+				}
+			});
+
+			return canHaz;
+		}(); // closure
+
+		var canHazOneTime = function() {
+			var canHaz = false;
+
+			angular.forEach(things, function (thing) {
+				if (thing.canHaz) {
+					if (!thing.recurring) {
+						canHaz = true;
+					}
+				}
+			});
+
+			return canHaz;
+		}(); // closure
+
+		var numberOfTokensRequired = function() {
+			var tokensRequired = 0;
+
+			if (canHazRecurring) {
+				tokensRequired++;
+			}
+			if (canHazOneTime) {
+				tokensRequired++;
+			}
+
+			return tokensRequired;
+		}(); // closure
+
 		var creditCard = {
 			number: $scope.cc.number,
 			cvc: $scope.cc.cvc,
@@ -106,32 +156,87 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			$scope.$digest();
 		};
 
-		var makeRecurringCharges = function (patronId, things, stripeToken) {
+		var makeRecurringCharges = function (things, stripeToken) {
+			if (!$scope.isLoggedIn()) {
+				console.log("Programmer error: " + 
+					"Cannot make recurring charges if not logged in.");
+				return;
+			}
+
+			var patronEmail = session.patron.email;
 
 			// TODO: Revisit the names of these.
 			var data = { 
 				stripeToken: stripeToken,
 				things: things,
-				patronId: patronId
+				patronEmail: patronEmail
 			};
 				
-			var res = $http.put('/commit/phil/', data);
+			var res = $http.put('/commit/' + contributionTo, data);
 			res.success(function(data) {
+				// TODO: Now what?
 				console.log(data);
 				// The server is happy.
-				$scope.result = ":-)";
+				$scope.status += " :-)";
 			});
 
 			res.error(function(data, status, headers, config) {
 				console.log(data);
 				// The server is sad.
-				$scope.result = ":-("
+				$scope.status += " :-(";
 			});
 		};
 
-		var handleTokenCreated = function (response) {
-			$scope.result = ":-)";
-			// makeRecurringCharges($scope.whoami, $scope.things, response.id);
+		var makeOneTimeCharges = function (things, stripeToken) {
+			var data = { 
+				stripeToken: stripeToken,
+				things: things
+			};
+
+			var res = $http.put('/commit/once/' + contributionTo, data);
+			res.success(function(data) {
+				console.log(data);
+				// The server is happy.
+				$scope.status += " :-)";
+			// TODO: Now what?
+			});
+
+			res.error(function(data, status, headers, config) {
+				console.log(data);
+				// The server is sad.
+				$scope.status += ":-(";
+			});
+		};
+
+		var handleTokenCreated = function (response1, response2) {
+			$scope.status = ":-)";
+
+			var recurringThings = [];
+			var oneTimeThings = [];
+			
+			angular.forEach(things, function (thing) {
+				if (thing.canHaz) {
+					if (thing.recurring) {
+						recurringThings.push(thing);
+					}
+					else {
+						oneTimeThings.push(thing);
+					}
+				}
+			});
+
+			if (canHazRecurring && canHazOneTime && response2) {
+				// Can haz all the things
+				makeRecurringCharges(recurringThings, response1.id);
+				makeOneTimeCharges(oneTimeThings, response2.id);
+			}
+			else if (canHazRecurring) {
+				makeRecurringCharges(recurringThings, response1.id);
+			}
+			else if (canHazOneTime) {
+				makeOneTimeCharges(oneTimeThings, response1.id);
+			}
+
 			refreshView();
 		};
 
@@ -157,12 +262,8 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			handleProgrammerError(status, response);
 		};
 
-		var stripeResponseHandler = function(status, response) {
+		var handleCreateTokenError = function (status, response) {
 			switch (status) {
-				case 200: // ok!
-					handleTokenCreated(response);
-					break;
-
 				case 402: // request failed 
 					handleCardError(response);
 					break;
@@ -180,6 +281,30 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 				default:
 					handleUnknownResponse(status, response);
 					break;
+			}
+		};
+
+		var stripeResponseHandler = function(status1, response1) {
+			if (status1 === 200) {
+				// 200 ok!
+				if (numberOfTokensRequired === 1) {
+					handleTokenCreated(response1);
+				}
+				else if (numberOfTokensRequired === 2) {
+					// Ok, we have one token. Cool. But we need two,
+					// one for one-time charges and one for recurring charges.
+					Stripe.createToken(creditCard, function (status2, response2) {
+						if (status2 === 200) {
+							handleTokenCreated(response1, response2);
+						}
+						else {
+							handleCreateTokenError(status2, response2);
+						}
+					});
+				}
+			}
+			else {
+				handleCreateTokenError(status1, response1);
 			}
 		};
 

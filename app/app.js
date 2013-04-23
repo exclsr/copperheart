@@ -98,7 +98,7 @@ var ensureAuthenticated = function(req, res, next) {
 	}
 
 	res.header("WWW-Authenticate", "Google OpenID")
-	res.send(401,
+	res.send(401, // unauthorized
 		"To get a more desirable response," +
 		" please first authenticate with the server," +
 		" and try again.");
@@ -349,26 +349,6 @@ app.put('/patron/username', ensureAuthenticated, function (req, res) {
 });
 
 
-// Some day we'll use jade for basic templating. 
-// For now, AngularJS in /public. 
-// 
-// app.get('/', routes.index);
-// app.get('/users', user.list);
-
-// TODO: Figure out a way to share this price code
-// on both the client and the server (if practical).
-var priceNow = function(things) {
-	var totalPrice = 0;
-
-	things.forEach(function (thing) {
-		if (thing.canHaz && !thing.recurring) {
-			totalPrice += thing.price;
-		}
-	});
-
-	return totalPrice.toFixed(2);
-};
-
 // TODO: Figure out a way to share this price code
 // on both the client and the server (if practical).
 var perMonthMultiplier = function (frequency) {
@@ -415,6 +395,15 @@ var getStripePlanId = function (patronId) {
 	return planId;
 };
 
+// Some day we'll use jade for basic templating. 
+// For now, AngularJS in /public. 
+// 
+// app.get('/', routes.index);
+// app.get('/users', user.list);
+
+// TODO: Figure out a way to share this price code
+// on both the client and the server (if practical).
+
 var getStripePlanRequest = function (patronId, things) {
 	// This is one person's monthly contribution into to the pool.
 	//
@@ -454,17 +443,63 @@ var getStripePlanRequest = function (patronId, things) {
 };
 
 
-app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
+app.put('/commit/once/:toUsername', function (req, res) {
+	var stripeToken = req.body.stripeToken;
+	var things = req.body.things;
 
-	var patronId = req.body.patronId;
+
+	var priceNow = function (things) {
+		var totalPrice = 0;
+
+		things.forEach(function (thing) {
+			if (thing.canHaz && !thing.recurring) {
+				totalPrice += thing.price;
+			}
+		});
+
+		return totalPrice.toFixed(2);
+	};
+
+	// TODO: MVP: Get things from our database, so that
+	// we use the prices in there and not the ones
+	// given to us by the client.
+
+	var oneTimeCharge = priceNow(things);
+	var oneTimeChargeInCents = oneTimeCharge * 100;
+
+	// TODO: MVP: Put email (or id) of backer in the description, below
+	var chargeRequest = {
+		amount: oneTimeChargeInCents,
+		currency: 'usd',
+		card: stripeToken,
+		description: 'among the first tests'
+	};
+
+	stripe.charges.create(chargeRequest, function(err, chargeResponse) {
+		if (err) {
+			// TODO: Obviously ...
+			console.log(err);
+			res.send(500);
+		}
+		else {
+			// Success! 
+			console.log(chargeResponse);
+			res.send("<3");
+		}
+	});
+});
+
+app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
+
+	var patronEmail = req.body.patronEmail;
 	var stripeToken = req.body.stripeToken;
 	var things = req.body.things;
 
 	var patron = req.user;
-	var serverSidePatronId = patron.id;
+	var serverSidePatronEmail = patron.email;
 
-	if (patronId !== serverSidePatronId) {
-		res.send(412, 
+	if (patronEmail !== serverSidePatronEmail) {
+		res.send(412, // precondition failed
 			"The patron name specified in your request does not match" +
 			" who the server thinks is logged in." + 
 			" Can you help us solve this mystery?");
@@ -473,12 +508,12 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 	//
 	// We are now authenticated, and have a user object.
 	//
-	var success = function(patronId) {
+	var success = function (patronId) {
 		if (patronId) {
 			console.log(patronId);
 		}
 		
-		res.send("♥");
+		res.send("<3");
 	}
 
 	var failure = function (err) {
@@ -486,6 +521,8 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 		res.send(500);
 	};
 
+	// This is called after we save the contribution data (below).
+	// Now we put the appropriate charges into the Stripe system.
 	var doStripeStuff = function () {
 		// 1. See if our patron has a Stripe ID.
 		if (patron.stripeId) {
@@ -497,10 +534,10 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 			// the active subscription, and create a new one with the
 			// details that we want.
 			var createPlanAnew = function () {
-				var planRequest = getStripePlanRequest(patronId, things);
+				var planRequest = getStripePlanRequest(patron.id, things);
 				stripe.plans.create(planRequest, function (err, planResponse) {
 					// TODO: Do anything with the response?
-					err ? failure(err) : success(patronId);
+					err ? failure(err) : success(patron.id);
 				});
 			};
 
@@ -510,7 +547,7 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 			};
 
 			var deleteAndCreatePlan = function () {
-				var stripePlanId = getStripePlanId(patronId);
+				var stripePlanId = getStripePlanId(patron.id);
 				stripe.plans.del(stripePlanId, handleDeleteResponse);
 			};
 
@@ -538,7 +575,7 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 				// make a Stripe customer to associate with the plan.
 				var customerRequest = {
 					card: stripeToken,
-					description: patronId, 
+					description: patronEmail, 
 					plan: planResponse.id
 				};
 
@@ -554,7 +591,7 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 			// before creating a customer, so we can create a customer
 			// and associate them with a plan in one step.
 			var createPlanAndCustomer = function () {
-				var planRequest = getStripePlanRequest(patronId, things);
+				var planRequest = getStripePlanRequest(patron.id, things);
 				console.log("Creating plan ...");
 				// TODO: If we get a failure at this point, we have a data
 				// integrity issue, because it is likely a plan already exists.
@@ -571,53 +608,32 @@ app.put('/commit/:toUsername/', ensureAuthenticated, function (req, res) {
 					err ? failure(err) : stripePlanCreated(planResponse);
 				});
 			};
-			
+
 			createPlanAndCustomer();
 		};
 	}
 
-	
-	db.patrons.getByUsername(req.params.toUsername, 
-		function (project) {
+	// To save the contribution, we need to get the ID of
+	// the person we're giving things to; we do so
+	// via the username, which was in the request url.
+	db.patrons.getByUsername(
+		req.params.toUsername, 
+		function (project) { // TODO: 'project' is not the best name
 			// Save the contributions to our database, first.
 			var contribution = {};
-			contribution.backerId = patronId;
+			contribution.backerId = patron.id;
 			contribution.projectId = project.id;
 			contribution.things = things;
 
 			db.contributions.save(contribution, doStripeStuff, failure);
+			// then do Stripe stuff ...
 		},
-		failure);
+		failure
+	);
 
 	return;
 
-	// TODO: MVP: Get things from our database, so that
-	// we use the prices in there and not the ones
-	// given to us by the client.
 
-	var oneTimeCharge = priceNow(things);
-	var oneTimeChargeInCents = oneTimeCharge * 100;
-
-	// TODO: MVP: Put email (or id) of backer in the description, below
-	var chargeRequest = {
-		amount: oneTimeChargeInCents,
-		currency: 'usd',
-		card: stripeToken,
-		description: 'among the first tests'
-	};
-
-	stripe.charges.create(chargeRequest, function(err, chargeResponse) {
-		if (err) {
-			// TODO: Obviously ...
-			console.log(err);
-			res.send(500);
-		}
-		else {
-			// Success! 
-			console.log(chargeResponse);
-			res.send("Ok");
-		}
-	});
 
 });
 

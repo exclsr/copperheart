@@ -4,12 +4,15 @@
 function EditCtrl(session, $scope, $http) {
 
 	$scope.pageName = "edit";
+	var patron = {};
 
-	var initialize = function () {
+	var bindToSession = function () {
+		patron = session.patron;
+	};
 
+	var initialize = function() {
 		var patronRes = $http.get('/patron');
 		patronRes.success(function (patron) {
-			// $scope.patron = patron; // TODO: What is this?
 			$scope.email = patron.email;
 			$scope.username = patron.username;
 			$scope.things = patron.things;
@@ -20,8 +23,18 @@ function EditCtrl(session, $scope, $http) {
 		});
 
 		patronRes.error(function(data, status, headers, config) {
-			// TODO: Something terrible went wrong. Deal with it.
-			console.log(data);
+			if (status === 401) {
+				// We're not logged in. There is a todo task in the
+				// top-level controller to address this, but in the 
+				// mean time, let's force-log-out, so we can at least
+				// log back in.
+				$scope.logout();
+			}
+			else {
+				// TODO: Something terrible went wrong. Deal with it.
+				console.log(data);
+			}
+			
 		});
 	};
 
@@ -232,6 +245,7 @@ function EditCtrl(session, $scope, $http) {
 		saveThings(thingsToKeep);
 	};
 
+	bindToSession();
 	initialize();
 }
 EditCtrl.$inject = ['session', '$scope', '$http'];

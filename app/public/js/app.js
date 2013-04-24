@@ -2,7 +2,7 @@
 
 
 // Declare app level module which depends on filters, and services
-angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 'ngSanitize']).
+angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 'ngSanitize', 'ui']).
   config(['$routeProvider', function($routeProvider) {
   	// Not sure which order is best, so let's do both!
     $routeProvider.when('/:who/hello', {templateUrl: 'partials/hello.html', controller: HelloCtrl});

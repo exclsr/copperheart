@@ -265,7 +265,6 @@ app.put('/patron/things', ensureAuthenticated, function (req, res) {
 	// TODO: Do we have to do anything with 'things' to be 
 	// on the safe side?
 	db.things.save(patron.username, things, success, failure);
-	res.send(things);
 });
 
 

@@ -36,6 +36,19 @@ function EditCtrl(session, $scope, $http) {
 			}
 			
 		});
+
+		// When 'things' changes, save to our database.
+		// Ignore the first time things is assigned.
+		$scope.$watch('things', 
+			function(newValue, oldValue) {
+				if (oldValue !== undefined) { 
+					saveThings($scope.things);
+				}
+			},
+			true // test if values change instead of refs
+			// basically, this 'true' is needed for watching
+			// the array elements.
+		);
 	};
 
 
@@ -177,8 +190,6 @@ function EditCtrl(session, $scope, $http) {
 
 		putThings.success(function (data) {
 			console.log(data);
-			// TODO: Where should this be? Here?
-			$scope.things = things;
 		});
 
 		putThings.error(function (data, status, headers, config) { 
@@ -227,7 +238,7 @@ function EditCtrl(session, $scope, $http) {
 		newThing.frequency = "month"; // TODO: Don't need this?
 
 		things.push(newThing);
-		saveThings(things);
+		$scope.things = things;
 	};
 
 
@@ -242,7 +253,11 @@ function EditCtrl(session, $scope, $http) {
 			}
 		});
 
-		saveThings(thingsToKeep);
+		$scope.things = thingsToKeep;
+	};
+
+	$scope.markThingsAsChanged = function () {
+		$scope.$apply('things');
 	};
 
 	bindToSession();

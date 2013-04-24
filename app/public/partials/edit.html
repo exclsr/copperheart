@@ -2,6 +2,7 @@
 
 <div class="view">
 <div class="span12">
+
 	<div class="currentlyDoing" style="padding-top: 1em">
 		<h3>who are you, what are you working on?</h3>
 		<div class="who span6" style="height: 315px">
@@ -79,9 +80,14 @@
 			</div>
 		</div>
 
+
 		<h3 style="clear: left; padding-top: 1.5em">things <small>:: {{things.length}}</h3>
-		<div ng-repeat="thing in things">
-			<div ng-class-odd="'odd'" class="editThingContainer span10">
+		<div ui-sortable="{ axis: 'y', update: markThingsAsChanged }" ng-model="things">
+			<div  ng-repeat="thing in things" style="user-select: none !important"
+				ng-class-odd="'odd'" class="editThingContainer span10">
+				<span class="span1 moveThing" style="width: 1ex">
+					<i class="icon-resize-vertical"></i>
+				</span>
 				<span class="span3">A {{thing.unit}}</span>
 				<span class="span3">of {{thing.name}},</span>
 				<span class="span2">for {{thing.price}} dollars.</span> 
@@ -89,7 +95,7 @@
 					<i class="icon-trash" ng-click="deleteThing(thing)" style="padding-right: 1.1em"></i>
 				</span>
 			</div>
-		</div>
+		</div>		
 	</div>
 
 	<h3 style="clear: left; padding-top: 1.5em">profile name</h3>

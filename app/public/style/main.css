@@ -483,6 +483,9 @@ select.paymentDay {
 	padding-bottom: 0.5ex;*/
 
 }
+.editThingContainer {
+	padding-left: 0;
+}
 .editThingContainer.odd {
 	background-color: #bbb;
 	-webkit-border-radius: 4px;
@@ -490,17 +493,27 @@ select.paymentDay {
 	border-radius: 4px;
 }
 .editThingContainer .thingTrashIcon {
-	display: none;
+	visibility: hidden;
 }
 .editThingContainer:hover .thingTrashIcon {
 	/*
 	 * TODO: How does this work for iPad? 
 	 */
-	display: inline-block;
+	visibility: visible;
 }
 .thingTrashIcon:hover {
 	cursor: pointer;
 }
+.editThingContainer .moveThing {
+	visibility: hidden;
+}
+.editThingContainer:hover .moveThing {
+	visibility: visible;
+}
+.moveThing:hover {
+	cursor: move;
+}
+
 
 .things .span1 {
 /*	width: 5ex !important;

@@ -118,8 +118,16 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			}
 		};
 
+
 		if (!session.contributions[profile.username]) {
-			mergeThingsAndContributions(profile.things, patron.contributions);
+		 	mergeThingsAndContributions(
+		 		profile.things, 
+		 		patron.contributions);
+		}
+		else {
+			mergeThingsAndContributions(
+				profile.things, 
+				session.contributions[profile.username]);
 		}
 
 		session.activeContribution.profile = profile;

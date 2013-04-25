@@ -57,7 +57,8 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			console.log(data);
 		});
 
-		$http.get('/things/' + profile.username)
+		// TODO: Make a config object for DI to set n=4
+		$http.get('/things/' + profile.username + '?n=4')
 		.success(onThingsReady)
 		.error(function (data, status, headers, config) {
 			// TODO: Something terrible went wrong. Deal with it.

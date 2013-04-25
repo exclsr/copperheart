@@ -145,7 +145,20 @@ app.get('/whoami', function (req, res) {
 app.get('/things/:username', function (req, res) {
 
 	var success = function (things) {
-		res.send(things);
+		if (!req.query.n || things.length === 0) {
+			res.send(things);
+		}
+		else {
+			// TODO: Consider doing this limitation at the data layer.
+			res.send(
+				things.slice(
+					0, 
+					Math.min(
+						things.length, 
+						req.query.n)
+				)
+			);
+		}
 	};
 
 	var failure = function (err) {

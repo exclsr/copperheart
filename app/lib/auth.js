@@ -82,7 +82,8 @@ passport.deserializeUser(function (userEmail, done) {
 	// Output: we call 'done(error, userId)' to tell passport we're done.
 	var defaultNewUser = {
 		id: userEmail,
-		email: userEmail
+		email: userEmail,
+		username: userEmail
 	};
 
 	db.patrons.get(userEmail, 

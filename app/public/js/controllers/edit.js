@@ -242,6 +242,21 @@ function EditCtrl(session, $scope, $http) {
 		return newThingId;
 	};
 
+	var parseNumber = function (maybeNumber) {
+		if (angular.isNumber(maybeNumber)) {
+			return maybeNumber;
+		}
+		else {
+			var parsedNumber = parseFloat(maybeNumber);
+			if (parsedNumber === NaN) {
+				return 0;
+			}
+			else {
+				return parsedNumber;
+			}
+		}
+	};
+
 	$scope.areEqual = function (x, y) {
 		return x === y;
 	};
@@ -257,7 +272,7 @@ function EditCtrl(session, $scope, $http) {
 		newThing.id = createThingId($scope.thing.name, things);
 		newThing.name = $scope.thing.name;
 		newThing.unit = $scope.thing.unit;
-		newThing.price = $scope.thing.price;
+		newThing.price = parseNumber($scope.thing.price);
 		newThing.glyph = $scope.thing.glyph;
 		newThing.frequency = "month"; // TODO: Don't need this?
 

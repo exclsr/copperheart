@@ -196,7 +196,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		// here and calls 'priceNow' whenever necessary.
 		angular.forEach($scope.contributions, function (thing) {
 			if (thing.canHaz && !thing.recurring) {
-				totalPrice += thing.price;
+				totalPrice += parseFloat(thing.price);
 			}
 		});
 
@@ -210,7 +210,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			var itemPrice = 0;
 
 			if (thing.canHaz && thing.recurring) {
-				itemPrice = thing.price * perMonthMultiplier(thing.frequency);
+				itemPrice = parseFloat(thing.price) * perMonthMultiplier(thing.frequency);
 				pricePerMonth += itemPrice;
 			}
 		});

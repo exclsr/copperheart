@@ -276,7 +276,8 @@ app.put('/patron/things', ensureAuthenticated, function (req, res) {
 
 	// TODO: Do we have to do anything with 'things' to be 
 	// on the safe side? Yes! We need to strip out quotes
-	// in the glyphs, for one.
+	// in the glyphs, for one. And, make sure we are only
+	// putting in numbers for prices.
 	db.things.save(patron.username, things, success, failure);
 });
 
@@ -388,7 +389,7 @@ var pricePerMonth = function(things) {
 		var itemPrice = 0;
 
 		if (thing.canHaz && thing.recurring) {
-			itemPrice = thing.price * perMonthMultiplier(thing.frequency);
+			itemPrice = parseFloat(thing.price) * perMonthMultiplier(thing.frequency);
 			pricePerMonth += itemPrice;
 		}
 	});
@@ -465,7 +466,7 @@ app.put('/commit/once/:toUsername', function (req, res) {
 
 		things.forEach(function (thing) {
 			if (thing.canHaz && !thing.recurring) {
-				totalPrice += thing.price;
+				totalPrice += parseFloat(thing.price);
 			}
 		});
 

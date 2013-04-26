@@ -213,10 +213,10 @@ app.get('/contributions/:toUsername', function (req, res) {
 app.get('/who/:username', function (req, res) {
 	var success = function (who) {
 		var publicWho = {};
-		publicWho.name = who.name;
-		publicWho.present = who.present;
-		publicWho.passions = who.passions;
-		publicWho.communities = who.communities;
+		publicWho.name = who.name || "";
+		publicWho.present = who.present || "";
+		publicWho.passions = who.passions || [];
+		publicWho.communities = who.communities || [];
 
 		res.send(publicWho);
 	};

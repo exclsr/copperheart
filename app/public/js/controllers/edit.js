@@ -5,7 +5,7 @@ function EditCtrl(session, $scope, $http) {
 
 	$scope.pageName = "edit";
 	$scope.thing = {};
-	
+
 	var patron = {};
 	var icons = [
 		'glass', 'music', 'heart', 'star', 'film',
@@ -63,14 +63,14 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 
-	var saveWho = function() {
+	var saveWho = function(success) {
 		var who = {};
 		who.name = $scope.name;
 		who.present = $scope.present;
 
 		var putWho = $http.put('/patron/who', who);
 		putWho.success(function (data) {
-			console.log("<3");
+			success();
 		});
 		putWho.error(function (data, status, headers, config) { 
 			// TODO: Oh ... no.
@@ -79,7 +79,7 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 
-	var saveUsername = function() {
+	var saveUsername = function(success) {
 		var data = {};
 		data.username = $scope.username;
 
@@ -94,8 +94,7 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 	$scope.saveProfile = function() {
-		saveWho();
-		saveUsername();
+		saveWho(saveUsername);
 	}
 
 

@@ -49,7 +49,7 @@
 					ng-class="{ canHaz: thing.canHaz }">
 					<input type="checkbox" ng-model="thing.canHaz" id="{{thing.id}}"/>
 					<span>A {{thing.unit}} of {{thing.name}}</span>
-					<div class="glyph {{thing.id}}"></div>
+					<div class="glyph"><i class="icon-{{thing.glyph}}"></i></div>
 					<span class="price">${{thing.price}}</span>
 				</label>
 			</div>

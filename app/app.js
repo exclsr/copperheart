@@ -275,7 +275,8 @@ app.put('/patron/things', ensureAuthenticated, function (req, res) {
 	};
 
 	// TODO: Do we have to do anything with 'things' to be 
-	// on the safe side?
+	// on the safe side? Yes! We need to strip out quotes
+	// in the glyphs, for one.
 	db.things.save(patron.username, things, success, failure);
 });
 

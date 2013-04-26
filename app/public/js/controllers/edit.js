@@ -4,7 +4,18 @@
 function EditCtrl(session, $scope, $http) {
 
 	$scope.pageName = "edit";
+	$scope.thing = {};
+	
 	var patron = {};
+	var icons = [
+		'glass', 'music', 'heart', 'star', 'film',
+		'ok', 'off', 'signal', 'cog', 'home', 'time',
+		'repeat', 'lock', 'flag', 'headphones', 'book',
+		'camera', 'facetime-video', 'pencil', 'gift', 'leaf',
+		'fire', 'eye-open', 'plane', 'comment', 'magnet',
+		'shopping-cart', 'bullhorn', 'bell', 'certificate',
+		'globe', 'wrench', 'briefcase'
+	];
 
 	var bindToSession = function () {
 		patron = session.patron;
@@ -232,6 +243,14 @@ function EditCtrl(session, $scope, $http) {
 		return newThingId;
 	};
 
+	$scope.areEqual = function (x, y) {
+		return x === y;
+	};
+
+
+	$scope.setNewThingGlyph = function (glyphName) {
+		$scope.thing.glyph = glyphName;
+	};
 
 	$scope.addThing = function() {
 		var things = $scope.things;
@@ -240,6 +259,7 @@ function EditCtrl(session, $scope, $http) {
 		newThing.name = $scope.thing.name;
 		newThing.unit = $scope.thing.unit;
 		newThing.price = $scope.thing.price;
+		newThing.glyph = $scope.thing.glyph;
 		newThing.frequency = "month"; // TODO: Don't need this?
 
 		things.push(newThing);
@@ -264,6 +284,10 @@ function EditCtrl(session, $scope, $http) {
 	$scope.markThingsAsChanged = function () {
 		$scope.$apply('things');
 	};
+
+	$scope.getIcons = function () {
+		return icons;
+	}
 
 	bindToSession();
 	initialize();

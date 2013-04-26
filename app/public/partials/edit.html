@@ -64,6 +64,7 @@
 
 	<div class="things" style="clear: left">
 		<h3 style="padding-top: 1em">add a thing</h3>
+
 		<div class="newThingContainer span10">
 			<label class="span3">
 				A <input ng-model="thing.unit" class="span2" placeholder="(unit of measure)" type="text" /> 
@@ -78,6 +79,19 @@
 			<div class="span1" style="text-align: right">
 				<button class="btn" ng-click="addThing()">Add</button>
 			</div>
+
+			<div class="span10" style="clear: left">
+				<div style="padding-top: 1em; padding-left: 1.5em">
+					<span class="glyph-choice" ng-repeat="icon in getIcons()">
+						<span class="glyph-choice-inner" ng-click="setNewThingGlyph(icon)">
+							<i class="icon-{{icon}} passive"
+							ng-class="{ selected: areEqual(icon, thing.glyph) }"></i>
+							<i class="icon-{{icon}} icon-white active" 
+							ng-class="{ selected: areEqual(icon, thing.glyph) }"></i>
+						</span>
+					</span>
+				</div>
+			</div>
 		</div>
 
 
@@ -90,8 +104,9 @@
 				</span>
 				<span class="span3">A {{thing.unit}}</span>
 				<span class="span3">of {{thing.name}},</span>
+				<span class="span1" style="width: 1ex"><i class="icon-{{thing.glyph}}"> </i></span>
 				<span class="span2">for {{thing.price}} dollars.</span> 
-				<span class="span1 thingTrashIcon" style="text-align: right">
+				<span class="span1 thingTrashIcon" style="text-align: right; width: 1ex">
 					<i class="icon-trash" ng-click="deleteThing(thing)" style="padding-right: 1.1em"></i>
 				</span>
 			</div>

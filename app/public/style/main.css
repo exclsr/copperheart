@@ -168,27 +168,10 @@ ul {
 	font-family: Georgia, Verdana;
 }
 
-.glyph, .drink, .internet, .rent, .groceries {
-	background-image: url(/img/glyphicons-halflings.png);
-	background-repeat: no-repeat;
-	width: 15px;
-	height: 15px;
+.glyph {
 	display: inline-block;
 	margin-top: 3px;
-	margin-left: 10px;
-}
-
-.drink {
-	background-position: 0 0;
-}
-.internet {	
-	background-position: -335px -145px;
-}
-.rent {
-	background-position: 0 -25px;
-}
-.groceries {
-	background-position: -360px -120px;
+	margin-left: 5px;
 }
 
 .price {
@@ -475,6 +458,37 @@ select.paymentDay {
 	margin-left: 1ex; margin-right: 1ex;
 	margin-bottom: 0;
 }
+
+
+.glyph-choice-inner {
+	padding-left: 0.8ex;
+}
+
+.glyph-choice .active, .glyph-choice .passive {
+	border: solid 1px transparent;
+}
+.glyph-choice .active {
+	display: none;
+}
+.glyph-choice:hover {
+	cursor: pointer;
+}
+
+.glyph-choice:hover .active {
+	display: inline-block;
+}
+.glyph-choice:hover .passive {
+	display: none;
+}
+.active.selected {
+	/*background-color: #96401E;*/
+	border: dotted 1px #96401E;
+	display: inline-block !important;
+}
+.passive.selected {
+	display: none !important;
+}
+
 
 .editThingContainer, .newThingContainer {
 	padding: 2ex;

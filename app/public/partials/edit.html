@@ -8,7 +8,7 @@
 		<div class="who span6" style="height: 315px">
 			<input ng-model="name" class="name" type="text"/>
 			<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
-			<button class="btn" ng-click="saveWho()">Save</button>
+			<button class="btn" ng-click="saveProfile()">Save</button>
 		</div>
 
 		<div class="projects span4">
@@ -100,7 +100,7 @@
 
 	<h3 style="clear: left; padding-top: 1.5em">profile name</h3>
 	<div class="span7">
-		<form ng-submit="saveUsername()">
+		<form ng-submit="saveProfile()">
 			<input ng-model="username" class="name" type="text"/> 
 			<h3 style="display: inline"><small>:: {{email}}</small></h3>
 			<div style="margin-bottom: 1.5em">

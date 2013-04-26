@@ -52,7 +52,7 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 
-	$scope.saveWho = function() {
+	var saveWho = function() {
 		var who = {};
 		who.name = $scope.name;
 		who.present = $scope.present;
@@ -68,7 +68,7 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 
-	$scope.saveUsername = function() {
+	var saveUsername = function() {
 		var data = {};
 		data.username = $scope.username;
 
@@ -81,6 +81,11 @@ function EditCtrl(session, $scope, $http) {
 			console.log(data);
 		});
 	};
+
+	$scope.saveProfile = function() {
+		saveWho();
+		saveUsername();
+	}
 
 
 	$scope.isAtCommunityLimit = function() {

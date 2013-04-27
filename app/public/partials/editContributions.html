@@ -1,0 +1,13 @@
+<div ng-include src="'/partials/header.html'"></div>
+
+<div class="view">
+<div class="span12">
+
+	<div class="contributingTo" style="padding-top: 1em">
+		<h3>contributing to</h3>
+		<div ng-repeat="contribution in contributions">
+			<pre>{{contribution | json}}</pre>
+		</div>
+	</div>
+</div>
+</div>

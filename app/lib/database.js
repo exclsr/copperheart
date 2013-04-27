@@ -34,7 +34,19 @@ var db = function() {
 				byEmail: {
 					map: function(doc) {
 						if (doc.email) {
+							// TODO: Be explicit about the data
+							// we return -- don't just return the
+							// entire document -- or maybe just
+							// don't return the things that could
+							// be large, like the list of backers?
 							emit(doc.email, doc);
+						}
+					}
+				},
+				byId: {
+					map: function(doc) {
+						if (doc.id) {
+							emit(doc.id, doc);
 						}
 					}
 				},
@@ -56,6 +68,7 @@ var db = function() {
 		database.get(patronsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
 				|| !doc.views.byEmail
+				|| !doc.views.byId
 				|| !doc.views.byUsername
 				|| forceDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
@@ -103,18 +116,45 @@ var db = function() {
 			url: '_design/contributions',
 			body: 
 			{
-				byPatrons: {
+				byPatronToProject: {
+					// What contributions are being given from a specific
+					// patron to a specific project?
 					map: function(doc) {
 						var getContributionId = function (backerId, projectId) {
 							return backerId + "-" + projectId;
 						};
 
+						// TODO: Change this key to an array like so
+						// [backerId, projectId]
 						if (doc.type 
 						 && doc.backerId
 						 && doc.projectId
 						 && doc.type === "contribution") { 
 						 	var id = getContributionId(doc.backerId, doc.projectId);
 							emit(id, doc);
+						}
+					}
+				},
+
+				byPatron: {
+					// What are all the contributions that a specific 
+					// patron is providing?
+					map: function(doc) {
+						if (doc.id) {
+							// the patron we're looking for
+							// emit([doc.id, 0], doc);
+
+							// doc === the profiles of the projects we're backing
+							// TODO: We don't really need the entire profile
+							// here. Probably just the name.
+							for (var backerId in doc.backers) {
+								emit([backerId, doc.id, 0], doc);
+							}
+						}
+
+						// the patron's contributions
+						if (doc.type === "contribution") { 
+							emit([doc.backerId, doc.projectId, 1], doc);
 						}
 					}
 				}
@@ -130,7 +170,8 @@ var db = function() {
 
 		database.get(contributionsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
-				|| !doc.views.byPatrons
+				|| !doc.views.byPatronToProject
+				|| !doc.views.byPatron
 				|| forceContributionsDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
@@ -188,6 +229,10 @@ var db = function() {
 		getView('patrons/all', success, failure);
 	};
 
+	var patronsById = function (success, failure, options) {
+		getView('patrons/byId', success, failure, options);
+	};
+
 	var patronsByEmail = function (success, failure, options) {
 		getView('patrons/byEmail', success, failure, options);
 	};
@@ -196,8 +241,12 @@ var db = function() {
 		getView('patrons/byUsername', success, failure, options);
 	};
 
-	var getPatron = function (patronId, success, failure) {
-		patronsByEmail(success, failure, {key: patronId, firstOnly: true});
+	var getPatron = function (patronEmail, success, failure) {
+		patronsByEmail(success, failure, {key: patronEmail, firstOnly: true});
+	};
+
+	var getPatronById = function (patronId, success, failure) {
+		patronsById(success, failure, {key: patronId, firstOnly: true});
 	};
 
 	var getPatronByUsername = function (username, success, failure) {
@@ -230,8 +279,20 @@ var db = function() {
 	};
 
 	var contributionsByRel = function (success, failure, options) {
-		getView('contributions/byPatrons', success, failure, options);
+		getView('contributions/byPatronToProject', success, failure, options);
 	};
+
+	var contributionsByPatron = function (success, failure, options) {
+		getView('contributions/byPatron', success, failure, options); 
+	}
+
+	var getContributionsByPatron = function (backerId, success, failure) {
+		var options = {
+			startkey: [backerId],
+			endkey: [backerId, {}, 3]
+		};
+		contributionsByPatron(success, failure, options);
+	}
 
 	var getContribution = function(backerId, projectId, success, failure) {
 		var id = getContributionId(backerId, projectId);
@@ -269,6 +330,7 @@ var db = function() {
 	return {
 		patrons : {
 			get : getPatron,
+			getById : getPatronById,
 			getByUsername : getPatronByUsername,
 			save : savePatron
 		},
@@ -278,6 +340,7 @@ var db = function() {
 		},
 		contributions : {
 			get : getContribution,
+			getByPatronId : getContributionsByPatron,
 			save : saveContribution
 		}
 	};

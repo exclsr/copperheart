@@ -209,6 +209,57 @@ app.get('/contributions/:toUsername', function (req, res) {
 	db.patrons.getByUsername(req.params.toUsername, gotProject, failure);
 });
 
+app.get('/contributions', function (req, res) {
+	if (!req.user) {
+		// 'Anonymous' doesn't have any contributions.
+		res.send([]);
+		return;
+	}
+
+	var patron = req.user;
+
+	var success = function (rawResults) {
+		var contributions = [];
+
+		// TODO: This relies quite a bit on the structure
+		// of the data. Is that what we want, here? This is
+		// a great candidate to move inside the data API.
+		if (rawResults) {
+			var contribution = undefined;
+
+			rawResults.forEach(function (rawResult) {
+				// Things we know: We'll get a project profile
+				// before we get the contributions to it.
+				if (rawResult.id) {
+					var project = {};
+					project.name = rawResult.name;
+					project.username = rawResult.username;
+
+					contribution = {};
+					contribution.project = project;
+				}
+
+				// Things we know: We'll get a contribution
+				// right after we get a project profile.
+				else if (rawResult.type === "contribution") {
+					contribution.things = rawResult.things;
+					contributions.push(contribution);
+				}
+			});
+		}
+
+		res.send(contributions);
+	}
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	db.contributions.getByPatronId(patron.id, success, failure);
+});
+
 // Public data of a person
 app.get('/who/:username', function (req, res) {
 	var success = function (who) {

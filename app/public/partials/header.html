@@ -3,7 +3,10 @@
 		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
 	</a>
 	{{patron.getUsername()}}
-	<span ng-show="isLoggedIn()">[<a href="#/edit">edit</a>]</span>
+	<span ng-show="isLoggedIn()"> | 
+		<a href="#/edit">profile</a> | 
+		<a href="#/edit/contributions">contributions</a>
+	</span>
 
 	<h6 id="login">
 		<a ng-show="!isLoggedIn()" href="/auth/google?from=#/{{pageName}}">log in</a>

@@ -6,7 +6,18 @@
 	<div class="contributingTo" style="padding-top: 1em">
 		<h3>contributing to</h3>
 		<div ng-repeat="contribution in contributions">
-			<pre>{{contribution | json}}</pre>
+			<h3>
+				<a href="/#/hello/{{contribution.project.username}}">
+					{{contribution.project.name}}</a>
+				<small>:: {{contribution.project.username}}</small>
+			</h3>
+			<ul>
+				<li ng-repeat="thing in contribution.things">
+					A {{thing.unit}} of {{thing.name}} 
+					each {{thing.frequency}}.
+					<i class="icon-{{thing.glyph}}"></i>
+					${{thing.price}}
+				</li>
 		</div>
 	</div>
 </div>

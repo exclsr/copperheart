@@ -635,14 +635,26 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 	db.patrons.getByUsername(
 		req.params.toUsername, 
 		function (project) { // TODO: 'project' is not the best name
-			// Save the contributions to our database, first.
-			var contribution = {};
-			contribution.backerId = patron.id;
-			contribution.projectId = project.id;
-			contribution.things = things;
 
-			db.contributions.save(contribution, doStripeStuff, failure);
-			// then do Stripe stuff ...
+			var onPatronSave = function() {
+				// After saving the patron inthe backed
+				// project data, save the contribution as its 
+				// own document.
+				// ... then do Stripe stuff
+				var contribution = {};
+				contribution.backerId = patron.id;
+				contribution.projectId = project.id;
+				contribution.things = things;
+				db.contributions.save(contribution, doStripeStuff, failure);
+			}
+
+			// First, save the contribution in the project data. We
+			// do this so we can create contribution views more easily,
+			// at the expense of space.
+			if (!project.backers[patron.id]) {
+				project.backers[patron.id] = patron.id;
+			}
+			db.patrons.save(project, onPatronSave, failure);
 		},
 		failure
 	);

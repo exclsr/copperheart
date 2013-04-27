@@ -83,7 +83,8 @@ passport.deserializeUser(function (userEmail, done) {
 	var defaultNewUser = {
 		id: userEmail,
 		email: userEmail,
-		username: userEmail
+		username: userEmail,
+		backers: {}
 	};
 
 	db.patrons.get(userEmail, 

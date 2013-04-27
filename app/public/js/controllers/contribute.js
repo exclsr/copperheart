@@ -50,11 +50,14 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		$scope.daysOfTheMonth.push('last');
 
 		var currentMonth = today.getMonth();
+		var paymentYear = today.getFullYear();
 		var nextMonth = currentMonth + 1;
-		if (nextMonth === 12) {
-			nextMonth = 1;
+		if (nextMonth === 11) {
+			nextMonth = 0;
+			paymentYear++;
 		}
-		$scope.nextMonth = nextMonth;
+		$scope.paymentMonth = nextMonth;
+		$scope.paymentYear = paymentYear;
 	};
 
 	bindToSession();
@@ -157,6 +160,19 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			$scope.$digest();
 		};
 
+		// Credit: http://stackoverflow.com/a/11252167/124487
+		// TODO: Probably move to the server
+		var treatAsUTC = function (date) {
+			var result = new Date(date);
+			result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+			return result;
+		};
+
+		var daysBetween = function (startDate, endDate) {
+			var millisecondsPerDay = 24 * 60 * 60 * 1000;
+			return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
+		};
+
 		var makeRecurringCharges = function (things, stripeToken) {
 			if (!$scope.isLoggedIn()) {
 				console.log("Programmer error: " + 
@@ -164,13 +180,19 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 				return;
 			}
 
+			var now = new Date();
+			var paymentDate = new Date(
+				$scope.paymentYear, $scope.paymentMonth, $scope.paymentDay);
+			var daysUntilPayment = Math.ceil(daysBetween(now, paymentDate)); 
+
 			var patronEmail = session.patron.email;
 
 			// TODO: Revisit the names of these.
 			var data = { 
 				stripeToken: stripeToken,
 				things: things,
-				patronEmail: patronEmail
+				patronEmail: patronEmail,
+				daysUntilPayment: daysUntilPayment
 			};
 				
 			var res = $http.put('/commit/' + contributionTo, data);

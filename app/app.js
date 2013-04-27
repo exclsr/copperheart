@@ -417,7 +417,7 @@ var getStripePlanId = function (patronId) {
 // TODO: Figure out a way to share this price code
 // on both the client and the server (if practical).
 
-var getStripePlanRequest = function (patronId, things) {
+var getStripePlanRequest = function (patronId, things, daysUntilFirstPayment) {
 	// This is one person's monthly contribution into to the pool.
 	//
 	// TODO: This is an important point if we ever want
@@ -445,7 +445,7 @@ var getStripePlanRequest = function (patronId, things) {
 		interval: 'month',
 		interval_count: 1,
 		name: planName,
-		trial_period_days: 2 
+		trial_period_days: daysUntilFirstPayment 
 		// TODO: calculate the trial period based on what day they want to pay.
 		// maybe. need to figure out how plans are first charged. a better way
 		// might be to just add things to a commit pool and take them out at
@@ -506,6 +506,7 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 
 	var patronEmail = req.body.patronEmail;
 	var stripeToken = req.body.stripeToken;
+	var daysUntilPayment = req.body.daysUntilPayment;
 	var things = req.body.things;
 
 	var patron = req.user;
@@ -547,7 +548,8 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			// the active subscription, and create a new one with the
 			// details that we want.
 			var createPlanAnew = function () {
-				var planRequest = getStripePlanRequest(patron.id, things);
+				var planRequest = getStripePlanRequest(
+									patron.id, things, daysUntilPayment);
 				stripe.plans.create(planRequest, function (err, planResponse) {
 					// TODO: Do anything with the response?
 					err ? failure(err) : success(patron.id);
@@ -604,7 +606,8 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			// before creating a customer, so we can create a customer
 			// and associate them with a plan in one step.
 			var createPlanAndCustomer = function () {
-				var planRequest = getStripePlanRequest(patron.id, things);
+				var planRequest = getStripePlanRequest(
+									patron.id, things, daysUntilPayment);
 				console.log("Creating plan ...");
 				// TODO: If we get a failure at this point, we have a data
 				// integrity issue, because it is likely a plan already exists.

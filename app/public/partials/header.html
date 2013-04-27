@@ -2,10 +2,10 @@
 	<a href="/">
 		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
 	</a>
-	{{patron.getUsername()}}
+	<a href="/#/hello/{{patron.getUsername()}}">{{patron.getUsername()}}</a>
 	<span ng-show="isLoggedIn()"> | 
-		<a href="#/edit">profile</a> | 
-		<a href="#/edit/contributions">contributions</a>
+		<a href="/#/edit">profile</a> | 
+		<a href="/#/edit/contributions">contributions</a>
 	</span>
 
 	<h6 id="login">

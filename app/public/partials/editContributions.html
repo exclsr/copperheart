@@ -20,5 +20,12 @@
 				</li>
 		</div>
 	</div>
+
+	<div class="cardOnFile">
+		<h3>card on file</h3>
+		<p ng-show="!hasCard()">...</p>
+		<p ng-show="hasNoCard()">None.</p>
+		<p ng-show="hasCard()">{{card.type}} with a last digit of {{card.lastDigit}}.</p>
+	</div>
 </div>
 </div>

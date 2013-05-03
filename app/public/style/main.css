@@ -70,6 +70,9 @@ ul {
 	margin-top: 0.5ex; margin-left: 6ex;
 	float: left;
 }
+.header h3 {
+	margin: 0;
+}
 #login {
 	margin: 0;
 	font-weight: normal;

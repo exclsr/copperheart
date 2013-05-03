@@ -5,6 +5,7 @@
 angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 'ngSanitize', 'ui']).
   config(['$routeProvider', function($routeProvider) {
   	$routeProvider.when('/entrance', {templateUrl: 'partials/entrance.html', controller: EntranceCtrl});
+    $routeProvider.when('/about', {templateUrl: 'partials/about.html'});
     // Not sure which order is best, so let's do both!
     $routeProvider.when('/:who/hello', {templateUrl: 'partials/hello.html', controller: HelloCtrl});
     $routeProvider.when('/hello/:who', {templateUrl: 'partials/hello.html', controller: HelloCtrl});

@@ -2,6 +2,7 @@
 
 function EntranceCtrl(session, $scope, $http) {
 
+	$scope.pageName = "entrance";
 	var profiles = [];
 
 	$http.get('/entrance/usernames')

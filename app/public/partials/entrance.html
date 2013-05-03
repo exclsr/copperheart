@@ -1,8 +1,20 @@
-<!-- TODO: Does this cause flashing? Can we do something about that? -->
 <div ng-include src="'/partials/header.html'"></div>
 
 <div class="view">
 <div class="entrance span12">
 
+	<a ng-repeat="profile in profiles"
+		href="/#/hello/{{profile.username}}" class="profileLink">
+		<div class="profile span3">
+			<img ng-src="{{profile.imageUrl}}"/>
+			<h3>{{profile.name}}</h3>
+			<ul>
+				<li ng-repeat="community in profile.communities">
+					{{community.name}}
+				</li>
+			</ul>
+		</div>
+	</a>
 </div>
 </div>
+

@@ -27,6 +27,44 @@ var db = function() {
 
 	var createViews = function() {
 
+		// TODO: 'profiles' isn't quite right, maybe.
+		// Also, the attachments are a work in progress.
+		var profilesDesignDoc = {
+			url: '_design/profiles',
+			body: 
+			{
+				byUsername: {
+					map: function(doc) {
+						if (doc.username) {
+							var profile = {};
+							profile.name = doc.name;
+							profile.communities = doc.communities || [];
+							profile.username = doc.username;
+							if (doc._attachments && doc._attachments["profile.jpg"]) {
+								profile.image = doc._attachments["profile.jpg"];
+							} 
+							
+							emit(doc.username, profile);
+						}
+					}
+				}
+			}
+      	};
+
+		var forceProfilesDesignDocSave = false;
+
+		database.get(profilesDesignDoc.url, function (err, doc) {
+			if (err || !doc.views 
+				|| !doc.views.byUsername
+				|| forceProfilesDesignDocSave) {
+				// TODO: Add a mechanism for knowing when views
+				// themselves have updated, to save again at the
+				// appropriate times.
+				database.save(profilesDesignDoc.url, profilesDesignDoc.body); 
+			}
+		});
+
+
 		var patronsDesignDoc = {
 			url: '_design/patrons',
 			body: 
@@ -147,6 +185,10 @@ var db = function() {
 							// doc === the profiles of the projects we're backing
 							// TODO: We don't really need the entire profile
 							// here. Probably just the name.
+							//
+							// TODO: Maybe have a 'basic info' section in the doc
+							// that contains name and username, and can be expanded
+							// with messing with the view.
 							for (var backerId in doc.backers) {
 								emit([backerId, doc.id, 0], doc);
 							}
@@ -227,6 +269,18 @@ var db = function() {
 
 	var _all = function(success, failure) {
 		getView('patrons/all', success, failure);
+	};
+
+	var profilesByUsername = function (success, failure, options) {
+		getView('profiles/byUsername', success, failure, options);
+	};
+
+	var getProfileByUsername = function (username, success, failure) {
+		var options = {}
+		options.key = username;
+		options.firstOnly = true;
+		// options.attachments = true;
+		profilesByUsername(success, failure, options);
 	};
 
 	var patronsById = function (success, failure, options) {
@@ -326,8 +380,40 @@ var db = function() {
 		);
 	};
 
+	var getProfileImageByUsername = function(username, res, callback) {
+		// Stream the profile image to 'res'
+
+		var gotPatron = function (patron) {
+			var docId = patron._id;
+			var attachmentName = "profile.jpg";
+
+			res.type("image/jpeg");
+			var readStream = database.getAttachment(docId, attachmentName, function (err) {
+				if (err) {
+					callback(err);
+				}
+			});
+
+			// TODO: Consider setting 'end' to false so we can
+			// maybe send an error code if we mess up.
+			readStream.pipe(res);
+		};
+
+		var failure = function (err) {
+			callback(err);
+		}
+
+		getPatronByUsername(username, gotPatron, failure);
+	};
+
 	createDatabaseAndViews();
 	return {
+		profileImages : {
+			get : getProfileImageByUsername
+		},
+		profiles : {
+			getByUsername : getProfileByUsername
+		},
 		patrons : {
 			get : getPatron,
 			getById : getPatronById,

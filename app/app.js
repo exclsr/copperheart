@@ -40,6 +40,11 @@ app.configure('development', function(){
 	app.use(express.errorHandler());
 });
 
+
+app.get('/entrance/usernames', function (req, res) {
+	res.send(config.entranceUsernames() || []);
+});
+
 //----------------------------------------------------------------
 // Data: Authentication
 //----------------------------------------------------------------
@@ -321,6 +326,36 @@ app.get('/who/:username', function (req, res) {
 
 	db.patrons.getByUsername(req.params.username, success, failure);
 });
+
+
+app.get('/profile/:username', function (req, res) {
+	var success = function (data) {
+		var profile = {};
+		profile.username = data.username;
+		profile.name = data.name;
+		profile.communities = data.communities;
+		profile.image = data.image;
+
+		res.send(profile);
+	}
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	db.profiles.getByUsername(req.params.username, success, failure);
+});
+
+app.get('/profile/:username/image', function (req, res) {
+	db.profileImages.get(req.params.username, res, function (err) {
+		if (err) {
+			res.send(404);
+		}
+	});
+});
+
 
 
 // Public and private data of a patron

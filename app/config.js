@@ -1,6 +1,8 @@
 //----------------------------------------------------
 // config.js
 //
+var entranceUsernames = process.env.ENTRANCE_USERNAMES;
+
 var port = process.env.PORT || 3000;
 
 var stripeApiTest  = process.env.STRIPE_API_TEST || 'missing api key';
@@ -43,6 +45,10 @@ catch (err) {
 // can at least make it a lot smaller. Maybe putting
 // everything in one config object (json) that is exported
 // is the way to start ...
+exports.entranceUsernames = function() {
+	return overrides.entranceUsernames || entranceUsernames;
+}
+
 exports.port = function() {
 	return overrides.port || port;
 };

@@ -792,6 +792,13 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 
 });
 
+// Lastly ...
+// This needs to be at the bottom, so things like
+// /whoami, /card or /contributions still work.
+app.get('/:username', function (req, res) {
+	res.redirect("/#/hello/" + req.params.username);
+});
+
 http.createServer(app).listen(app.get('port'), function(){
 	console.log("Express server listening on port " + app.get('port'));
 });

@@ -66,6 +66,9 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 	//---------------------------------------------------------
 	// $scope methods
 	//---------------------------------------------------------
+	$scope.getPageName = function() {
+		return session.pageName;
+	};
 
 	$scope.isLoginNeeded = function () {
 		// The patron needs to log in if there

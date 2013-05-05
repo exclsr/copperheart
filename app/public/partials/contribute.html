@@ -25,7 +25,7 @@
 			{{patron.getUsername()}}
 			<span ng-show="isLoginNeeded()"> 
 				| 
-				<a href="/auth/google?from=#/{{pageName}}">log in</a>
+				<a href="/auth/google?from=%23/{{getPageName()}}">log in</a>
 			</span>
 			<div class="bubble" ng-show="isLoginNeeded()">Please log in 
 				if you'd like to make recurring contributions, so you can 

@@ -2,7 +2,7 @@
 
 function EditContributionsCtrl(session, $scope, $http) {
 
-	$scope.pageName = "edit/contributions";
+	session.pageName = "edit/contributions";
 	$scope.contributions = [];
 	var hasCard = false;
 

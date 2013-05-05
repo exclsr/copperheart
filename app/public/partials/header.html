@@ -11,7 +11,7 @@
 	</span>
 
 	<h6 id="login">
-		<a ng-show="!isLoggedIn()" href="/auth/google?from=#/{{pageName}}">log in</a>
+		<a ng-show="!isLoggedIn()" href="/auth/google?from=%23/{{getPageName()}}">log in</a>
 		<a ng-show="isLoggedIn()" ng-click="logout()" style="cursor:pointer">log out</a>
 	</h6>
 </div>

@@ -58,7 +58,12 @@ var loginFailureUrl = '/';
 var authMiddlewareSaveWhereFrom = 
 	[
 		function (req, res, next) {
-			req.session.loginFrom = req.query["from"];
+			var rawFrom = req.query["from"] || "";
+			// The encoded url stuff causes the auth redirect to fail,
+			// so we decode what we know we're going to get, which is a
+			// bit hack-ish, so feel free to have a better idea.
+			var loginFrom = rawFrom.replace("%23", "#");
+			req.session.loginFrom = loginFrom;
 			next();
 		},
 		auth.authenticate('google', { failureRedirect: loginFailureUrl })

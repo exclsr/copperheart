@@ -4,7 +4,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	var profile = {};
 	var patron = {};
-	$scope.pageName = "hello";
+	session.pageName = "hello";
 
 	// TODO: Rename to something related to binding
 	// to route params, as that's what we're really doing.

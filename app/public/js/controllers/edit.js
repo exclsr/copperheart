@@ -3,7 +3,7 @@
 /* Controllers */
 function EditCtrl(session, $scope, $http) {
 
-	$scope.pageName = "edit";
+	session.pageName = "edit";
 	$scope.thing = {};
 
 	var patron = {};

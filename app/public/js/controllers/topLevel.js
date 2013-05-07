@@ -26,7 +26,7 @@ function TopLevelCtrl(session, $scope, $http) {
 		return "anonymous";
 	};
 
-	$scope.isLoggedIn = function() {
+	$scope.isSignedIn = function() {
 		if (session.patron.username) {
 			return true;
 		}
@@ -34,8 +34,8 @@ function TopLevelCtrl(session, $scope, $http) {
 		return false;
 	};
 
-	$scope.logout = function() {
-		$http.get('/auth/logout')
+	$scope.signOut = function() {
+		$http.get('/auth/signout')
 		.success(function () {
 			// clear out the logged in user
 			session.patron = {};

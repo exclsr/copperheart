@@ -2,11 +2,11 @@
 
 <div class="view span12">
 	<div class="whatContribution span11">
-		<div class="span4">
+		<div class="span5">
 			<h3>contributing</h3>
 			<ul class="contributionList">
 				<li class="contribution" ng-repeat="thing in things">
-					<div ng-class="{ notPossible: thing.recurring && isLoginNeeded() }">
+					<div ng-class="{ notPossible: thing.recurring && isSignInNeeded() }">
 						<div class="glyph"><i class="icon-{{thing.glyph}}"></i></div>
 						<span>A {{thing.unit}} of {{thing.name}}</span>
 						<span ng-show="thing.recurring">each {{thing.frequency}}</span>
@@ -16,7 +16,7 @@
 			</ul>
 		</div>
 
-		<div class="span3">
+		<div class="span4">
 			<h3>to</h3>
 			<div>{{who.name}}</div>
 			<div class="contributeToImage">
@@ -24,32 +24,47 @@
 			</div>
 		</div>
 
-		<div class="span3">
+<!-- 		<div class="span3">
 			<h3>from</h3>
 			{{patron.getUsername()}}
-			<span ng-show="isLoginNeeded()"> 
+			<span ng-show="isSignInNeeded()"> 
 				| 
 				<a href="/auth/google?from=%23/{{getPageName()}}">log in</a>
 			</span>
-			<div class="bubble" ng-show="isLoginNeeded()">Please log in 
+			<div class="bubble" ng-show="isSignInNeeded()">Please log in 
 				if you'd like to make recurring contributions, so you can 
 				change them in the future.</div>
 		</div>
-	</div>
+ -->	</div>
 
-	<form novalidate id="payment-form" class="css-form">
-		<div class="whenContribution span11">
-			<div class="span10">
+	<div class="span11">
+		<div class="span5 whenContribution">
+			<h3>from</h3>
+			{{patron.getUsername()}}
+			<span ng-show="isSignInNeeded()"> 
+				| 
+				<a href="/auth/google?from=%23/{{getPageName()}}">Sign in with Google</a>
+			</span>
+			<div class="bubble" ng-show="isSignInNeeded()">Please sign in 
+				if you'd like to make recurring contributions, so you can 
+				change them in the future.</div>
+		</div>
+
+		<div class="whenContribution">
+			<div class="span5">
 				<h3>when</h3>
 				<div><span class="heart">♥</span> {{priceNow | currency}} now.</div>
-				<div ng-hide="pricePerMonth <= 0 || isLoginNeeded()"><span class="copper heart">♥</span> {{pricePerMonth | currency}} each month, starting on the 
+				<div ng-hide="pricePerMonth <= 0 || isSignInNeeded()"><span class="copper heart">♥</span> {{pricePerMonth | currency}} each month, starting on the 
 					<select class="paymentDay" ordinal ng-model='paymentDay'>
 						<option ng-repeat="day in daysOfTheMonth">{{day | ordinal}}<option>
 					</select>
 					day of {{paymentMonth | month}}.</div>
 			</div>
 		</div>
+	</div>
 
+
+	<form novalidate id="payment-form" class="css-form">
 		<div class="howContribution span11">
 			<div class="span10">
 			<h3>how</h3>

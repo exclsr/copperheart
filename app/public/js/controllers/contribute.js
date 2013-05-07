@@ -70,22 +70,22 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		return session.pageName;
 	};
 
-	$scope.isLoginNeeded = function () {
+	$scope.isSignInNeeded = function () {
 		// The patron needs to log in if there
 		// is a recurring payment.
-		var isLoginNeeded = false;
-		if ($scope.isLoggedIn()) {
+		var isSignInNeeded = false;
+		if ($scope.isSignedIn()) {
 			return false;
 		}
 
 		angular.forEach($scope.things, function (thing) {
 			if (thing.recurring && thing.canHaz) {
-				isLoginNeeded = true;
+				isSignInNeeded = true;
 				return;
 			}
 		});
 
-		return isLoginNeeded;
+		return isSignInNeeded;
 	};
 
 	$scope.isErrorHappening = function() {

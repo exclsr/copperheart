@@ -92,7 +92,7 @@ app.get(auth.googleReturnUrl, auth.authMiddleware, function (req, res) {
 });
 
 // Logout ...
-app.get('/auth/logout', function (req, res){
+app.get('/auth/signout', function (req, res){
 	req.logout();
 	res.send(204); // no content
 });

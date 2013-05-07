@@ -3,15 +3,15 @@
 		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
 	</a>
 
-	<span ng-show="!isLoggedIn()">anonymous</span>
-	<span ng-show="isLoggedIn()">
+	<span ng-show="!isSignedIn()">anonymous</span>
+	<span ng-show="isSignedIn()">
 		<a href="/#/hello/{{patron.getUsername()}}">{{patron.getUsername()}}</a> | 
 		<a href="/#/edit">profile</a> | 
 		<a href="/#/edit/contributions">contributions</a>
 	</span>
 
 	<h6 id="login">
-		<a ng-show="!isLoggedIn()" href="/auth/google?from=%23/{{getPageName()}}">log in</a>
-		<a ng-show="isLoggedIn()" ng-click="logout()" style="cursor:pointer">log out</a>
+		<a ng-show="!isSignedIn()" href="/auth/google?from=%23/{{getPageName()}}">sign in with Google</a>
+		<a ng-show="isSignedIn()" ng-click="signOut()" style="cursor:pointer">sign out</a>
 	</h6>
 </div>

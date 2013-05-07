@@ -7,6 +7,7 @@
 			<ul class="contributionList">
 				<li class="contribution" ng-repeat="thing in things">
 					<div ng-class="{ notPossible: thing.recurring && isLoginNeeded() }">
+						<div class="glyph"><i class="icon-{{thing.glyph}}"></i></div>
 						<span>A {{thing.unit}} of {{thing.name}}</span>
 						<span ng-show="thing.recurring">each {{thing.frequency}}</span>
 						<span class="glyph {{thing.id}}"></span>

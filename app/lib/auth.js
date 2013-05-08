@@ -72,6 +72,7 @@ var firstRun = function(req, res, next) {
 passport.serializeUser(function (user, done) {
 	// Input: 'user' is what we get from Google when using OpenID.
 	// Output: we call 'done(error, userId)' to tell passport we're done.
+
 	var userEmail = user.emails[0].value;
 	done(null, userEmail);
 });
@@ -87,17 +88,33 @@ passport.deserializeUser(function (userEmail, done) {
 		backers: {}
 	};
 
+	// TODO: DeserializeUser is called for pretty much every HTTP
+	// request, which is quite often. Consider not calling the 
+	// database each time, if this becomes an issue. Ain't nobody 
+	// got time for that.
 	db.patrons.get(userEmail, 
 		function (data) {
-			// Success.
+			// database returned from patrons.get
 			if (!data || data === "" || data.length === 0) {
-				// Not found.
+				// The patron was not found in our database. 
+				// That is fine, but let's save the profile.
 				data = defaultNewUser;
+				db.patrons.save(defaultNewUser, 
+					function () {
+						// New user saved.
+						done(null, data);
+					},
+					function (error) {
+						// Failed to save user.
+						done(null, data);
+					});
 			}
-			done(null, data);
+			else {
+				done(null, data);
+			}
 		},
 		function (error) {
-			// Failure.
+			// database query patrons.get failed.
 			done(null, defaultNewUser);
 	});
 }); 

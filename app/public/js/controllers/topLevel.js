@@ -34,6 +34,15 @@ function TopLevelCtrl(session, $scope, $http) {
 		return false;
 	};
 
+	$scope.patron.getDisplayName = function () {
+		if ($scope.isSignedIn()) {
+			if (session && session.patron && session.patron.name) {
+				return session.patron.name;
+			}
+		}
+		return $scope.patron.getUsername();
+	};
+
 	$scope.signOut = function() {
 		$http.get('/auth/signout')
 		.success(function () {

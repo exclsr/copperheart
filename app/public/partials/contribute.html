@@ -23,24 +23,18 @@
 				<img ng-src="/profile/{{who.username}}/image"/>
 			</div>
 		</div>
-
-<!-- 		<div class="span3">
-			<h3>from</h3>
-			{{patron.getUsername()}}
-			<span ng-show="isSignInNeeded()"> 
-				| 
-				<a href="/auth/google?from=%23/{{getPageName()}}">log in</a>
-			</span>
-			<div class="bubble" ng-show="isSignInNeeded()">Please log in 
-				if you'd like to make recurring contributions, so you can 
-				change them in the future.</div>
-		</div>
- -->	</div>
+	</div>
 
 	<div class="span11">
 		<div class="span5 whenContribution">
 			<h3>from</h3>
-			{{patron.getUsername()}}
+			<div ng-show="isNameEmpty() && isSignedIn()" 
+					ng-init="fromName = patron.getDisplayName()">
+				<input type="text" ng-model="fromName" class="fromName"/>
+			</div>
+			<span ng-show="!isNameEmpty() || !isSignedIn()">
+				{{patron.getDisplayName()}}
+			</span>
 			<span ng-show="isSignInNeeded()"> 
 				| 
 				<a href="/auth/google?from=%23/{{getPageName()}}">Sign in with Google</a>

@@ -394,6 +394,9 @@ ul.contributionList .contribution {
 	z-index: 0;
 }
 
+.fromName {
+	font-size: 12pt !important;
+}
 
 /* change behavior of the light-blue borders
 that bootstrap creates on focus, and the yellow

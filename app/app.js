@@ -428,8 +428,13 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 		res.send(500);
 	};
 
-	patron.name = who.name;
-	patron.present = who.present;
+	if (who.name !== undefined) {
+		patron.name = who.name;
+	}
+	if (who.present !== undefined) {
+		patron.present = who.present;
+	}
+
 	db.patrons.save(patron, success, failure);
 });
 

@@ -60,6 +60,20 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		$scope.paymentYear = paymentYear;
 	};
 
+	var savePatronName = function(success) {
+		var who = {};
+		who.name = $scope.fromName;
+
+		var putWho = $http.put('/patron/who', who);
+		putWho.success(function (data) {
+			success();
+		});
+		putWho.error(function (data, status, headers, config) { 
+			// TODO: Oh ... no.
+			console.log(data);
+		});
+	};
+
 	bindToSession();
 	initialize();
 
@@ -88,6 +102,10 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		return isSignInNeeded;
 	};
 
+	$scope.isNameEmpty = function() {
+		return !(session && session.patron && session.patron.name);
+	};
+
 	$scope.isErrorHappening = function() {
 		if ($scope.errors) {
 			return ($scope.errors.isCard ||
@@ -108,7 +126,7 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		var canHazRecurring = function() {
 			var canHaz = false;
 
-			if (!$scope.isLoggedIn()) {
+			if (!$scope.isSignedIn()) {
 				return false;
 			}
 
@@ -177,7 +195,7 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		};
 
 		var makeRecurringCharges = function (things, stripeToken) {
-			if (!$scope.isLoggedIn()) {
+			if (!$scope.isSignedIn()) {
 				console.log("Programmer error: " + 
 					"Cannot make recurring charges if not logged in.");
 				return;
@@ -334,6 +352,7 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			}
 		};
 
+		savePatronName();
 		// TODO: Learn how to inject something like Stripe, then do so.
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};

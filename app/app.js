@@ -21,6 +21,7 @@ app.configure(function(){
 	app.set('port', config.port());
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
+	app.use(express.static(path.join(__dirname, 'public')));
 	app.use(express.logger('dev'));
 	app.use(express.bodyParser());
 	app.use(auth.firstRun); // TODO: Auth ...
@@ -33,7 +34,6 @@ app.configure(function(){
 	// end-required for auth.
 	app.use(express.methodOverride());
 	app.use(app.router);
-	app.use(express.static(path.join(__dirname, 'public')));
 });
 
 app.configure('development', function(){

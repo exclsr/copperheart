@@ -1,6 +1,6 @@
 'use strict';
 
-function ContributeCtrl(session, $scope, $http, $routeParams) {
+function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 
 	session.pageName = "contribute";
 	var contributionTo = undefined;
@@ -60,6 +60,15 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		$scope.paymentYear = paymentYear;
 	};
 
+	//---------------------------------------------------------
+	// init
+	//---------------------------------------------------------
+	bindToSession();
+	initialize();
+
+	//---------------------------------------------------------
+	// private, non-init methods
+	//---------------------------------------------------------
 	var savePatronName = function(success) {
 		var who = {};
 		who.name = $scope.fromName;
@@ -74,8 +83,35 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		});
 	};
 
-	bindToSession();
-	initialize();
+	var commitStatusOptions = {
+		nothing: 'nothing',
+		carding: 'carding',
+		committing: 'committing',
+		wrappingUp: 'wrappingUp',
+		done: 'done',
+		error: 'error'
+	};
+
+	var commitStatus = commitStatusOptions.nothing;
+
+	var stepsComplete = {
+		carding: false,
+		oneTime: false,
+		recurring: false
+	};
+
+	var resetStepsComplete = function() {
+		// TODO: The JavaScript-y way
+		stepsComplete.carding = false;
+		stepsComplete.oneTime = false;
+		stepsComplete.recurring = false;
+	}
+
+	var wrapUpContribution = function() {
+		// This is called when 'makeContribution' is a success.
+		commitStatus = commitStatusOptions.wrappingUp;
+		$location.path('/contribute/thanks');
+	}
 
 	//---------------------------------------------------------
 	// $scope methods
@@ -106,6 +142,21 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		return !(session && session.patron && session.patron.name);
 	};
 
+
+	$scope.isCommitStatus = function (status) {
+		if (commitStatus === commitStatusOptions[status]) {
+			return true;
+		}
+		return false;
+	};
+
+	$scope.isStepComplete = function (step) {
+		if (stepsComplete[step]) {
+			return true;
+		}
+		return false;
+	};
+
 	$scope.isErrorHappening = function() {
 		if ($scope.errors) {
 			return ($scope.errors.isCard ||
@@ -117,11 +168,12 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 	}
 
 	$scope.makeContribution = function() {
-		
-		$scope.status = "...";
+		resetStepsComplete();
+		commitStatus = commitStatusOptions.carding;
 		$scope.errors = {}; // clear error flags
 
 		var things = $scope.things;
+		var paymentsCount = 0;
 		
 		var canHazRecurring = function() {
 			var canHaz = false;
@@ -194,6 +246,13 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 			return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
 		};
 
+		var maybeWrapUp = function() {
+			if (paymentsCount === numberOfTokensRequired) {
+				// We're done! 
+				wrapUpContribution();
+			}
+		};
+
 		var makeRecurringCharges = function (things, stripeToken) {
 			if (!$scope.isSignedIn()) {
 				console.log("Programmer error: " + 
@@ -218,16 +277,17 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 				
 			var res = $http.put('/commit/' + contributionTo, data);
 			res.success(function(data) {
-				// TODO: Now what?
-				console.log(data);
 				// The server is happy.
-				$scope.status += " :-)";
+				stepsComplete.recurring = true;
+				paymentsCount++;
+				maybeWrapUp();
 			});
 
 			res.error(function(data, status, headers, config) {
 				console.log(data);
 				// The server is sad.
-				$scope.status += " :-(";
+				commitStatus = commitStatusOptions.error;
+				// TODO: Describe what the patron can now do.
 			});
 		};
 
@@ -239,21 +299,23 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 
 			var res = $http.put('/commit/once/' + contributionTo, data);
 			res.success(function(data) {
-				console.log(data);
 				// The server is happy.
-				$scope.status += " :-)";
-			// TODO: Now what?
+				stepsComplete.oneTime = true;
+				paymentsCount++;
+				maybeWrapUp();
 			});
 
 			res.error(function(data, status, headers, config) {
 				console.log(data);
 				// The server is sad.
-				$scope.status += ":-(";
+				commitStatus = commitStatusOptions.error;
+				// TODO: Describe what the patron can now do.
 			});
 		};
 
 		var handleTokenCreated = function (response1, response2) {
-			$scope.status = ":-)";
+			stepsComplete.carding = true;
+			commitStatus = commitStatusOptions.committing;
 
 			var recurringThings = [];
 			var oneTimeThings = [];
@@ -307,6 +369,8 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		};
 
 		var handleCreateTokenError = function (status, response) {
+			commitStatus = commitStatusOptions.error;
+
 			switch (status) {
 				case 402: // request failed 
 					handleCardError(response);
@@ -357,4 +421,4 @@ function ContributeCtrl(session, $scope, $http, $routeParams) {
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-ContributeCtrl.$inject = ['session', '$scope', '$http', '$routeParams'];
+ContributeCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams'];

@@ -494,6 +494,22 @@ select.paymentDay {
 	z-index: 0;
 }
 
+.commitBlock {
+	margin-top: 1.2em;
+}
+
+.commitStatus {
+	display: inline;
+}
+.commitIcons {
+	display: inline; 
+	margin-left: 1ex;
+}
+.payment-errors {
+	margin-top: -1em;
+	margin-left: -7em;
+}
+
 
 /* Edit page */
 .name {

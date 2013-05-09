@@ -60,8 +60,8 @@
 
 	<form novalidate id="payment-form" class="css-form">
 		<div class="howContribution span11">
-			<div class="span10">
-			<h3>how</h3>
+			<div class="span5">
+				<h3>how</h3>
 				<div class="card pull-left well">
 					<div class="form-row cardNumberRow">
 						<input class="cardNumber pull-right" type="text" size="20" data-stripe="number" 
@@ -90,38 +90,50 @@
 						</div>
 					</div>
 				</div><!-- end card -->
+			</div>
 
-				<!-- <h2><span ng-repeat="thing in things">
-					<span class="heart" ng-show="thing.canHaz && !thing.recurring">♥</span>
-					<span class="recurringHeart" 
-						ng-show="thing.canHaz && thing.recurring">♥</span>
-					</span>&nbsp;</h2> -->
+			<div class="span5">
+				<h3>good to go?</h3>
+				<button class="btn" ng-click="makeContribution()">Contribute</button>
 
-				<div class="payment-errors errorBubble span5" ng-show="isErrorHappening()">
-					<div class="cardError" ng-show="errors.isCard">
-						<p>Sorry, it seems the card isn't working. Maybe
-						different numbers are needed.</p>
-					</div>
-
-					<div class="stripeApiError" ng-show="errors.isApi">
-						<p>Sorry, our credit card processor seems to be
-						having some issues at the moment.</p>
-
-						<p>Please try pressing the button again. But if 
-						that doesn't work, you might have to come back 
-						in a bit.</p>
-					</div>
-
-					<div class="programmerError" ng-show="errors.isProgrammer">
-						<p>Hey, check your console for errors, because
-						there is a misconfiguration.</p>
+				<div class="commitBlock">
+					<p class="commitStatus" ng-show="isCommitStatus('carding')">
+						one moment ...
+					</p>
+					<p class="commitStatus" ng-show="isCommitStatus('committing')">
+						saving contributions ...
+					</p>
+					<p class="commitStatus" ng-show="isCommitStatus('wrappingUp')">
+						wrapping up ...
+					</p>
+					<div class="commitIcons">
+							<span ng-show="isStepComplete('carding')">
+								<i class="icon-play" style="margin-top: 0.5ex"></i>
+							</span>
+							<span ng-show="isStepComplete('oneTime')" class="heart">♥</span>
+							<span ng-show="isStepComplete('recurring')" class="copper heart">♥</span>
 					</div>
 				</div>
+			</div>
 
-				<div style="clear: left">
-					<button class="btn" ng-click="makeContribution()">Contribute</button>
-					<!-- TODO: Make a CSS animation to show something is happening. -->
-					{{status}}
+			<div class="payment-errors errorBubble span6" ng-show="isErrorHappening()">
+				<div class="cardError" ng-show="errors.isCard">
+					<p>Sorry, it seems the card isn't working. 
+						Maybe different numbers are needed.</p>
+				</div>
+
+				<div class="stripeApiError" ng-show="errors.isApi">
+					<p>Sorry, our credit card processor seems to be
+					having some issues at the moment.</p>
+
+					<p>Please try pressing the button again. But if 
+					that doesn't work, you might have to come back 
+					in a bit.</p>
+				</div>
+
+				<div class="programmerError" ng-show="errors.isProgrammer">
+					<p>Hey, check your console for errors, because
+					there is a misconfiguration.</p>
 				</div>
 			</div>
 		</div>

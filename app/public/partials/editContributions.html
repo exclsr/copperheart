@@ -4,25 +4,31 @@
 <div class="span12">
 
 	<div class="contributingTo" style="padding-top: 1em">
-		<h3>contributing to</h3>
+		<div class="row">
+			<h3 class="span3" style="margin-top: 0">contributing to</h3>
+			<div class="span4"></div>
+			<div class="span2" style="margin-top: 1.5ex">each month</div>
+		</div>
+
 		<div ng-repeat="contribution in contributions">
-			<h3>
+			<p class="span3">
 				<a href="/#/hello/{{contribution.project.username}}">
 					{{contribution.project.name}}</a>
 				<small>:: {{contribution.project.username}}</small>
-			</h3>
-			<ul>
+			</p>
+			<ul style="list-style: none" class="span4">
 				<li ng-repeat="thing in contribution.things">
-					A {{thing.unit}} of {{thing.name}} 
+					<i class="icon-{{thing.glyph}} glyph"></i>
+					&nbsp;A {{thing.unit}} of {{thing.name}} 
 					each {{thing.frequency}}.
-					<i class="icon-{{thing.glyph}}"></i>
-					${{thing.price}}
 				</li>
+			</ul>
+			<div class="span1">{{contribution.pricePerMonth | currency}}</div>
 		</div>
 	</div>
 
-	<div class="cardOnFile">
-		<h3>card on file</h3>
+	<div class="cardOnFile" style="clear: left">
+		<h3 style="padding-top: 1.5em">card on file</h3>
 		<p ng-show="!hasCard()">...</p>
 		<p ng-show="hasNoCard()">None.</p>
 		<p ng-show="hasCard()">{{card.type}} with a last digit of {{card.lastDigit}}.</p>

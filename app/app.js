@@ -252,8 +252,12 @@ app.get('/contributions', function (req, res) {
 				// Things we know: We'll get a contribution
 				// right after we get a project profile.
 				else if (rawResult.type === "contribution") {
-					contribution.things = rawResult.things;
-					contributions.push(contribution);
+					// If !contribution, there is a data issue, 
+					// but it can happen.
+					if (contribution) {
+						contribution.things = rawResult.things;
+						contributions.push(contribution);
+					}
 				}
 			});
 		}

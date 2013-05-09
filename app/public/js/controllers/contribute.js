@@ -416,7 +416,9 @@ function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 			}
 		};
 
-		savePatronName();
+		if ($scope.isNameEmpty() && $scope.isSignedIn()) {
+			savePatronName();
+		}
 		// TODO: Learn how to inject something like Stripe, then do so.
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};

@@ -60,27 +60,14 @@ var firstRun = function(req, res, next) {
 	return next();
 };
 
-// From the passport demo:
-//
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.  However, since this example does not
-//   have a database of user records, the complete Google profile is serialized
-//   and deserialized.
-passport.serializeUser(function (user, done) {
+//   serialize users into and deserialize users out of the session.  
+passport.serializeUser(function (user, callback) {
 	// Input: 'user' is what we get from Google when using OpenID.
-	// Output: we call 'done(error, userId)' to tell passport we're done.
-
+	// Output: we call 'callback(error, userData)' to tell passport we're done.
 	var userEmail = user.emails[0].value;
-	done(null, userEmail);
-});
 
-passport.deserializeUser(function (userEmail, done) {
-	// Input: 'userEmail' is what we saved in the serializeUser step.
-	// --> TODO: confirm the above is true.
-	// Output: we call 'done(error, userId)' to tell passport we're done.
 	var defaultNewUser = {
 		id: userEmail,
 		email: userEmail,
@@ -88,10 +75,9 @@ passport.deserializeUser(function (userEmail, done) {
 		backers: {}
 	};
 
-	// TODO: DeserializeUser is called for pretty much every HTTP
-	// request, which is quite often. Consider not calling the 
-	// database each time, if this becomes an issue. Ain't nobody 
-	// got time for that.
+	// TODO: What, exactly, do we want to serialize into passport?
+	// We probably only need the username, possibly the email address,
+	// and possibly the id.
 	db.patrons.get(userEmail, 
 		function (data) {
 			// database returned from patrons.get
@@ -102,21 +88,27 @@ passport.deserializeUser(function (userEmail, done) {
 				db.patrons.save(defaultNewUser, 
 					function () {
 						// New user saved.
-						done(null, data);
+						callback(null, data);
 					},
 					function (error) {
 						// Failed to save user.
-						done(null, data);
+						callback(null, data);
 					});
 			}
 			else {
-				done(null, data);
+				callback(null, data);
 			}
 		},
 		function (error) {
 			// database query patrons.get failed.
-			done(null, defaultNewUser);
+			callback(null, defaultNewUser);
 	});
+});
+
+passport.deserializeUser(function (user, callback) {
+	// Input: 'user' is what we saved in the serializeUser step.
+	// Output: we 'callback(error, userObject)' to tell passport we're done.
+	callback(null, user);
 }); 
 
 

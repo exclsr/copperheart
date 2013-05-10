@@ -4,22 +4,64 @@
 // The thing that knows about our database implementation.
 //
 var cradle = require('cradle');
+var nano = require('nano');
 
 var db = function() {
 
 	// TODO: Sandbox vs production database.
 	var couchHost = 'http://localhost';
 	var couchPort = 5984;
+	
 	var databaseName = 'sandbox';
 
+	var database;
+	var cradleDb;
+	var isUsingCradle = false;
 	// Connect to Couch! 
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.
 	// See https://github.com/cloudhead/cradle#retry-on-connection-issues
-	var database = new(cradle.Connection)(couchHost, couchPort, {
+	cradleDb = new(cradle.Connection)(couchHost, couchPort, {
 		cache: true,
 		raw: false
 	}).database(databaseName);
+
+	if (isUsingCradle) {
+		database = cradleDb;
+	}
+	else {
+		var host = couchHost + ':' + couchPort;
+		var n = nano(host);
+		var cookieToken = "";
+		var callback = function() {
+			database = nano({
+				url: couchHost + ':' + couchPort //,
+				//cookie: cookieToken
+			}).use(databaseName);
+		};
+		
+		var getCookieToken = function (callback) {
+			// TODO: Need to refresh cookie when appropriate.
+			n.auth(dbAuth.username, dbAuth.password, 
+				function (err, body, headers) {
+					if (err) {
+						// TODO: Freak out.
+						callback(err);
+						return;
+					}
+
+					if (headers && headers['set-cookie']) {
+						cookieToken = headers['set-cookie'];
+					}
+
+				callback();
+			});
+		};
+
+		// TODO: Set up nano to use cookies for auth.
+		// getCookieToken(callback);
+		callback();
+	}
 
 	var getContributionId = function (backerId, projectId) {
 		return backerId + "-" + projectId;
@@ -53,14 +95,14 @@ var db = function() {
 
 		var forceProfilesDesignDocSave = false;
 
-		database.get(profilesDesignDoc.url, function (err, doc) {
+		cradleDb.get(profilesDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
 				|| !doc.views.byUsername
 				|| forceProfilesDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				database.save(profilesDesignDoc.url, profilesDesignDoc.body); 
+				cradleDb.save(profilesDesignDoc.url, profilesDesignDoc.body); 
 			}
 		});
 
@@ -103,7 +145,7 @@ var db = function() {
       	// TODO: This is lame.
       	var forceDesignDocSave = false;
 
-		database.get(patronsDesignDoc.url, function (err, doc) {
+		cradleDb.get(patronsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
 				|| !doc.views.byEmail
 				|| !doc.views.byId
@@ -112,7 +154,7 @@ var db = function() {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				database.save(patronsDesignDoc.url, patronsDesignDoc.body); 
+				cradleDb.save(patronsDesignDoc.url, patronsDesignDoc.body); 
 			}
 		});
 
@@ -138,14 +180,14 @@ var db = function() {
       	// that stuff above.
       	var forceThingsDesignDocSave = false;
 
-		database.get(thingsDesignDoc.url, function (err, doc) {
+		cradleDb.get(thingsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
 				|| !doc.views.byUsername
 				|| forceThingsDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				database.save(thingsDesignDoc.url, thingsDesignDoc.body); 
+				cradleDb.save(thingsDesignDoc.url, thingsDesignDoc.body); 
 			}
 		});
 
@@ -210,7 +252,7 @@ var db = function() {
       	// that stuff above.
       	var forceContributionsDesignDocSave = false;
 
-		database.get(contributionsDesignDoc.url, function (err, doc) {
+		cradleDb.get(contributionsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
 				|| !doc.views.byPatronToProject
 				|| !doc.views.byPatron
@@ -218,15 +260,16 @@ var db = function() {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				database.save(contributionsDesignDoc.url, contributionsDesignDoc.body); 
+				cradleDb.save(contributionsDesignDoc.url, contributionsDesignDoc.body); 
 			}
 		});
-
 	};
 
 	var createDatabaseAndViews = function() {
-		// Create database!
-		database.exists(function (err, exists) {
+		// Create database! We use cradle to create
+		// our database and views, as it's a little
+		// easier than via nano.
+		cradleDb.exists(function (err, exists) {
 			if (err) {
 				throw (err);
 			}
@@ -234,37 +277,94 @@ var db = function() {
 				createViews();
 			}
 			else {
-				database.create();
+				cradleDb.create();
 				createViews();
 			}
 		});
 	};
 
+	// For performance testing, for the time being
+	var log = function (d, prefix) {
+		var seconds = d.getSeconds();
+		var millisecond = d.getMilliseconds();
+		console.log(prefix + ": " + seconds + "." + millisecond);
+	};
 
 	var getView = function(viewUrl, success, failure, viewGenerationOptions) {
-		database.view(viewUrl, viewGenerationOptions, function (error, response) {
-			if (error) {
-				failure(error);
-				return;
-			}
 
-			// Return the first row only, if the flag is indicated.
-			if (viewGenerationOptions 
-			&& viewGenerationOptions.firstOnly 
-			&& response.length > 0) {
-				// TODO: Ok, how should we really do something like this?
-				// The semantics are inconsistent with the other way.
-				success(response[0].value);
-				return;
-			}
+		if (!isUsingCradle) {
+			var foo = viewUrl.split('/');
+			var designName = foo[0];
+			var viewName = foo[1];
 
-			var docs = [];
-			response.forEach(function (row) {
-				docs.push(row);
+			log(new Date(), 'before view'); // TODO: Hack
+			database.view(designName, viewName, viewGenerationOptions, function(err, body) {
+				if (err) {
+					failure(err);
+					return;
+				}
+
+				// Return the first row only, if the flag is indicated.
+				if (viewGenerationOptions 
+				&& viewGenerationOptions.firstOnly 
+				&& body.rows.length > 0) {
+					// TODO: Ok, how should we really do something like this?
+					// The semantics are inconsistent with the other way.
+					log(new Date(), 'success view'); // TODO: Hack
+					success(body.rows[0].value);
+					return;
+				}
+
+				var docs = [];
+				body.rows.forEach(function (doc) {
+					docs.push(doc.value);
+				});
+
+				success(docs);
 			});
+		}
+		else {
+			log(new Date(), 'before view'); // TODO: Hack
+			database.view(viewUrl, viewGenerationOptions, function (error, response) {
+				if (error) {
+					failure(error);
+					return;
+				}
 
-			success(docs);
-		});
+				// Return the first row only, if the flag is indicated.
+				if (viewGenerationOptions 
+				&& viewGenerationOptions.firstOnly 
+				&& response.length > 0) {
+					// TODO: Ok, how should we really do something like this?
+					// The semantics are inconsistent with the other way.
+					log(new Date(), 'success view'); // TODO: Hack
+					success(response[0].value);
+					return;
+				}
+
+				var docs = [];
+				response.forEach(function (row) {
+					docs.push(row);
+				});
+
+				success(docs);
+			});
+		}
+	};
+
+	var saveDocument = function(doc, success, failure) {
+		if (isUsingCradle) {
+			database.save(doc, function (error, response) {
+				// TODO: What to do with response, if anything?
+				error ? failure(error) : success();
+			});
+		}
+		else {
+			database.insert(doc, function (error, response) {
+				// TODO: What to do with response, if anything?
+				error ? failure(error) : success();
+			});
+		}
 	};
 
 	var _all = function(success, failure) {
@@ -308,10 +408,36 @@ var db = function() {
 	};
 
 	var savePatron = function (patron, success, failure) {
-		database.save(patron, function (error, response) {
-			// TODO: What to do with response, if anything?
-			error ? failure(error) : success();
-		});
+		getPatron(patron.email, 
+			function (existingPatron) {
+				if (!existingPatron || existingPatron.length < 1) {
+					// No existing patron. Create doc.
+					saveDocument(patron, success, failure);
+				}
+				else {
+					// TODO: Really need to set up a convention for 
+					// accessing single objects in our database.
+					// existingPatron = existingPatron[0];
+
+					// Update the existing contribution.
+					if (isUsingCradle) {
+						database.save(existingPatron._id, existingPatron._rev,
+							patron, 
+							function (error, response) {
+								error ? failure(error) : success();
+							});
+					}
+					else {
+						patron._rev = existingPatron._rev;
+						database.insert(patron, 
+						function (error, response) {
+							error ? failure(error) : success();
+						});
+					}
+				}
+			},
+			failure
+		);
 	};
 
 	var thingsByUsername = function (success, failure, options) {
@@ -325,9 +451,7 @@ var db = function() {
 	var saveThings = function (username, things, success, failure) {
 		var patronFound = function (patron) {
 			patron.things = things;
-			database.save(patron, function (error, response) {
-				error ? failure(error) : success();
-			})
+			saveDocument(patron, success, failure);
 		};
 		patronsByUsername(patronFound, failure, {key: username, firstOnly: true});
 	};
@@ -360,20 +484,29 @@ var db = function() {
 			function (existingContribution) {
 				if (!existingContribution || existingContribution.length < 1) {
 					// No existing contribution. Create doc.
-					database.save(contribution, function (error, response) {
-						error ? failure(error) : success();
-					});
+					saveDocument(contribution, success, failure);
 				}
 				else {
 					// TODO: Really need to set up a convention for 
 					// accessing single objects in our database.
 					existingContribution = existingContribution[0];
+
 					// Update the existing contribution.
-					database.save(existingContribution._id, existingContribution._rev,
-						contribution, 
+					if (isUsingCradle) {
+						database.save(existingContribution._id, existingContribution._rev,
+							contribution, 
+							function (error, response) {
+								error ? failure(error) : success();
+							});
+					}
+					else {
+						// contribution._id = existingContribution._id;
+						contribution._rev = existingContribution._rev;
+						database.insert(contribution, 
 						function (error, response) {
 							error ? failure(error) : success();
 						});
+					}
 				}
 			},
 			failure
@@ -388,11 +521,21 @@ var db = function() {
 			var attachmentName = "profile.jpg";
 
 			res.type("image/jpeg");
-			var readStream = database.getAttachment(docId, attachmentName, function (err) {
-				if (err) {
-					callback(err);
-				}
-			});
+			var readStream;
+			if (isUsingCradle) {
+				readStream = database.getAttachment(docId, attachmentName, function (err) {
+					if (err) {
+						callback(err);
+					}
+				});
+			}
+			else {
+				readStream = database.attachment.get(docId, attachmentName, function (err) {
+					if (err) {
+						callback(err);
+					}
+				});
+			}
 
 			// TODO: Consider setting 'end' to false so we can
 			// maybe send an error code if we mess up.

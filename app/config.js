@@ -62,6 +62,10 @@ exports.adminEmailAddresses = function() {
 	return overrides.adminEmailAddresses || adminEmailAddresses;
 };
 
+exports.memberEmailAddresses = function() {
+	return overrides.memberEmailAddresses || memberEmailAddresses;
+};
+
 exports.entranceUsernames = function() {
 	return overrides.entranceUsernames || entranceUsernames;
 };

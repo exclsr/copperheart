@@ -1,6 +1,7 @@
 //----------------------------------------------------
 // config.js
 //
+var adminEmailAddresses = process.env.ADMIN_EMAIL_ADDRESSES || [];
 var entranceUsernames = process.env.ENTRANCE_USERNAMES || [];
 
 var port = process.env.PORT || 3000;
@@ -56,6 +57,10 @@ catch (err) {
 // can at least make it a lot smaller. Maybe putting
 // everything in one config object (json) that is exported
 // is the way to start ...
+exports.adminEmailAddresses = function() {
+	return overrides.adminEmailAddresses || adminEmailAddresses;
+};
+
 exports.entranceUsernames = function() {
 	return overrides.entranceUsernames || entranceUsernames;
 };

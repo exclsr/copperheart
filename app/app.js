@@ -117,6 +117,32 @@ var anonymousPatron = "anonymous";
 
 // Patron data that patrons want to know about
 // as they're wandering through the site.
+app.get('/whoami/role', function (req, res) {
+	// TODO: What's an appropriate security permissions model?
+	if (req.user) {
+		var admins = config.adminEmailAddresses();
+		var adminFound = false;
+		if (admins) {
+			admins.forEach(function (adminEmailAddress) {
+				if (adminEmailAddress === req.user.email) {
+					adminFound = true;
+					return;
+				}
+			});
+		}
+
+		if (adminFound) {
+			res.send('admin');
+		}
+		else {
+			res.send('patron');
+		}
+	}
+	else {
+		res.send('guest');
+	}
+});
+
 app.get('/whoami/id', function (req, res) {
 	if (req.user) {
 		var patron = req.user;
@@ -488,6 +514,8 @@ app.put('/patron/username', ensureAuthenticated, function (req, res) {
 	var username = req.body.username;
 
 	var success = function (things) {
+		// TODO: When changing the username, we need to 
+		// invalidate the passport user as well.
 		res.send("<3");
 	};
 

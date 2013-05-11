@@ -6,10 +6,11 @@
 	<span ng-show="!isSignedIn()">anonymous</span>
 	<span ng-show="isSignedIn()">
 		{{patron.getUsername()}}</a> | 
-		<a href="/#/edit/contributions">contributions</a> |
+		<a href="/#/edit/contributions">contributions</a>
+	</span>
+	<span ng-show="isMember()"> |
 		<a href="/#/hello/{{patron.getUsername()}}">profile</a> : 
 		<a href="/#/edit">edit</a>
-		
 	</span>
 
 	<h6 id="login">

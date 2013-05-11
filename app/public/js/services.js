@@ -30,7 +30,9 @@ angular.module('myApp.services', []).
 
 		var defaultSession = function() {
 			return {
-				patron: {},
+				patron: {
+					role: 'guest'
+				},
 				activeContribution: {
 					profile: {},
 					priceNow: 0,

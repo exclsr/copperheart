@@ -9,7 +9,15 @@ function TopLevelCtrl(session, $scope, $http) {
 	if (!session.patron.username) {
 		$http.get('/whoami')
 		.success(function (patron) {
+			// TODO: Put role stuff in database and get via /whoami
+			$http.get('/whoami/role')
+			.success(function (role) {
+				patron.role = role;
 				session.patron = patron;
+			})
+			.error(function() {
+				session.patron = patron;
+			});
 		})
 		.error(function(data, status, headers, config) {
 			// TODO: Something terrible went wrong. Deal with it.
@@ -29,6 +37,18 @@ function TopLevelCtrl(session, $scope, $http) {
 	$scope.isSignedIn = function() {
 		if (session.patron.username) {
 			return true;
+		}
+
+		return false;
+	};
+
+	$scope.isMember = function() {
+		if (session && session.patron && session.patron.role) {
+			var role = session.patron.role;
+			if (role === "admin"
+			||  role === "member") {
+				return true;
+			}
 		}
 
 		return false;

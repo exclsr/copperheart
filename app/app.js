@@ -119,8 +119,14 @@ var anonymousPatron = "anonymous";
 // as they're wandering through the site.
 app.get('/whoami/role', function (req, res) {
 	// TODO: What's an appropriate security permissions model?
+	// TODO: Probably store the role in the database!
+	// TODO: Make an admin page to manage roles and things.
+	// TODO: This is clearly a hack job. Think about it a while.
+	// ----- One idea is to /hasPermission/<role> and go from there.
 	if (req.user) {
 		var admins = config.adminEmailAddresses();
+		var members = config.memberEmailAddresses();
+
 		var adminFound = false;
 		if (admins) {
 			admins.forEach(function (adminEmailAddress) {
@@ -133,10 +139,25 @@ app.get('/whoami/role', function (req, res) {
 
 		if (adminFound) {
 			res.send('admin');
+			return;
 		}
 		else {
-			res.send('patron');
+			var memberFound = false;
+			if (members) {
+				members.forEach(function (memberEmailAddress) {
+					if (memberEmailAddress === req.user.email) {
+						memberFound = true;
+						return;
+					}
+				});
+			}
+			if (memberFound) {
+				res.send('member');
+				return;
+			}
 		}
+		
+		res.send('patron');
 	}
 	else {
 		res.send('guest');

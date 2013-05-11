@@ -113,24 +113,20 @@ var ensureAuthenticated = function(req, res, next) {
 		" and try again.");
 };
 
-var anonymousPatron = "anonymous";
-
-// Patron data that patrons want to know about
-// as they're wandering through the site.
-app.get('/whoami/role', function (req, res) {
+var getRole = function (user) {
 	// TODO: What's an appropriate security permissions model?
 	// TODO: Probably store the role in the database!
 	// TODO: Make an admin page to manage roles and things.
 	// TODO: This is clearly a hack job. Think about it a while.
 	// ----- One idea is to /hasPermission/<role> and go from there.
-	if (req.user) {
+	if (user) {
 		var admins = config.adminEmailAddresses();
 		var members = config.memberEmailAddresses();
 
 		var adminFound = false;
 		if (admins) {
 			admins.forEach(function (adminEmailAddress) {
-				if (adminEmailAddress === req.user.email) {
+				if (adminEmailAddress === user.email) {
 					adminFound = true;
 					return;
 				}
@@ -138,30 +134,55 @@ app.get('/whoami/role', function (req, res) {
 		}
 
 		if (adminFound) {
-			res.send('admin');
-			return;
+			return 'admin';
 		}
 		else {
 			var memberFound = false;
 			if (members) {
 				members.forEach(function (memberEmailAddress) {
-					if (memberEmailAddress === req.user.email) {
+					if (memberEmailAddress === user.email) {
 						memberFound = true;
 						return;
 					}
 				});
 			}
 			if (memberFound) {
-				res.send('member');
-				return;
+				return 'member';
 			}
 		}
 		
-		res.send('patron');
+		return 'patron';
 	}
 	else {
-		res.send('guest');
+		return 'guest';
 	}
+};
+
+var isMember = function(user) {
+	var role = getRole(user);
+	return (role === "admin" || role === "member");
+}
+
+// TODO: Can we refactor this a little, combining
+// with ensureAuthenticated?
+var ensureIsMember = function(req, res, next) {
+	if (isMember(req.user)) {
+		next();
+		return;
+	}
+	
+	res.send(401, // unauthorized
+		"To get a more desirable response," +
+		" please become a member," +
+		" and try again.");
+};
+
+var anonymousPatron = "anonymous";
+
+// Patron data that patrons want to know about
+// as they're wandering through the site.
+app.get('/whoami/role', function (req, res) {
+	res.send(getRole(req.user));
 });
 
 app.get('/whoami/id', function (req, res) {
@@ -415,8 +436,8 @@ app.get('/profile/:username/image', function (req, res) {
 
 
 // Public and private data of a patron
-// TODO: Rename?
-app.get('/patron', ensureAuthenticated, function (req, res) {
+// TODO: Rename? Yes, to 'member'
+app.get('/patron', ensureIsMember, function (req, res) {
 	// TODO: Maybe not do 'ensureAuthenticated' here, and instead
 	// send back something empty if we're not logged in, and have 
 	// the client deal with that scenario.
@@ -443,7 +464,7 @@ app.get('/patron', ensureAuthenticated, function (req, res) {
 	db.patrons.get(req.user.email, gotPatron, failure);
 });
 
-app.put('/patron/things', ensureAuthenticated, function (req, res) {
+app.put('/patron/things', ensureIsMember, function (req, res) {
 	var patron = req.user;
 	var things = req.body;
 
@@ -465,7 +486,7 @@ app.put('/patron/things', ensureAuthenticated, function (req, res) {
 });
 
 
-app.put('/patron/who', ensureAuthenticated, function (req, res) {
+app.put('/patron/who', ensureIsMember, function (req, res) {
 	var patron = req.user;
 	var who = req.body;
 
@@ -489,7 +510,7 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	db.patrons.save(patron, success, failure);
 });
 
-app.put('/patron/passions', ensureAuthenticated, function (req, res) {
+app.put('/patron/passions', ensureIsMember, function (req, res) {
 	// TODO: Obvi refactoring with the code above.
 	var patron = req.user;
 	var passions = req.body;
@@ -509,7 +530,7 @@ app.put('/patron/passions', ensureAuthenticated, function (req, res) {
 });
 
 
-app.put('/patron/communities', ensureAuthenticated, function (req, res) {
+app.put('/patron/communities', ensureIsMember, function (req, res) {
 	// TODO: Obvi refactoring with the code above.
 	var patron = req.user;
 	var communities = req.body;
@@ -529,7 +550,7 @@ app.put('/patron/communities', ensureAuthenticated, function (req, res) {
 });
 
 
-app.put('/patron/username', ensureAuthenticated, function (req, res) {
+app.put('/patron/username', ensureIsMember, function (req, res) {
 	// TODO: Obvi refactoring with the code above.
 	var patron = req.user;
 	var username = req.body.username;

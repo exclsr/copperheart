@@ -6,6 +6,7 @@ var entranceUsernames = process.env.ENTRANCE_USERNAMES || [];
 var port = process.env.PORT || 3000;
 
 var database = {
+	useAuthentication: process.env.DB_USE_AUTH || false,
 	username: process.env.DB_USERNAME || "",
 	password: process.env.DB_PASSWORD || "",
 	host: process.env.DB_HOST || "http://localhost",

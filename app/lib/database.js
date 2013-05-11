@@ -21,28 +21,67 @@ var db = function (dbConfig) {
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.
 	// See https://github.com/cloudhead/cradle#retry-on-connection-issues
-	cradleDb = new(cradle.Connection)(couchHost, couchPort, {
-		cache: true,
-		raw: false
-	}).database(databaseName);
+	// TODO: Maybe the 'useAuthentication' flag is silly.
+	if (dbConfig.useAuthentication) {
+		cradleDb = new(cradle.Connection)(
+			dbConfig.secureHost || couchHost, 
+			dbConfig.securePort || couchPort, 
+			{
+				cache: true,
+				raw: false,
+				secure: true,
+				auth: { 
+					username: dbConfig.username, 
+					password: dbConfig.password
+				}
+			}
+		).database(databaseName);
+	}
+	else {
+		cradleDb = new(cradle.Connection)(
+			couchHost, 
+			couchPort, 
+			{
+				cache: true,
+				raw: false
+			}
+		).database(databaseName);
+	}
 
 	if (isUsingCradle) {
 		database = cradleDb;
 	}
 	else {
-		var host = couchHost + ':' + couchPort;
-		var n = nano(host);
+		var dbUrl = couchHost + ':' + couchPort;
+		// TODO: Use https when necessary. Most of the data
+		// in our database is meant for the public, but there is 
+		// definitely private data as well, such as email 
+		// addresses ... I guess emails are about it, as the
+		// stripe customer IDs are useless without our api keys. 
+		// 
+		// if (dbConfig.useAuthentication) {
+		// 	dbUrl = dbConfig.secureHost + ':' + dbConfig.securePort;
+		// }
+		var nanoDb = nano(dbUrl);
+
 		var cookieToken = "";
 		var callback = function() {
-			database = nano({
-				url: couchHost + ':' + couchPort //,
-				//cookie: cookieToken
-			}).use(databaseName);
+			if (dbConfig.useAuthentication) {
+				database = nano({
+					url: dbUrl,
+					cookie: cookieToken
+				}).use(databaseName);
+			}
+			else {
+				database = nano({
+					url: dbUrl
+				}).use(databaseName);
+			}
 		};
 		
 		var getCookieToken = function (callback) {
 			// TODO: Need to refresh cookie when appropriate.
-			n.auth(dbAuth.username, dbAuth.password, 
+			nanoDb.auth(dbConfig.username, dbConfig.password, 
 				function (err, body, headers) {
 					if (err) {
 						// TODO: Freak out.
@@ -58,9 +97,12 @@ var db = function (dbConfig) {
 			});
 		};
 
-		// TODO: Set up nano to use cookies for auth.
-		// getCookieToken(callback);
-		callback();
+		if (dbConfig.useAuthentication) {
+			getCookieToken(callback);
+		}
+		else {
+			callback();
+		}
 	}
 
 	var getContributionId = function (backerId, projectId) {

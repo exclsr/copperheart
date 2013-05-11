@@ -1,9 +1,19 @@
 //----------------------------------------------------
 // config.js
 //
-var entranceUsernames = process.env.ENTRANCE_USERNAMES;
+var entranceUsernames = process.env.ENTRANCE_USERNAMES || [];
 
 var port = process.env.PORT || 3000;
+
+var database = {
+	username: process.env.DB_USERNAME || "",
+	password: process.env.DB_PASSWORD || "",
+	host: process.env.DB_HOST || "http://localhost",
+	port: process.env.DB_PORT || 5984,
+	name: process.env.DB_NAME || "sandbox",
+	secureHost: process.env.DB_SECURE_HOST || "http://localhost",
+	securePort: process.env.DB_SECURE_PORT || 5984
+};
 
 var stripeApiTest  = process.env.STRIPE_API_TEST || 'missing api key';
 var stripeApiLive  = process.env.STRIPE_API_LIVE || 'missing api key';
@@ -47,7 +57,11 @@ catch (err) {
 // is the way to start ...
 exports.entranceUsernames = function() {
 	return overrides.entranceUsernames || entranceUsernames;
-}
+};
+
+exports.database = function() {
+	return overrides.database || database;
+};
 
 exports.port = function() {
 	return overrides.port || port;

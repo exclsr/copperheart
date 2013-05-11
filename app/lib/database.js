@@ -5,17 +5,17 @@
 //
 var cradle = require('cradle');
 var nano = require('nano');
+var config  = require('../config.js');
 
-var db = function() {
+var db = function (dbConfig) {
 
-	// TODO: Sandbox vs production database.
-	var couchHost = 'http://localhost';
-	var couchPort = 5984;
-	
-	var databaseName = 'sandbox';
+	var couchHost = dbConfig.host || 'http://localhost';
+	var couchPort = dbConfig.port || 5984;
+	var databaseName = dbConfig.name || 'sandbox';
 
 	var database;
 	var cradleDb;
+	// TODO: Eventually remove this flag.
 	var isUsingCradle = false;
 	// Connect to Couch! 
 	// TODO: Put retry stuff in here, as we'll be 
@@ -573,6 +573,6 @@ var db = function() {
 			save : saveContribution
 		}
 	};
-}(); // closure
+}(config.database()); // closure
 
 exports.db = db;

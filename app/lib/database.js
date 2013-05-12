@@ -48,6 +48,26 @@ var db = function (dbConfig) {
 		).database(databaseName);
 	}
 
+	// TODO: This initializes our database. Should
+	// rename the method.
+	var handleNewCouchCookie = function (headers) {
+		var dbUrl = couchHost + ':' + couchPort;
+		var cookieToken;
+
+		if (headers && headers['set-cookie']) {
+			cookieToken = headers['set-cookie'];
+		}
+
+		// TODO: do we want this useAuth flag?
+		if (dbConfig.useAuthentication && cookieToken) {
+			database = nano({
+				url: dbUrl,
+				cookie: cookieToken
+			}).use(databaseName);
+		}
+	};
+
+
 	if (isUsingCradle) {
 		database = cradleDb;
 	}
@@ -63,45 +83,27 @@ var db = function (dbConfig) {
 		// 	dbUrl = dbConfig.secureHost + ':' + dbConfig.securePort;
 		// }
 		var nanoDb = nano(dbUrl);
-
-		var cookieToken = "";
-		var callback = function() {
-			if (dbConfig.useAuthentication) {
-				database = nano({
-					url: dbUrl,
-					cookie: cookieToken
-				}).use(databaseName);
-			}
-			else {
-				database = nano({
-					url: dbUrl
-				}).use(databaseName);
-			}
-		};
 		
-		var getCookieToken = function (callback) {
-			// TODO: Need to refresh cookie when appropriate.
+		var getCookieToken = function () {
 			nanoDb.auth(dbConfig.username, dbConfig.password, 
 				function (err, body, headers) {
 					if (err) {
 						// TODO: Freak out.
-						callback(err);
+						console.log(err);
 						return;
 					}
-
-					if (headers && headers['set-cookie']) {
-						cookieToken = headers['set-cookie'];
-					}
-
-				callback();
-			});
+					handleNewCouchCookie(headers);
+				}
+			);
 		};
 
 		if (dbConfig.useAuthentication) {
-			getCookieToken(callback);
+			getCookieToken();
 		}
 		else {
-			callback();
+			database = nano({
+				url: dbUrl
+			}).use(databaseName);
 		}
 	}
 
@@ -335,17 +337,18 @@ var db = function (dbConfig) {
 	var getView = function(viewUrl, success, failure, viewGenerationOptions) {
 
 		if (!isUsingCradle) {
-			var foo = viewUrl.split('/');
-			var designName = foo[0];
-			var viewName = foo[1];
+			var splitViewUrl = viewUrl.split('/');
+			var designName = splitViewUrl[0];
+			var viewName = splitViewUrl[1];
 
 			log(new Date(), 'before view'); // TODO: Hack
-			database.view(designName, viewName, viewGenerationOptions, function(err, body) {
+			database.view(designName, viewName, viewGenerationOptions, function (err, body, headers) {
 				if (err) {
 					failure(err);
 					return;
 				}
-
+				
+				handleNewCouchCookie(headers);
 				// Return the first row only, if the flag is indicated.
 				if (viewGenerationOptions 
 				&& viewGenerationOptions.firstOnly 
@@ -402,9 +405,15 @@ var db = function (dbConfig) {
 			});
 		}
 		else {
-			database.insert(doc, function (error, response) {
+			database.insert(doc, function (error, response, headers) {
 				// TODO: What to do with response, if anything?
-				error ? failure(error) : success();
+				if (error) {
+					failure(error);
+				}
+				else {
+					handleNewCouchCookie(headers);
+					success();
+				}
 			});
 		}
 	};
@@ -472,8 +481,14 @@ var db = function (dbConfig) {
 					else {
 						patron._rev = existingPatron._rev;
 						database.insert(patron, 
-						function (error, response) {
-							error ? failure(error) : success();
+						function (error, response, headers) {
+							if (error) {
+								failure(error);
+							} 
+							else {
+								handleNewCouchCookie(headers);
+								success();
+							}
 						});
 					}
 				}
@@ -545,8 +560,14 @@ var db = function (dbConfig) {
 						// contribution._id = existingContribution._id;
 						contribution._rev = existingContribution._rev;
 						database.insert(contribution, 
-						function (error, response) {
-							error ? failure(error) : success();
+						function (error, response, headers) {
+							if (error) { 
+								failure(error);
+							}
+							else {
+								handleNewCouchCookie(headers);
+								success();
+							}
 						});
 					}
 				}
@@ -572,6 +593,10 @@ var db = function (dbConfig) {
 				});
 			}
 			else {
+				// We access the database via getPatronByUsername right before
+				// making this call, so we don't have to refresh our cookies.
+				// TODO: We should check anyway. Check the docs to see if headers
+				// are returned in this callback, or what.
 				readStream = database.attachment.get(docId, attachmentName, function (err) {
 					if (err) {
 						callback(err);

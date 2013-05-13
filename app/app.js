@@ -871,9 +871,10 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 	);
 
 	return;
+});
 
-
-
+app.get('/stripe/connect-client-id', ensureIsMember, function (req, res) {
+	res.send(config.stripeConnectClientId());
 });
 
 // Lastly ...

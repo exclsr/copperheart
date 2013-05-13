@@ -48,6 +48,14 @@ function EditCtrl(session, $scope, $http) {
 			
 		});
 
+		$http.get('/stripe/connect-client-id')
+		.success(function (stripeConnectClientId) {
+			$scope.stripeConnectClientId = stripeConnectClientId;
+		})
+		.error(function() {
+			// TODO: Stripe is down? Show a status.
+		});
+
 		// When 'things' changes, save to our database.
 		// Ignore the first time things is assigned.
 		$scope.$watch('things', 

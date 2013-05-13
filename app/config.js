@@ -18,8 +18,9 @@ var database = {
 	securePort: process.env.DB_SECURE_PORT || 5984
 };
 
-var stripeApiTest  = process.env.STRIPE_API_TEST || 'missing api key';
-var stripeApiLive  = process.env.STRIPE_API_LIVE || 'missing api key';
+var stripeApiTest  = process.env.STRIPE_API_TEST || 'missing stripe api key';
+var stripeApiLive  = process.env.STRIPE_API_LIVE || 'missing stripe api key';
+var stripeConnectClientId = process.env.STRIPE_CONNECT_CLIENT_ID || 'missing stripe connect client id';
 
 // If multiple developers are working with the same
 // Stripe account, there can be data conflicts during test.
@@ -84,6 +85,10 @@ exports.stripeApiTest = function() {
 
 exports.stripeApiLive = function() {
 	return overrides.stripeApiLive || stripeApiLive;
+};
+
+exports.stripeConnectClientId = function() {
+	return overrides.stripeConnectClientId || stripeConnectClientId;
 };
 
 exports.stripeTestClientId = function() {

@@ -557,7 +557,7 @@ var db = function (dbConfig) {
 							});
 					}
 					else {
-						// contribution._id = existingContribution._id;
+						contribution._id = existingContribution._id;
 						contribution._rev = existingContribution._rev;
 						database.insert(contribution, 
 						function (error, response, headers) {

@@ -744,6 +744,7 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 	var things = req.body.things;
 
 	var patron = req.user;
+	var toMember = undefined;
 	var serverSidePatronEmail = patron.email;
 
 	if (patronEmail !== serverSidePatronEmail) {
@@ -754,7 +755,7 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 		return;
 	}
 	// TODO NEXT: apiKey || access_token
-	var stripe = require('stripe')(apiKey);
+	
 	//
 	// We are now authenticated, and have a user object.
 	//
@@ -774,8 +775,18 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 	// This is called after we save the contribution data (below).
 	// Now we put the appropriate charges into the Stripe system.
 	var doStripeStuff = function () {
+
+		var stripe;
+		if (toMember.stripeToken) {
+			stripe = require('stripe')(toMember.stripeToken);
+		}
+		else {
+			failure("Member does not have a connecteed Stripe account.");
+			return;
+		}
+
 		// 1. See if our patron has a Stripe ID.
-		if (patron.stripeId) {
+		if (patron.stripeIds && patron.stripeIds[toMember.id]) {
 			// If they do, cool. That means they've been here before, 
 			// and we need to update their subscription plan in Stripe.
 
@@ -783,6 +794,8 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			// once they've been created. That's fine. Let's delete
 			// the active subscription, and create a new one with the
 			// details that we want.
+			var stripeId = patron.stripeIds[toMember.id];
+
 			var createPlanAnew = function () {
 				var planRequest = getStripePlanRequest(
 									patron.id, things, daysUntilPayment);
@@ -809,7 +822,9 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			// means we need to create a customer for them in Stripe, 
 			// create a subscription plan for them, and associate the two.
 			var stripeCustomerCreated = function (customerResponse) {
-				patron.stripeId = customerResponse.id;
+
+				patron.stripeIds = patron.stripeIds || {};
+				patron.stripeIds[toMember.id] = customerResponse.id;
 				// TODO: What if we fail at this point? That's not cool,
 				// because then we have some stuff on the Stripe servers
 				// that isn't referenced on ours. That would be bad.
@@ -870,16 +885,16 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 	// via the username, which was in the request url.
 	db.patrons.getByUsername(
 		req.params.toUsername, 
-		function (project) { // TODO: 'project' is not the best name
+		function (member) { 
 
 			var onPatronSave = function() {
-				// After saving the patron inthe backed
-				// project data, save the contribution as its 
+				// After saving the patron in the backed
+				// member data, save the contribution as its 
 				// own document.
 				// ... then do Stripe stuff
 				var contribution = {};
 				contribution.backerId = patron.id;
-				contribution.projectId = project.id;
+				contribution.projectId = member.id;
 				contribution.things = things;
 				db.contributions.save(contribution, doStripeStuff, failure);
 			}
@@ -887,10 +902,11 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			// First, save the contribution in the project data. We
 			// do this so we can create contribution views more easily,
 			// at the expense of space.
-			if (!project.backers[patron.id]) {
-				project.backers[patron.id] = patron.id;
+			if (!member.backers[patron.id]) {
+				member.backers[patron.id] = patron.id;
 			}
-			db.patrons.save(project, onPatronSave, failure);
+			toMember = member;
+			db.patrons.save(member, onPatronSave, failure);
 		},
 		failure
 	);

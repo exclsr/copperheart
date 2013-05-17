@@ -3,9 +3,19 @@
 <div class="view">
 <div class="about offset2 span6">
 
-<h3>Thank you.</h3>
+	<h3>Thank you.</h3>
 
-<p>...</p>
+	<div ng-show="isSignedIn()">
+		<p>Would you like to write a note to <a href="/#/hello/{{toUsername}}">{{toName}}</a>? <span class="elaborate">Why did you contribute? Which projects do you like?</span></p>
 
+		<form novalidate id="thanks-form" class="css-form">
+			<textarea class="span6 noteArea"
+			ng-model="note"></textarea>
+			<button class="btn" ng-click="sendNote()">Send note</button>
+			<span class="noteSent" ng-show="isNoteSent">
+				Thanks.
+			</span>
+		</form>
+	</div>
 </div>
 </div>

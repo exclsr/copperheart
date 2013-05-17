@@ -996,6 +996,33 @@ app.get('/stripe/connect-response', ensureIsMember, function (req, res) {
 	}
 });
 
+// TODO: Allow anonymous folks to send messages, too. Perhaps by way of email,
+// or by saving them in the database under 'anonymous notes.''
+app.put('/commit/:toUsername/note', ensureAuthenticated, function (req, res) {
+	var patron = req.user;
+	var note = req.body.note;
+	var success = function() {
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	var gotMember = function (member) {
+		var gotContribution = function (rawContribution) {
+			if (rawContribution && rawContribution[0]) {
+				var contribution = rawContribution[0];
+				contribution.note = note;
+				db.contributions.save(contribution, success, failure);
+			}
+		};
+		db.contributions.get(patron.id, member.id, gotContribution, failure);
+	};
+	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
+});
+
 
 // Lastly ...
 // This needs to be at the bottom, so things like

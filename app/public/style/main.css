@@ -401,7 +401,7 @@ ul.contributionList .contribution {
 /* change behavior of the light-blue borders
 that bootstrap creates on focus, and the yellow
 outlines that Chrome creates on select elements */
-input:focus, select:focus {
+input:focus, select:focus, textarea:focus {
 	border-color: #666 !important;
 	box-shadow: none !important;
 	-webkit-box-shadow: none !important;
@@ -508,6 +508,18 @@ select.paymentDay {
 .payment-errors {
 	margin-top: -1em;
 	margin-left: -7em;
+}
+
+/* Thanks page */
+.elaborate {
+	color: #aaa;
+	display: inline-block;
+}
+.noteArea {
+	height: 200px;
+}
+.noteSent {
+	margin-left: 1ex;
 }
 
 

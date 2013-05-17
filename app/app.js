@@ -15,7 +15,6 @@ var express = require('express')
 	, qs      = require('querystring');
 
 var apiKey = config.stripeApiTest(); 
-var stripe = require('stripe')(apiKey);
 
 var app = express();
 
@@ -351,6 +350,8 @@ app.get('/card', function (req, res) {
 		res.send({});
 		return;
 	}
+
+	var stripe = require('stripe')(apiKey);
 
 	var failure = function (err) {
 		console.log(err);
@@ -705,18 +706,34 @@ app.put('/commit/once/:toUsername', function (req, res) {
 		description: 'among the first tests'
 	};
 
-	stripe.charges.create(chargeRequest, function(err, chargeResponse) {
-		if (err) {
-			// TODO: Obviously ...
-			console.log(err);
-			res.send(500);
+	var success = function (member) {
+		if (member.stripeToken) {
+			var stripe = require('stripe')(member.stripeToken);
+			stripe.charges.create(chargeRequest, function(err, chargeResponse) {
+				if (err) {
+					// TODO: Obviously ...
+					console.log(err);
+					res.send(500);
+				}
+				else {
+					// Success! 
+					console.log(chargeResponse);
+					res.send("<3");
+				}
+			});
 		}
 		else {
-			// Success! 
-			console.log(chargeResponse);
-			res.send("<3");
+			// member not found
+			res.send(404);
 		}
-	});
+	};
+
+	var failure = function (error) {
+		console.log(error);
+		res.send(500);
+	}
+
+	db.patrons.getByUsername(req.params.toUsername, success, failure);
 });
 
 app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
@@ -736,6 +753,8 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			" Can you help us solve this mystery?");
 		return;
 	}
+	// TODO NEXT: apiKey || access_token
+	var stripe = require('stripe')(apiKey);
 	//
 	// We are now authenticated, and have a user object.
 	//

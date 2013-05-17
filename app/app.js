@@ -281,11 +281,11 @@ app.get('/contributions/:toUsername', function (req, res) {
 		res.send(500);
 	};
 
-	var gotProject = function (project) {
-		db.contributions.get(patron.id, project.id, success, failure);
+	var gotMember = function (member) {
+		db.contributions.get(patron.id, member.id, success, failure);
 	};
 
-	db.patrons.getByUsername(req.params.toUsername, gotProject, failure);
+	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
 });
 
 app.get('/contributions', function (req, res) {
@@ -307,19 +307,19 @@ app.get('/contributions', function (req, res) {
 			var contribution = undefined;
 
 			rawResults.forEach(function (rawResult) {
-				// Things we know: We'll get a project profile
+				// Things we know: We'll get a member profile
 				// before we get the contributions to it.
 				if (rawResult.id) {
-					var project = {};
-					project.name = rawResult.name;
-					project.username = rawResult.username;
+					var member = {};
+					member.name = rawResult.name;
+					member.username = rawResult.username;
 
 					contribution = {};
-					contribution.project = project;
+					contribution.member = member;
 				}
 
 				// Things we know: We'll get a contribution
-				// right after we get a project profile.
+				// right after we get a member profile.
 				else if (rawResult.type === "contribution") {
 					// If !contribution, there is a data issue, 
 					// but it can happen.
@@ -894,12 +894,12 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 				// ... then do Stripe stuff
 				var contribution = {};
 				contribution.backerId = patron.id;
-				contribution.projectId = member.id;
+				contribution.memberId = member.id;
 				contribution.things = things;
 				db.contributions.save(contribution, doStripeStuff, failure);
 			}
 
-			// First, save the contribution in the project data. We
+			// First, save the contribution in the member data. We
 			// do this so we can create contribution views more easily,
 			// at the expense of space.
 			if (!member.backers[patron.id]) {

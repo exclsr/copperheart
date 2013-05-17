@@ -107,8 +107,8 @@ var db = function (dbConfig) {
 		}
 	}
 
-	var getContributionId = function (backerId, projectId) {
-		return backerId + "-" + projectId;
+	var getContributionId = function (backerId, memberId) {
+		return backerId + "-" + memberId;
 	};
 
 	var createViews = function() {
@@ -244,17 +244,17 @@ var db = function (dbConfig) {
 					// What contributions are being given from a specific
 					// patron to a specific project?
 					map: function(doc) {
-						var getContributionId = function (backerId, projectId) {
-							return backerId + "-" + projectId;
+						var getContributionId = function (backerId, memberId) {
+							return backerId + "-" + memberId;
 						};
 
 						// TODO: Change this key to an array like so
-						// [backerId, projectId]
+						// [backerId, memberId]
 						if (doc.type 
 						 && doc.backerId
-						 && doc.projectId
+						 && doc.memberId
 						 && doc.type === "contribution") { 
-						 	var id = getContributionId(doc.backerId, doc.projectId);
+						 	var id = getContributionId(doc.backerId, doc.memberId);
 							emit(id, doc);
 						}
 					}
@@ -282,7 +282,7 @@ var db = function (dbConfig) {
 
 						// the patron's contributions
 						if (doc.type === "contribution") { 
-							emit([doc.backerId, doc.projectId, 1], doc);
+							emit([doc.backerId, doc.memberId, 1], doc);
 						}
 					}
 				}
@@ -529,15 +529,15 @@ var db = function (dbConfig) {
 		contributionsByPatron(success, failure, options);
 	}
 
-	var getContribution = function(backerId, projectId, success, failure) {
-		var id = getContributionId(backerId, projectId);
+	var getContribution = function(backerId, memberId, success, failure) {
+		var id = getContributionId(backerId, memberId);
 		contributionsByRel(success, failure, {key: id});
 	};
 
 	var saveContribution = function(contribution, success, failure) {
 		contribution.type = "contribution";
 
-		getContribution(contribution.backerId, contribution.projectId,
+		getContribution(contribution.backerId, contribution.memberId,
 			function (existingContribution) {
 				if (!existingContribution || existingContribution.length < 1) {
 					// No existing contribution. Create doc.

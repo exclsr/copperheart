@@ -15,8 +15,7 @@ var db = function (dbConfig) {
 
 	var database;
 	var cradleDb;
-	// TODO: Eventually remove this flag.
-	var isUsingCradle = false;
+
 	// Connect to Couch! 
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.
@@ -68,44 +67,40 @@ var db = function (dbConfig) {
 	};
 
 
-	if (isUsingCradle) {
-		database = cradleDb;
+	var dbUrl = couchHost + ':' + couchPort;
+	// TODO: Use https when necessary. Most of the data
+	// in our database is meant for the public, but there is 
+	// definitely private data as well, such as email 
+	// addresses ... I guess emails are about it, as the
+	// stripe customer IDs are useless without our api keys. 
+	// 
+	// if (dbConfig.useAuthentication) {
+	// 	dbUrl = dbConfig.secureHost + ':' + dbConfig.securePort;
+	// }
+	var nanoDb = nano(dbUrl);
+	
+	var getCookieToken = function () {
+		nanoDb.auth(dbConfig.username, dbConfig.password, 
+			function (err, body, headers) {
+				if (err) {
+					// TODO: Freak out.
+					console.log(err);
+					return;
+				}
+				handleNewCouchCookie(headers);
+			}
+		);
+	};
+
+	if (dbConfig.useAuthentication) {
+		getCookieToken();
 	}
 	else {
-		var dbUrl = couchHost + ':' + couchPort;
-		// TODO: Use https when necessary. Most of the data
-		// in our database is meant for the public, but there is 
-		// definitely private data as well, such as email 
-		// addresses ... I guess emails are about it, as the
-		// stripe customer IDs are useless without our api keys. 
-		// 
-		// if (dbConfig.useAuthentication) {
-		// 	dbUrl = dbConfig.secureHost + ':' + dbConfig.securePort;
-		// }
-		var nanoDb = nano(dbUrl);
-		
-		var getCookieToken = function () {
-			nanoDb.auth(dbConfig.username, dbConfig.password, 
-				function (err, body, headers) {
-					if (err) {
-						// TODO: Freak out.
-						console.log(err);
-						return;
-					}
-					handleNewCouchCookie(headers);
-				}
-			);
-		};
-
-		if (dbConfig.useAuthentication) {
-			getCookieToken();
-		}
-		else {
-			database = nano({
-				url: dbUrl
-			}).use(databaseName);
-		}
+		database = nano({
+			url: dbUrl
+		}).use(databaseName);
 	}
+
 
 	var getContributionId = function (backerId, memberId) {
 		return backerId + "-" + memberId;
@@ -336,86 +331,47 @@ var db = function (dbConfig) {
 
 	var getView = function(viewUrl, success, failure, viewGenerationOptions) {
 
-		if (!isUsingCradle) {
-			var splitViewUrl = viewUrl.split('/');
-			var designName = splitViewUrl[0];
-			var viewName = splitViewUrl[1];
+		var splitViewUrl = viewUrl.split('/');
+		var designName = splitViewUrl[0];
+		var viewName = splitViewUrl[1];
 
-			log(new Date(), 'before view'); // TODO: Hack
-			database.view(designName, viewName, viewGenerationOptions, function (err, body, headers) {
-				if (err) {
-					failure(err);
-					return;
-				}
-				
-				handleNewCouchCookie(headers);
-				// Return the first row only, if the flag is indicated.
-				if (viewGenerationOptions 
-				&& viewGenerationOptions.firstOnly 
-				&& body.rows.length > 0) {
-					// TODO: Ok, how should we really do something like this?
-					// The semantics are inconsistent with the other way.
-					log(new Date(), 'success view'); // TODO: Hack
-					success(body.rows[0].value);
-					return;
-				}
+		database.view(designName, viewName, viewGenerationOptions, function (err, body, headers) {
+			if (err) {
+				failure(err);
+				return;
+			}
+			
+			handleNewCouchCookie(headers);
+			// Return the first row only, if the flag is indicated.
+			if (viewGenerationOptions 
+			&& viewGenerationOptions.firstOnly 
+			&& body.rows.length > 0) {
+				// TODO: Ok, how should we really do something like this?
+				// The semantics are inconsistent with the other way.
+				success(body.rows[0].value);
+				return;
+			}
 
-				var docs = [];
-				body.rows.forEach(function (doc) {
-					docs.push(doc.value);
-				});
-
-				success(docs);
+			var docs = [];
+			body.rows.forEach(function (doc) {
+				docs.push(doc.value);
 			});
-		}
-		else {
-			log(new Date(), 'before view'); // TODO: Hack
-			database.view(viewUrl, viewGenerationOptions, function (error, response) {
-				if (error) {
-					failure(error);
-					return;
-				}
 
-				// Return the first row only, if the flag is indicated.
-				if (viewGenerationOptions 
-				&& viewGenerationOptions.firstOnly 
-				&& response.length > 0) {
-					// TODO: Ok, how should we really do something like this?
-					// The semantics are inconsistent with the other way.
-					log(new Date(), 'success view'); // TODO: Hack
-					success(response[0].value);
-					return;
-				}
-
-				var docs = [];
-				response.forEach(function (row) {
-					docs.push(row);
-				});
-
-				success(docs);
-			});
-		}
+			success(docs);
+		});
 	};
 
 	var saveDocument = function(doc, success, failure) {
-		if (isUsingCradle) {
-			database.save(doc, function (error, response) {
-				// TODO: What to do with response, if anything?
-				error ? failure(error) : success();
-			});
-		}
-		else {
-			database.insert(doc, function (error, response, headers) {
-				// TODO: What to do with response, if anything?
-				if (error) {
-					failure(error);
-				}
-				else {
-					handleNewCouchCookie(headers);
-					success();
-				}
-			});
-		}
+		database.insert(doc, function (error, response, headers) {
+			// TODO: What to do with response, if anything?
+			if (error) {
+				failure(error);
+			}
+			else {
+				handleNewCouchCookie(headers);
+				success();
+			}
+		});
 	};
 
 	var _all = function(success, failure) {
@@ -471,26 +427,17 @@ var db = function (dbConfig) {
 					// existingPatron = existingPatron[0];
 
 					// Update the existing contribution.
-					if (isUsingCradle) {
-						database.save(existingPatron._id, existingPatron._rev,
-							patron, 
-							function (error, response) {
-								error ? failure(error) : success();
-							});
-					}
-					else {
-						patron._rev = existingPatron._rev;
-						database.insert(patron, 
-						function (error, response, headers) {
-							if (error) {
-								failure(error);
-							} 
-							else {
-								handleNewCouchCookie(headers);
-								success();
-							}
-						});
-					}
+					patron._rev = existingPatron._rev;
+					database.insert(patron, 
+					function (error, response, headers) {
+						if (error) {
+							failure(error);
+						} 
+						else {
+							handleNewCouchCookie(headers);
+							success();
+						}
+					});
 				}
 			},
 			failure
@@ -549,27 +496,18 @@ var db = function (dbConfig) {
 					existingContribution = existingContribution[0];
 
 					// Update the existing contribution.
-					if (isUsingCradle) {
-						database.save(existingContribution._id, existingContribution._rev,
-							contribution, 
-							function (error, response) {
-								error ? failure(error) : success();
-							});
-					}
-					else {
-						contribution._id = existingContribution._id;
-						contribution._rev = existingContribution._rev;
-						database.insert(contribution, 
-						function (error, response, headers) {
-							if (error) { 
-								failure(error);
-							}
-							else {
-								handleNewCouchCookie(headers);
-								success();
-							}
-						});
-					}
+					contribution._id = existingContribution._id;
+					contribution._rev = existingContribution._rev;
+					database.insert(contribution, 
+					function (error, response, headers) {
+						if (error) { 
+							failure(error);
+						}
+						else {
+							handleNewCouchCookie(headers);
+							success();
+						}
+					});
 				}
 			},
 			failure
@@ -585,24 +523,15 @@ var db = function (dbConfig) {
 
 			res.type("image/jpeg");
 			var readStream;
-			if (isUsingCradle) {
-				readStream = database.getAttachment(docId, attachmentName, function (err) {
-					if (err) {
-						callback(err);
-					}
-				});
-			}
-			else {
-				// We access the database via getPatronByUsername right before
-				// making this call, so we don't have to refresh our cookies.
-				// TODO: We should check anyway. Check the docs to see if headers
-				// are returned in this callback, or what.
-				readStream = database.attachment.get(docId, attachmentName, function (err) {
-					if (err) {
-						callback(err);
-					}
-				});
-			}
+			// We access the database via getPatronByUsername right before
+			// making this call, so we don't have to refresh our cookies.
+			// TODO: We should check anyway. Check the docs to see if headers
+			// are returned in this callback, or what.
+			readStream = database.attachment.get(docId, attachmentName, function (err) {
+				if (err) {
+					callback(err);
+				}
+			});
 
 			// TODO: Consider setting 'end' to false so we can
 			// maybe send an error code if we mess up.

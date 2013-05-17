@@ -58,16 +58,17 @@ function EditContributionsCtrl(session, $scope, $http) {
 			console.log(data);
 		});
 
-		$http.get('/card')
-		.success(function (data) {
-			if (data !== {}) {
-				hasCard = true;
-				$scope.card = data;
-			}
-		})
-		.error(function (data) {
-			console.log(data);
-		});
+		// TODO: ...
+		// $http.get('/card')
+		// .success(function (data) {
+		// 	if (data !== {}) {
+		// 		hasCard = true;
+		// 		$scope.card = data;
+		// 	}
+		// })
+		// .error(function (data) {
+		// 	console.log(data);
+		// });
 	};
 
 	initialize();

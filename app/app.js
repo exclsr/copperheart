@@ -344,47 +344,53 @@ app.get('/contributions', function (req, res) {
 });
 
 
-app.get('/card', function (req, res) {
-	if (!req.user) {
-		// 'Anonymous' doesn't have a card.
-		res.send({});
-		return;
-	}
+// TODO: Consider whether to do this. Basically, a
+// patron can have multiple Stripe customer ids, 
+// which each get their own card. This should be
+// figured out in the long run, but for the time
+// being there are more important things.
+//
+// app.get('/card', function (req, res) {
+// 	if (!req.user) {
+// 		// 'Anonymous' doesn't have a card.
+// 		res.send({});
+// 		return;
+// 	}
 
-	var stripe = require('stripe')(apiKey);
+// 	var stripe = require('stripe')(apiKey);
 
-	var failure = function (err) {
-		console.log(err);
-		// TODO: Figure out an error message scheme.
-		res.send(500);
-	};
+// 	var failure = function (err) {
+// 		console.log(err);
+// 		// TODO: Figure out an error message scheme.
+// 		res.send(500);
+// 	};
 
-	var success = function (patron) {
-		if (!patron.stripeId) {
-			res.send({});
-			return;
-		}
-		stripe.customers.retrieve(patron.stripeId, function (err, customer) {
-			if (err) {
-				failure(err);
-				return;
-			}
+// 	var success = function (patron) {
+// 		if (!patron.stripeId) {
+// 			res.send({});
+// 			return;
+// 		}
+// 		stripe.customers.retrieve(patron.stripeId, function (err, customer) {
+// 			if (err) {
+// 				failure(err);
+// 				return;
+// 			}
 
-			var card = {};
-			if (customer.active_card 
-				&& customer.active_card.type
-				&& customer.active_card.last4) {
-				card.type = customer.active_card.type;
-				var last4 = customer.active_card.last4;
-				card.lastDigit = last4.substring(last4.length - 1);
-			}
+// 			var card = {};
+// 			if (customer.active_card 
+// 				&& customer.active_card.type
+// 				&& customer.active_card.last4) {
+// 				card.type = customer.active_card.type;
+// 				var last4 = customer.active_card.last4;
+// 				card.lastDigit = last4.substring(last4.length - 1);
+// 			}
 
-			res.send(card);
-		});
-	};
+// 			res.send(card);
+// 		});
+// 	};
 
-	db.patrons.getByUsername(req.user.username, success, failure);
-});
+// 	db.patrons.getByUsername(req.user.username, success, failure);
+// });
 
 // Public data of a person
 app.get('/who/:username', function (req, res) {

@@ -7,10 +7,12 @@ var express = require('express')
 	, routes  = require('./routes')
 	, user    = require('./routes/user')
 	, http    = require('http')
+	, https   = require('https')
 	, path    = require('path')
 	, config  = require('./config.js')
 	, auth    = require('./lib/auth.js')
-	, db      = require('./lib/database.js').db;
+	, db      = require('./lib/database.js').db
+	, qs      = require('querystring');
 
 var apiKey = config.stripeApiTest(); 
 var stripe = require('stripe')(apiKey);
@@ -457,6 +459,10 @@ app.get('/patron', ensureIsMember, function (req, res) {
 		patron.present = patronData.present || "";
 		patron.passions = patronData.passions || [];
 		patron.communities = patronData.communities || [];
+		// Don't transfer the actual token. We only care
+		// if the member has associated their stripe account
+		// with us.
+		patron.hasStripeAccount = patronData.stripeToken ? true : false;
 
 		res.send(patron);
 	};
@@ -876,6 +882,85 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 app.get('/stripe/connect-client-id', ensureIsMember, function (req, res) {
 	res.send(config.stripeConnectClientId());
 });
+
+app.get('/stripe/connect-response', ensureIsMember, function (req, res) {
+	if (!isMember(req.user)) {
+		// TODO: Redirect to a formal error page in this situation.
+		res.send(401, // unauthorized
+		"Hey. It looks like you signed out in the middle of your Stripe " +
+		"authorization request.");
+		return;
+	}
+
+	var redirect = function () {
+		res.redirect('/#/edit');
+	};
+
+	if (req.query.error) {
+		// Stripe error. Neat. No need to do anything.
+		redirect();
+	}
+	else {
+		// we get back:
+		// {
+		//    state: 'whatever we sent',
+		//    scope: 'read_write',
+		//    code: 'woeifjlfjaljfweaoifjoiwuef'
+		// }
+		var stripeResponse = req.query;
+
+		var data = qs.stringify({
+			client_secret: apiKey,
+			code: stripeResponse.code,
+			grant_type: 'authorization_code'
+		});
+
+		var options = {
+			host: 'connect.stripe.com',
+			port: '443',
+			path: '/oauth/token',
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Content-Length': data.length
+			}
+		};
+
+		var postReq = https.request(options, function (postRes) {
+			var postResBody = "";
+
+			if (postRes.statusCode === 200) {
+				postRes.setEncoding('utf8');
+				postRes.on('data', function (chunk) {
+					postResBody += chunk;
+				});
+				postRes.on('end', function() {
+					var stripeAccess = JSON.parse(postResBody);
+					var success = function() {
+						// TODO: ????
+					};
+					var failure = function() {
+						// TODO: ????
+					};
+
+					var gotPatron = function (patron) {
+						patron.stripeToken = stripeAccess.access_token;
+						db.patrons.save(patron, success, failure);
+					};
+
+					if (stripeAccess && stripeAccess.access_token) {
+						db.patrons.get(req.user.email, gotPatron, failure);
+					}
+				});
+			};
+		});
+
+		postReq.write(data);
+		postReq.end();
+		redirect();
+	}
+});
+
 
 // Lastly ...
 // This needs to be at the bottom, so things like

@@ -31,6 +31,7 @@ function EditCtrl(session, $scope, $http) {
 			$scope.present = patron.present;
 			$scope.passions = patron.passions;
 			$scope.communities = patron.communities;
+			$scope.hasStripeAccount = patron.hasStripeAccount;
 		});
 
 		patronRes.error(function(data, status, headers, config) {

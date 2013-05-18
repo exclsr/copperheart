@@ -14,7 +14,13 @@ var express = require('express')
 	, db      = require('./lib/database.js').db
 	, qs      = require('querystring');
 
-var apiKey = config.stripeApiTest(); 
+var apiKey;
+if (config.isProduction()) {
+	apiKey = config.stripeApiLive(); 
+}
+else {
+	apiKey = config.stripeApiTest();
+}
 
 var app = express();
 
@@ -40,7 +46,6 @@ app.configure(function(){
 app.configure('development', function(){
 	app.use(express.errorHandler());
 });
-
 
 app.get('/entrance/usernames', function (req, res) {
 	res.send(config.entranceUsernames() || []);
@@ -123,7 +128,7 @@ var getRole = function (user) {
 	if (user) {
 		var admins = config.adminEmailAddresses();
 		var members = config.memberEmailAddresses();
-
+		
 		var adminFound = false;
 		if (admins) {
 			admins.forEach(function (adminEmailAddress) {

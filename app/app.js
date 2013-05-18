@@ -1034,6 +1034,10 @@ app.put('/commit/:toUsername/note', ensureAuthenticated, function (req, res) {
 	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
 });
 
+app.post('/stripe/webhook', function (req, res) {
+	// don't realy care at this point.
+	res.send("<3");
+});
 
 // Lastly ...
 // This needs to be at the bottom, so things like

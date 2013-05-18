@@ -31,7 +31,7 @@ function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 		.success(function (data) {
 			var stripeApiKey = data;
 			// Identifies our website in the createToken call below
-			Stripe.setPublishableKey(apiKey);
+			Stripe.setPublishableKey(stripeApiKey);
 		})
 		.error(function (data, status, headers, config) {
 			// TODO: We're offline.

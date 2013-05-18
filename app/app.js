@@ -460,7 +460,7 @@ app.get('/profile/:username/image', function (req, res) {
 
 // Public and private data of a patron
 // TODO: Rename? Yes, to 'member'
-app.get('/patron', ensureIsMember, function (req, res) {
+app.get('/member', ensureIsMember, function (req, res) {
 	// TODO: Maybe not do 'ensureAuthenticated' here, and instead
 	// send back something empty if we're not logged in, and have 
 	// the client deal with that scenario.
@@ -471,28 +471,28 @@ app.get('/patron', ensureIsMember, function (req, res) {
 		res.send(500);
 	};
 
-	var gotPatron = function (patronData) {
-		var patron = {};
-		patron.email = patronData.email;
-		patron.username = patronData.username;
-		patron.things = patronData.things || [];
-		patron.name = patronData.name || "";
-		patron.present = patronData.present || "";
-		patron.passions = patronData.passions || [];
-		patron.communities = patronData.communities || [];
+	var gotMember = function (memberData) {
+		var member = {};
+		member.email = memberData.email;
+		member.username = memberData.username;
+		member.things = memberData.things || [];
+		member.name = memberData.name || "";
+		member.present = memberData.present || "";
+		member.passions = memberData.passions || [];
+		member.communities = memberData.communities || [];
 		// Don't transfer the actual token. We only care
 		// if the member has associated their stripe account
 		// with us.
-		patron.hasStripeAccount = patronData.stripeToken ? true : false;
+		member.hasStripeAccount = memberData.stripeToken ? true : false;
 
-		res.send(patron);
+		res.send(member);
 	};
 
-	db.patrons.get(req.user.email, gotPatron, failure);
+	db.patrons.get(req.user.email, gotMember, failure);
 });
 
-app.put('/patron/things', ensureIsMember, function (req, res) {
-	var patron = req.user;
+app.put('/member/things', ensureIsMember, function (req, res) {
+	var member = req.user;
 	var things = req.body;
 
 	var success = function (things) {
@@ -509,11 +509,11 @@ app.put('/patron/things', ensureIsMember, function (req, res) {
 	// on the safe side? Yes! We need to strip out quotes
 	// in the glyphs, for one. And, make sure we are only
 	// putting in numbers for prices.
-	db.things.save(patron.username, things, success, failure);
+	db.things.save(member.username, things, success, failure);
 });
 
 
-app.put('/patron/who', ensureIsMember, function (req, res) {
+app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	var patron = req.user;
 	var who = req.body;
 
@@ -537,9 +537,9 @@ app.put('/patron/who', ensureIsMember, function (req, res) {
 	db.patrons.save(patron, success, failure);
 });
 
-app.put('/patron/passions', ensureIsMember, function (req, res) {
+app.put('/member/passions', ensureIsMember, function (req, res) {
 	// TODO: Obvi refactoring with the code above.
-	var patron = req.user;
+	var member = req.user;
 	var passions = req.body;
 
 	var success = function (things) {
@@ -552,14 +552,14 @@ app.put('/patron/passions', ensureIsMember, function (req, res) {
 		res.send(500);
 	};
 
-	patron.passions = passions;
-	db.patrons.save(patron, success, failure);
+	member.passions = passions;
+	db.patrons.save(member, success, failure);
 });
 
 
-app.put('/patron/communities', ensureIsMember, function (req, res) {
+app.put('/member/communities', ensureIsMember, function (req, res) {
 	// TODO: Obvi refactoring with the code above.
-	var patron = req.user;
+	var member = req.user;
 	var communities = req.body;
 
 	var success = function (things) {
@@ -572,14 +572,14 @@ app.put('/patron/communities', ensureIsMember, function (req, res) {
 		res.send(500);
 	};
 
-	patron.communities = communities;
-	db.patrons.save(patron, success, failure);
+	member.communities = communities;
+	db.patrons.save(member, success, failure);
 });
 
 
-app.put('/patron/username', ensureIsMember, function (req, res) {
+app.put('/member/username', ensureIsMember, function (req, res) {
 	// TODO: Obvi refactoring with the code above.
-	var patron = req.user;
+	var member = req.user;
 	var username = req.body.username;
 
 	var success = function (things) {
@@ -595,8 +595,8 @@ app.put('/patron/username', ensureIsMember, function (req, res) {
 	};
 
 	// TODO: Need to check for dups.
-	patron.username = username;
-	db.patrons.save(patron, success, failure);
+	member.username = username;
+	db.patrons.save(member, success, failure);
 });
 
 

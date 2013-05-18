@@ -22,19 +22,19 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 	var initialize = function() {
-		var patronRes = $http.get('/patron');
-		patronRes.success(function (patron) {
-			$scope.email = patron.email;
-			$scope.username = patron.username;
-			$scope.things = patron.things;
-			$scope.name = patron.name;
-			$scope.present = patron.present;
-			$scope.passions = patron.passions;
-			$scope.communities = patron.communities;
-			$scope.hasStripeAccount = patron.hasStripeAccount;
+		var memberRes = $http.get('/member');
+		memberRes.success(function (member) {
+			$scope.email = member.email;
+			$scope.username = member.username;
+			$scope.things = member.things;
+			$scope.name = member.name;
+			$scope.present = member.present;
+			$scope.passions = member.passions;
+			$scope.communities = member.communities;
+			$scope.hasStripeAccount = member.hasStripeAccount;
 		});
 
-		patronRes.error(function(data, status, headers, config) {
+		memberRes.error(function(data, status, headers, config) {
 			if (status === 401) {
 				// We're not logged in. There is a todo task in the
 				// top-level controller to address this, but in the 
@@ -92,7 +92,7 @@ function EditCtrl(session, $scope, $http) {
 		var data = {};
 		data.username = $scope.username;
 
-		var putUsername = $http.put('/patron/username', data);
+		var putUsername = $http.put('/member/username', data);
 		putUsername.success(function (data) {
 			console.log("<3");
 		});
@@ -113,7 +113,7 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 	var saveCommunities = function (communities, callback) {
-		var putCommunities = $http.put('/patron/communities', communities);
+		var putCommunities = $http.put('/member/communities', communities);
 		putCommunities.success(function (data) {
 			$scope.communities = communities;
 			console.log("<3");
@@ -165,7 +165,7 @@ function EditCtrl(session, $scope, $http) {
 	};
 
 	var savePassions = function (passions, callback) {
-		var putPassions = $http.put('/patron/passions', passions);
+		var putPassions = $http.put('/member/passions', passions);
 		putPassions.success(function (data) {
 			$scope.passions = passions;
 			console.log("<3");
@@ -210,7 +210,7 @@ function EditCtrl(session, $scope, $http) {
 
 
 	var saveThings = function (things) {
-		var putThings = $http.put('/patron/things', things);
+		var putThings = $http.put('/member/things', things);
 
 		putThings.success(function (data) {
 			console.log(data);

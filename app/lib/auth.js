@@ -108,7 +108,19 @@ passport.serializeUser(function (user, callback) {
 passport.deserializeUser(function (user, callback) {
 	// Input: 'user' is what we saved in the serializeUser step.
 	// Output: we 'callback(error, userObject)' to tell passport we're done.
-	callback(null, user);
+	if (user.refreshFromDatabase) {
+		db.patrons.get(user.id, 
+			function (dbUser) {
+				callback(null, dbUser);
+			},
+			function (error) {
+				callback(null, user);
+			}
+		);
+	}
+	else {
+		callback(null, user);
+	}
 }); 
 
 

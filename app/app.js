@@ -192,6 +192,14 @@ var ensureIsMember = function(req, res, next) {
 		" and try again.");
 };
 
+var invalidateUser = function (user) {
+	// TODO: If performance is critical, an alternative to this
+	// is just to save whatever is in db.patrons.save(user) into
+	// req.user.
+	user.refreshFromDatabase = true;
+	return user;
+};
+
 var anonymousPatron = "anonymous";
 
 // Patron data that patrons want to know about
@@ -456,8 +464,6 @@ app.get('/profile/:username/image', function (req, res) {
 	});
 });
 
-
-
 // Public and private data of a patron
 // TODO: Rename? Yes, to 'member'
 app.get('/member', ensureIsMember, function (req, res) {
@@ -518,6 +524,7 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	var who = req.body;
 
 	var success = function (things) {
+		req.user = invalidateUser(req.user);
 		res.send("<3");
 	};
 
@@ -543,6 +550,7 @@ app.put('/member/passions', ensureIsMember, function (req, res) {
 	var passions = req.body;
 
 	var success = function (things) {
+		req.user = invalidateUser(req.user);
 		res.send("<3");
 	};
 
@@ -563,6 +571,7 @@ app.put('/member/communities', ensureIsMember, function (req, res) {
 	var communities = req.body;
 
 	var success = function (things) {
+		req.user = invalidateUser(req.user);
 		res.send("<3");
 	};
 
@@ -585,6 +594,7 @@ app.put('/member/username', ensureIsMember, function (req, res) {
 	var success = function (things) {
 		// TODO: When changing the username, we need to 
 		// invalidate the passport user as well.
+		req.user = invalidateUser(req.user);
 		res.send("<3");
 	};
 
@@ -784,6 +794,7 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			console.log(patronId);
 		}
 		
+		req.user = invalidateUser(req.user);
 		res.send("<3");
 	}
 
@@ -992,7 +1003,7 @@ app.get('/stripe/connect-response', ensureIsMember, function (req, res) {
 				postRes.on('end', function() {
 					var stripeAccess = JSON.parse(postResBody);
 					var success = function() {
-						// TODO: ????
+						req.user = invalidateUser(req.user);
 					};
 					var failure = function() {
 						// TODO: ????

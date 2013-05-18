@@ -1,6 +1,8 @@
 //----------------------------------------------------
 // config.js
 //
+var isProduction = (process.env.NODE_ENV === "production");
+
 var adminEmailAddresses = process.env.ADMIN_EMAIL_ADDRESSES.split(",") || [];
 var memberEmailAddresses = process.env.MEMBER_EMAIL_ADDRESSES.split(",") || [];
 var entranceUsernames = process.env.ENTRANCE_USERNAMES.split(",") || [];
@@ -59,6 +61,10 @@ catch (err) {
 // can at least make it a lot smaller. Maybe putting
 // everything in one config object (json) that is exported
 // is the way to start ...
+exports.isProduction = function() {
+	return overrides.isProduction || isProduction;
+};
+
 exports.adminEmailAddresses = function() {
 	return overrides.adminEmailAddresses || adminEmailAddresses;
 };

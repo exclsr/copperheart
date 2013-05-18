@@ -3,9 +3,18 @@
 //
 var isProduction = (process.env.NODE_ENV === "production");
 
-var adminEmailAddresses = process.env.ADMIN_EMAIL_ADDRESSES.split(",") || [];
-var memberEmailAddresses = process.env.MEMBER_EMAIL_ADDRESSES.split(",") || [];
-var entranceUsernames = process.env.ENTRANCE_USERNAMES.split(",") || [];
+var parseList = function (envVar) {
+	if (envVar) {
+		return envVar.split(",");
+	}
+	else {
+		return [];
+	}
+};
+
+var adminEmailAddresses = parseList(process.env.ADMIN_EMAIL_ADDRESSES);
+var memberEmailAddresses = parseList(process.env.MEMBER_EMAIL_ADDRESSES);
+var entranceUsernames = parseList(process.env.ENTRANCE_USERNAMES);
 
 var port = process.env.PORT || 3000;
 

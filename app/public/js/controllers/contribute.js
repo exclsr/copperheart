@@ -26,6 +26,17 @@ function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 
 	var initialize = function() {
+
+		$http.get('/config/stripe-api-key')
+		.success(function (data) {
+			var stripeApiKey = data;
+			// Identifies our website in the createToken call below
+			Stripe.setPublishableKey(apiKey);
+		})
+		.error(function (data, status, headers, config) {
+			// TODO: We're offline.
+		});
+
 		$scope.cc = {};
 		$scope.cc.expMonth = '01';
 

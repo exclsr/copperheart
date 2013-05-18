@@ -20,6 +20,8 @@ var database = {
 	securePort: process.env.DB_SECURE_PORT || 5984
 };
 
+var stripePublicTest = process.env.STRIPE_PUBLIC_TEST || 'missing stripe public key';
+var stripePublicLive = process.env.STRIPE_PUBLIC_LIVE || 'missing stripe public key';
 var stripeApiTest  = process.env.STRIPE_API_TEST || 'missing stripe api key';
 var stripeApiLive  = process.env.STRIPE_API_LIVE || 'missing stripe api key';
 var stripeConnectClientId = process.env.STRIPE_CONNECT_CLIENT_ID || 'missing stripe connect client id';
@@ -29,12 +31,6 @@ var stripeConnectClientId = process.env.STRIPE_CONNECT_CLIENT_ID || 'missing str
 // Set this to be a unique value for you, like 
 // your GitHub name, and relax.
 var stripeTestClientId = undefined;
-
-// TODO: These keys are used on the client side, so we're
-// going to want to use a templating engine like jade sooner
-// rather than later.
-// var stripePublicTest = process.env.STRIPE_PUBLIC_TEST || 'missing public key';
-// var stripePublicLive = process.env.STRIPE_PUBLIC_LIVE || 'missing public key';
 
 var sessionSecret = process.env.SESSION_SECRET || "(express session secret)";
 
@@ -83,6 +79,14 @@ exports.database = function() {
 
 exports.port = function() {
 	return overrides.port || port;
+};
+
+exports.stripePublicTest = function() {
+	return overrides.stripePublicTest || stripePublicTest;
+};
+
+exports.stripePublicLive = function() {
+	return overrides.stripePublicLive || stripePublicLive;
 };
 
 exports.stripeApiTest = function() {

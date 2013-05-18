@@ -47,6 +47,15 @@ app.configure('development', function(){
 	app.use(express.errorHandler());
 });
 
+app.get('/config/stripe-api-key', function (req, res) {
+	if (config.isProduction()) {
+		res.send(config.stripePublicLive());
+	}
+	else {
+		res.send(config.stripePublicTest());
+	}
+});
+
 app.get('/entrance/usernames', function (req, res) {
 	res.send(config.entranceUsernames() || []);
 });

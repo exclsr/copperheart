@@ -40,7 +40,7 @@ function EditCtrl(session, $scope, $http) {
 				// top-level controller to address this, but in the 
 				// mean time, let's force-log-out, so we can at least
 				// log back in.
-				$scope.logout();
+				$scope.signOut();
 			}
 			else {
 				// TODO: Something terrible went wrong. Deal with it.

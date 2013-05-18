@@ -1,9 +1,9 @@
 //----------------------------------------------------
 // config.js
 //
-var adminEmailAddresses = process.env.ADMIN_EMAIL_ADDRESSES || [];
-var memberEmailAddresses = process.env.MEMBER_EMAIL_ADDRESSES || [];
-var entranceUsernames = process.env.ENTRANCE_USERNAMES || [];
+var adminEmailAddresses = process.env.ADMIN_EMAIL_ADDRESSES.split(",") || [];
+var memberEmailAddresses = process.env.MEMBER_EMAIL_ADDRESSES.split(",") || [];
+var entranceUsernames = process.env.ENTRANCE_USERNAMES.split(",") || [];
 
 var port = process.env.PORT || 3000;
 

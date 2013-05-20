@@ -545,7 +545,34 @@ var db = function (dbConfig) {
 		getPatronByUsername(username, gotPatron, failure);
 	};
 
+	var keepDatabaseServerActive = function() {
+		// So, our database host likes to go to sleep if it feels
+		// there is nothing important to do, resulting in 50-second
+		// response times, or in some cases timing out after a minute,
+		// and giving us 500 errors.
+		var relax = function() {
+			var opts = {
+				db: databaseName,
+				path: '/'
+			};
+
+			database.relax(opts, function (error, response, headers) {
+				if (error) { 
+					// don't care?
+				}
+				else {
+					handleNewCouchCookie(headers);
+				}
+			});
+		};
+
+		var fiveMinutes = 5 * 60 * 1000;
+		setInterval(relax, fiveMinutes);
+	};
+
 	createDatabaseAndViews();
+	keepDatabaseServerActive();
+
 	return {
 		profileImages : {
 			get : getProfileImageByUsername

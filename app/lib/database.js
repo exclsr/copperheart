@@ -556,7 +556,7 @@ var db = function (dbConfig) {
 				path: '/'
 			};
 
-			database.relax(opts, function (error, response, headers) {
+			nanoDb.relax(opts, function (error, response, headers) {
 				if (error) { 
 					// don't care?
 				}

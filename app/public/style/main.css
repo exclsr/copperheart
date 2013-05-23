@@ -188,8 +188,8 @@ ul {
 .choice-group .glyph, .choice-group span {
 	padding-left: 7px;
 }
-.choice-group .glyph {
-	vertical-align: top;
+.choice-group .glyph i {
+	vertical-align: 0;
 }
 .choice-group:hover {
 	background: #444;
@@ -233,6 +233,10 @@ ul {
 	display: inline-block;
 	margin-top: 3px;
 	margin-left: 5px;
+}
+
+.glyph i {
+	vertical-align: -1px;
 }
 
 .price {
@@ -311,6 +315,18 @@ ul {
 	margin-top: 2em;
 }
 
+.support {
+	margin-bottom: 1em;
+}
+
+.supportRow {
+	line-height: 1.5em; 
+	margin-left: 4.5ex;
+}
+.supportText {
+	margin-left: 1ex;
+	margin-right: 1ex;
+}
 
 /* Contribution page */
 /* TODO: Move to its own file */
@@ -340,7 +356,6 @@ ul.contributionList {
 }
 
 ul.contributionList .glyph {
-	vertical-align: top;
 	margin-right: 0.5ex;
 }
 

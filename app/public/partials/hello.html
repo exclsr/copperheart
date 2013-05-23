@@ -90,13 +90,13 @@
 		</div>
 	</div>
 
-	<div class="contributions span12">
+	<div class="support span12">
 		<div class="row"><h3 class="contributeTitle span7">Supported by the following monthly contributions</h3></div>
-		<div ng-repeat="thing in profile.getSupport()">
+		<div class="supportRow" ng-repeat="thing in profile.getSupport()">
 			<div class="glyph"><i class="icon-{{thing.glyph}}"></i></div>
-			<span>A {{thing.unit}} of {{thing.name}}, times {{thing.count | number:2}}</span>
+			<span class="supportText">A {{thing.unit}} of {{thing.name}}.</span>
+			<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>
 		</div>
-
 	</div>
 </div>
 </div>

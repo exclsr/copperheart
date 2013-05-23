@@ -4,6 +4,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	var profile = {};
 	var patron = {};
+	var member = {};
 	session.pageName = "hello";
 
 	// TODO: Rename to something related to binding
@@ -22,6 +23,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 				&& profile.passions
 				&& profile.communities
 				&& profile.things
+				&& member.support
 				&& patron.contributions;
 		};
 
@@ -50,6 +52,11 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			maybeSuccess();
 		};
 
+		var onSupportReady = function (support) {
+			member.support = support;
+			maybeSuccess();
+		};
+
 		$http.get('/who/' + profile.username)
 		.success(onWhoReady)
 		.error(function (data, status, headers, config) {
@@ -69,6 +76,12 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		.success(onContributionsReady)
 		.error(function (data, status, headers, config) {
 			// TODO: Once again, need an error handling scheme.
+			console.log(data);
+		});
+
+		$http.get('/support/' + profile.username)
+		.success(onSupportReady)
+		.error(function (data, status, headers, config) {
 			console.log(data);
 		});
 	};
@@ -171,7 +184,9 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	$scope.profile.getPassions = function() {
 		return profile.passions;
 	};
-
+	$scope.profile.getSupport = function() {
+		return member.support;
+	};
 
 	var perMonthMultiplier = function (frequency) {
 		switch (frequency) {

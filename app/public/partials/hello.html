@@ -89,5 +89,14 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="contributions span12">
+		<div class="row"><h3 class="contributeTitle span7">Supported by the following monthly contributions</h3></div>
+		<div ng-repeat="thing in profile.getSupport()">
+			<div class="glyph"><i class="icon-{{thing.glyph}}"></i></div>
+			<span>A {{thing.unit}} of {{thing.name}}, times {{thing.count | number:2}}</span>
+		</div>
+
+	</div>
 </div>
 </div>

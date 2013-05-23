@@ -280,6 +280,33 @@ var db = function (dbConfig) {
 							emit([doc.backerId, doc.memberId, 1], doc);
 						}
 					}
+				},
+
+				toMember: {
+					// What are all the contributions that a specific 
+					// member is receiving?
+					map: function(doc) {
+						// if (doc.id) {
+						// 	// for each backer, we want to know his or her name.
+
+						// 	// doc === the profiles of the projects we're backing
+						// 	// TODO: We don't really need the entire profile
+						// 	// here. Probably just the name.
+						// 	//
+						// 	// TODO: Maybe have a 'basic info' section in the doc
+						// 	// that contains name and username, and can be expanded
+						// 	// with messing with the view.
+						// 	for (var backerId in doc.backers) {
+						// 		emit([backerId, doc.id, 0], doc);
+						// 	}
+						// }
+
+
+						// the contributions to the member
+						if (doc.type === "contribution") { 
+							emit([doc.memberId, doc.backerId], doc);
+						}
+					}
 				}
 			}
       	};
@@ -295,6 +322,7 @@ var db = function (dbConfig) {
 			if (err || !doc.views 
 				|| !doc.views.byPatronToProject
 				|| !doc.views.byPatron
+				|| !doc.views.toMember
 				|| forceContributionsDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
@@ -466,7 +494,11 @@ var db = function (dbConfig) {
 
 	var contributionsByPatron = function (success, failure, options) {
 		getView('contributions/byPatron', success, failure, options); 
-	}
+	};
+
+	var contributionsToMember = function (success, failure, options) {
+		getView('contributions/toMember', success, failure, options); 
+	};
 
 	var getContributionsByPatron = function (backerId, success, failure) {
 		var options = {
@@ -474,6 +506,14 @@ var db = function (dbConfig) {
 			endkey: [backerId, {}, 3]
 		};
 		contributionsByPatron(success, failure, options);
+	};
+
+	var getContributionsToMember = function (memberId, success, failure) {
+		var options = {
+			startkey: [memberId],
+			endkey: [memberId, {}]
+		};
+		contributionsToMember(success, failure, options);
 	}
 
 	var getContribution = function(backerId, memberId, success, failure) {
@@ -593,6 +633,7 @@ var db = function (dbConfig) {
 		contributions : {
 			get : getContribution,
 			getByPatronId : getContributionsByPatron,
+			getToMemberId : getContributionsToMember,
 			save : saveContribution
 		}
 	};

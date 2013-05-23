@@ -271,6 +271,57 @@ app.get('/things/:username', function (req, res) {
 	db.things.get(req.params.username, success, failure);
 });
 
+// TODO: Figure out a way to share this price code
+// on both the client and the server (if practical).
+var perMonthMultiplier = function (frequency) {
+	switch (frequency) {
+		case 'day': 
+			return 365.0 / 12.0;
+
+		case 'week': 
+			// There are 4 and 1/3 weeks 
+			// each month, on average.
+			return 52.0 / 12.0;
+
+		case 'month':
+		default:
+			return 1.0;
+	}
+};
+
+app.get('/support/:toUsername', function (req, res) {
+	var success = function (data) {
+
+		var things = {};
+		data.forEach(function (contribution) {
+			contribution.things.forEach(function (thing) {
+				// TODO: Doesn't take into account things
+				// with the same id and different prices.
+				// ... or does it?
+				if (things[thing.id]) {
+					things[thing.id].count += perMonthMultiplier(thing.frequency);
+				}
+				else {
+					things[thing.id] = thing;
+					things[thing.id].count = perMonthMultiplier(thing.frequency);
+				}
+			});
+		});
+		res.send(things);
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	var gotMember = function (memberData) {
+		db.contributions.getToMemberId(memberData.id, success, failure);
+	};
+
+	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
+});
+
 app.get('/contributions/:toUsername', function (req, res) {
 	if (!req.user) {
 		// 'Anonymous' doesn't have any contributions.
@@ -611,23 +662,7 @@ app.put('/member/username', ensureIsMember, function (req, res) {
 });
 
 
-// TODO: Figure out a way to share this price code
-// on both the client and the server (if practical).
-var perMonthMultiplier = function (frequency) {
-	switch (frequency) {
-		case 'day': 
-			return 365.0 / 12.0;
 
-		case 'week': 
-			// There are 4 and 1/3 weeks 
-			// each month, on average.
-			return 52.0 / 12.0;
-
-		case 'month':
-		default:
-			return 1.0;
-	}
-};
 
 // TODO: Figure out a way to share this price code
 // on both the client and the server (if practical).
@@ -1069,4 +1104,10 @@ app.get('/:username', function (req, res) {
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log("Express server listening on port " + app.get('port'));
+	var mode = "development";
+	if (config.isProduction()) {
+		mode = "production";
+	}
+	console.log("Mode: " + mode);
+
 });

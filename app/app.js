@@ -322,6 +322,23 @@ app.get('/support/:toUsername', function (req, res) {
 	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
 });
 
+app.get('/support/:toUsername/names', function (req, res) {
+	
+	var success = function(data) {
+		res.send(data);
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	var gotMember = function (memberData) {
+		db.patrons.getBacking(memberData.id, success, failure);
+	};
+	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
+});
+
 app.get('/contributions/:toUsername', function (req, res) {
 	if (!req.user) {
 		// 'Anonymous' doesn't have any contributions.
@@ -954,8 +971,8 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 		req.params.toUsername, 
 		function (member) { 
 
-			var onPatronSave = function() {
-				// After saving the patron in the backed
+			var onMemberSave = function() {
+				// After saving the member in the backed
 				// member data, save the contribution as its 
 				// own document.
 				// ... then do Stripe stuff
@@ -972,8 +989,29 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 			if (!member.backers[patron.id]) {
 				member.backers[patron.id] = patron.id;
 			}
+			if (member.id === patron.id) {
+				// In this special case, where a member is making a 
+				// contribution to herself, just make one call to the
+				// database, to avoid conflicts.
+				if (!member.backing[member.id]) {
+					member.backing[member.id] = member.id;
+				}
+			}
+			else {
+				// Save the contribution in the patron data. We do this
+				// so we can create a view for who is backing a member.
+				if (!patron.backing[member.id]) {
+					patron.backing[member.id] = member.id;
+					// We're doing this async and we don't need to know
+					// when success occurs.
+					// TODO: This makes error handling a little harder,
+					// so think about what's up, now.
+					db.patrons.save(patron, function() {}, failure);
+				}
+			}
+
 			toMember = member;
-			db.patrons.save(member, onPatronSave, failure);
+			db.patrons.save(member, onMemberSave, failure);
 		},
 		failure
 	);

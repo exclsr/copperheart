@@ -72,7 +72,8 @@ passport.serializeUser(function (user, callback) {
 		id: userEmail,
 		email: userEmail,
 		username: userEmail,
-		backers: {}
+		backers: {},
+		backing: {} // TODO: Defaults like this should be in the data layer.
 	};
 
 	// TODO: What, exactly, do we want to serialize into passport?

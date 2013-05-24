@@ -24,6 +24,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 				&& profile.communities
 				&& profile.things
 				&& member.support
+				&& member.backers
 				&& patron.contributions;
 		};
 
@@ -57,6 +58,11 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			maybeSuccess();
 		};
 
+		var onBackersReady = function (backers) {
+			member.backers = backers;
+			maybeSuccess();
+		}
+
 		$http.get('/who/' + profile.username)
 		.success(onWhoReady)
 		.error(function (data, status, headers, config) {
@@ -81,6 +87,12 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 		$http.get('/support/' + profile.username)
 		.success(onSupportReady)
+		.error(function (data, status, headers, config) {
+			console.log(data);
+		});
+
+		$http.get('/support/' + profile.username + '/names')
+		.success(onBackersReady)
 		.error(function (data, status, headers, config) {
 			console.log(data);
 		});
@@ -186,6 +198,9 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 	$scope.profile.getSupport = function() {
 		return member.support;
+	};
+	$scope.profile.getBackers = function() {
+		return member.backers;
 	};
 
 	var perMonthMultiplier = function (frequency) {

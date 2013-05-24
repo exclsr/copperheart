@@ -98,5 +98,15 @@
 			<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>
 		</div>
 	</div>
+
+	<div class="backers span12">
+		<div class="row"><h3 class="contributeTitle span7">Backers</h3></div>
+		<div class="backersContent">
+			<span ng-repeat="backer in profile.getBackers()">
+				{{backer}}
+				<span ng-show="$middle">,</span>
+			</span>
+		</div>
+	</div>
 </div>
 </div>

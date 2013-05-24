@@ -316,7 +316,7 @@ ul {
 }
 
 .support {
-	margin-bottom: 1em;
+	
 }
 
 .supportRow {
@@ -326,6 +326,10 @@ ul {
 .supportText {
 	margin-left: 1ex;
 	margin-right: 1ex;
+}
+.backersContent {
+	margin-left: 5ex;
+	margin-bottom: 1em;
 }
 
 /* Contribution page */

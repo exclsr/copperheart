@@ -175,20 +175,35 @@ var db = function (dbConfig) {
 							emit(doc.username, doc);
 						}
 					}
+				},
+				backing: {
+					map: function(doc) {
+						var backer = doc;
+						var displayName;
+
+						if (doc.backing) {
+							// TODO: Obviously localization implications
+							displayName = backer.name || "anonymous";
+							for (var memberId in doc.backing) {
+								emit([memberId, displayName], displayName);
+							}
+						}
+					}
 				}
 			}
-      	};
+		};
 
-      	// Create or update the design doc if something we 
-      	// want is missing.
-      	// TODO: This is lame.
-      	var forceDesignDocSave = false;
+		// Create or update the design doc if something we 
+		// want is missing.
+		// TODO: This is lame.
+		var forceDesignDocSave = false;
 
 		cradleDb.get(patronsDesignDoc.url, function (err, doc) {
 			if (err || !doc.views 
 				|| !doc.views.byEmail
 				|| !doc.views.byId
 				|| !doc.views.byUsername
+				|| !doc.views.backing
 				|| forceDesignDocSave) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
@@ -430,6 +445,10 @@ var db = function (dbConfig) {
 		getView('patrons/byUsername', success, failure, options);
 	};
 
+	var patronsBacking = function (success, failure, options) {
+		getView('patrons/backing', success, failure, options);
+	};
+
 	var getPatron = function (patronEmail, success, failure) {
 		patronsByEmail(success, failure, {key: patronEmail, firstOnly: true});
 	};
@@ -440,6 +459,14 @@ var db = function (dbConfig) {
 
 	var getPatronByUsername = function (username, success, failure) {
 		patronsByUsername(success, failure, {key: username, firstOnly: true});
+	};
+
+	var getBackingNames = function (memberId, success, failure) {
+		var options = {
+			startkey: [memberId],
+			endkey: [memberId, {}]
+		};
+		patronsBacking(success, failure, options);
 	};
 
 	var savePatron = function (patron, success, failure) {
@@ -624,6 +651,7 @@ var db = function (dbConfig) {
 			get : getPatron,
 			getById : getPatronById,
 			getByUsername : getPatronByUsername,
+			getBacking : getBackingNames,
 			save : savePatron
 		},
 		things : {

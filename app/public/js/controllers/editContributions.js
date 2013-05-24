@@ -58,6 +58,14 @@ function EditContributionsCtrl(session, $scope, $http) {
 			console.log(data);
 		});
 
+		$http.get('/whoami')
+		.success(function (patron) {
+			$scope.name = patron.name;
+		})
+		.error(function (data) {
+			console.log(data);
+		});
+
 		// TODO: ...
 		// $http.get('/card')
 		// .success(function (data) {
@@ -89,6 +97,30 @@ function EditContributionsCtrl(session, $scope, $http) {
 		});
 
 		return pricePerMonth;
+	};
+
+	var saveWho = function(who, success) {
+		var who = {};
+		who.name = $scope.name;
+
+		var putWho = $http.put('/patron/who', who);
+		putWho.success(function (data) {
+			success();
+		});
+		putWho.error(function (data, status, headers, config) { 
+			// TODO: Oh ... no.
+			console.log(data);
+		});
+	};
+
+	$scope.saveName = function() {
+		var who = {};
+		who.name = $scope.name;
+		
+		saveWho(who, function() {
+			// TODO: update ui
+			console.log("<3");
+		});
 	};
 }
 EditContributionsCtrl.$inject = ['session', '$scope', '$http'];

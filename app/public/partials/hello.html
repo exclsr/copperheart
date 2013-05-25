@@ -32,7 +32,7 @@
 	<!-- -->
 	<div class="process span12">
 		<div class="row">
-			<h3 class="contributeTitle span7">Contribute to Copper Heart</h3>
+			<h3 class="contributeTitle span7">Contribute</h3>
 			<!-- hearts -->
 			<h3 class="contributeHearts span3">
 				<span ng-repeat="thing in contributions">
@@ -93,14 +93,13 @@
 	<div class="support span12">
 		<div class="row"><h3 class="contributeTitle span7">Supported by the following monthly contributions</h3></div>
 		<div class="supportRow" ng-repeat="thing in profile.getSupport()">
-			<div class="glyph"><i class="icon-{{thing.glyph}}"></i></div>
 			<span class="supportText">A {{thing.unit}} of {{thing.name}}.</span>
 			<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>
 		</div>
 	</div>
 
 	<div class="backers span12">
-		<div class="row"><h3 class="contributeTitle span7">Backers</h3></div>
+		<div class="row"><h3 class="contributeTitle span7">Backed by the following people</h3></div>
 		<div class="backersContent">
 			<span ng-repeat="backer in profile.getBackers()">
 				{{backer}}

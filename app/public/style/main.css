@@ -201,7 +201,7 @@ ul {
 }
 .choice-group.canHaz { 
 	color: #96401E;
-	background: #1e1e1e;
+	background: #0e0e0e;
 }
 .choice-group.canHaz select {
 	background: #181818;
@@ -321,14 +321,18 @@ ul {
 
 .supportRow {
 	line-height: 1.5em; 
-	margin-left: 4.5ex;
+	margin-left: 4.75ex;
 }
 .supportText {
 	margin-left: 1ex;
 	margin-right: 1ex;
 }
+
+.backers {
+	margin-top: 1.5em;
+}
 .backersContent {
-	margin-left: 5ex;
+	margin-left: 5.25ex;
 	margin-bottom: 1em;
 }
 

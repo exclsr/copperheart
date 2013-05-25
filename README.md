@@ -45,13 +45,14 @@ end game
 The first version of Copper Heart will be complete when:
 * The rough draft outlined above is fully realized.
 * Backers can subscribe to a newsletter from members.
-* People can change Stripe accounts and the expected things happen.
 
 The second version of Copper Heart will be complete when:
 * The setup process for installing it on your server is straight-forward and simple.
+* Ideas gathered from conversations around the first version have their say.
 
 A few ideas, in between:
 * Show how close certain needs are to being met (e.g. rent).
+* Show past, present, future projects by members.
 
 authors
 -------

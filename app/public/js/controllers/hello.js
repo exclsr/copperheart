@@ -248,6 +248,25 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return pricePerMonth;
 	};
 
+	$scope.setFrequency = function (thing, freq) {
+
+		angular.forEach($scope.contributions, function (contribution) {
+			if (contribution.id === thing.id) {
+				if (freq === 'once') {
+					contribution.recurring = false;
+				}
+				else {
+					contribution.recurring = true;
+					contribution.frequency = freq;
+				}
+			}
+		});
+	};
+
+	$scope.isEqual = function (a, b) {
+		return a === b;
+	}
+
 	$scope.toContribute = function() {
 		// TODO: Can we $watch on the functions?
 		session.activeContribution.priceNow = $scope.priceNow();

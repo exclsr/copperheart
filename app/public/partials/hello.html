@@ -58,24 +58,52 @@
 		<div class="frequency span3">
 			<div>
 				<div class="freqThing" ng-repeat="thing in contributions">
- 					<label class="choice-group checkbox turnOnRecurring"
- 						ng-class="{ peerSelected: thing.canHaz}" 
- 						ng-hide="thing.recurring">
- 						<input type="checkbox" ng-model="thing.recurring"/>
-						<span>(more than once?)</span>
-					</label>
-
- 					<div class="choice-group checkbox recurring" 
- 						ng-show="thing.recurring" ng-class="{ canHaz: thing.canHaz }">
-						<input type="checkbox" ng-model="thing.recurring"/>
-						<label class="span2 eachWhat">
-							<span>each</span>
-							<select class="span2" ng-model="thing.frequency">
-								<option>month</option>
-								<option>week</option>
-								<option>day</option>
-							</select>
-						</label>
+					<div class="row freq-group" ng-class="{ peerSelected: thing.canHaz}" >
+						<div class="freq-choice" ng-click="setFrequency(thing, 'once')"
+							ng-class="{ 
+								selected: 
+									thing.canHaz &&
+									!thing.recurring
+							}">
+							<div class="heart once">♥</div>
+							<label>once</label>
+						</div>
+						<div class="freq-choice" ng-click="setFrequency(thing, 'month')"
+							ng-class="{ 
+								selected: 
+									thing.canHaz &&
+									thing.recurring && 
+									isEqual(thing.frequency, 'month') 
+							}">
+							<div class="copper heart monthly">♥</div>
+							<label>monthly</label>
+						</div>
+						<div class="freq-choice" ng-click="setFrequency(thing, 'week')"
+						ng-class="{ 
+							selected: 
+								thing.canHaz &&
+								thing.recurring && 
+								isEqual(thing.frequency, 'week') 
+							}">
+							<div class="copper heart">♥</div>
+							<div class="copper heart">♥</div>
+							<div class="copper heart">♥</div>
+							<div class="copper heart">♥</div>
+							<label>weekly</label>
+						</div>
+						<div class="freq-choice" ng-click="setFrequency(thing, 'day')"
+						ng-class="{ 
+							selected: 
+								thing.canHaz &&
+								thing.recurring && 
+								isEqual(thing.frequency, 'day') 
+							}">
+							<div class="copper heart">♥♥♥♥♥</div>
+							<div class="copper heart">♥♥♥♥♥</div>
+							<div class="copper heart">♥♥♥♥♥</div>
+							<div class="copper heart">♥♥♥♥♥</div>
+							<label>daily</label>
+						</div>
 					</div>
 				</div>
 			</div>

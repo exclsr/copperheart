@@ -44,7 +44,14 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		};
 
 		var onThingsReady = function (things) {
-			profile.things = things;
+			var defaultThings = things;
+			// set the default for each thing to be
+			// a monthly contribution.
+			angular.forEach(defaultThings, function (thing) {
+				thing.recurring = true;
+				thing.frequency = "month";
+			});
+			profile.things = defaultThings;
 			maybeSuccess();
 		}
 

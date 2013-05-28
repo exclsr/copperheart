@@ -5,6 +5,10 @@ body {
 	font-size: 12pt;
 	padding: 0;
 }
+.debug {
+	border: solid 1px red;
+}
+
 .btn {
 	font-size: 12pt !important;
 }
@@ -177,7 +181,9 @@ ul {
 	color: black;
 	padding-top: 2em;
 }
-
+.process h3 {
+	color: #222;
+}
 
 .choice-group {
 	border-top: dotted #1c1c1c 1px;
@@ -185,6 +191,7 @@ ul {
 	padding: 2em;
 	padding-left: 2.25em;
 	font-size: 12pt !important;
+	min-width: 300px;
 }
 .choice-group .glyph, .choice-group span {
 	padding-left: 7px;
@@ -218,63 +225,70 @@ ul {
 
 .freq-group {
 	border-top: dotted #1c1c1c 1px;
-	margin: 0 !important;
-	padding-top: 0.15em;
-	padding-bottom: 0.15em;
-	font-size: 10pt !important;
+	margin: 0;
+	padding-top: 1ex;
+	padding-bottom: 0.81ex;
+	min-width: 275px;
 }
 
 .freq-choice {
 	/* TODO: Wraps w/ bootstrap spans */
 	float: left;
-	cursor: pointer;
-	text-align: center;
+	padding-right: 5px;
 	width: 10ex;
+
 	font-size: 10pt;
+	line-height: 1em;
+	text-align: center;
+
+	cursor: default;
 	opacity: 0;
 }
+.freq-choice label {
+	margin: 0;
+	margin-top: -1px;
+	margin-bottom: 1px;
+	padding: 0;
+
+	cursor: default;
+	font-size: 12pt;
+}
+.freq-choice .heart-group {
+	height: 4em;
+}
+.freq-choice.once .heart-group {
+	height: 1.5em;
+	padding-top: 2.5em;
+}
+.freq-choice.monthly .heart-group {
+	height: 2.5em;
+	padding-top: 1.5em;
+}
+
+.freq-choice.selected {
+	opacity: 1.0 !important;
+}
+.peerSelected .freq-choice label {
+	cursor: pointer;
+}
 .peerSelected .freq-choice {
+	cursor: pointer;
 	opacity: 0.1;
 }
 .peerSelected .freq-choice:hover {
 	opacity: 0.8;
 }
-.freq-choice label {
-	margin: 0;
-	margin-top: -3px;
-	margin-bottom: 3px;
-	padding: 0;
-	font-size: 12pt;
-}
-
-.freq-choice .once {
-	padding-top: 2.5em;
-	padding-bottom: 1em;
-	margin-bottom: 1px;
-}
-.freq-choice .monthly {
-	padding-top: 2em;
-	padding-bottom: 1.5em;
-	margin-bottom: 1px;
-}
-.freq-choice.selected {
-	opacity: 1.0 !important;
-}
-
-
-.process select {
-	color: black;
-	background-color: #888;
-}
 
 
 /* Contribution */
-.contributeTitle {
+.contributeTitle, .contributeHowOften {
 	padding-left: 1.85em;
 }
+.hide {
+	visibility: hidden;
+}
 .contributeHearts {
-	
-	padding-left: 2.40em;
+	padding-left: 0.5em;
 }
 .heart, .contributeHearts {
 	font-family: Georgia, Verdana;
@@ -351,11 +365,12 @@ ul {
 .total {
 	margin-top: 1px;
 	padding: 1em; padding-top: 1.3ex;
+
 }
 
-.total p {
-	padding: 2em;
-	padding-left: 0.5ex;
+.totalContainer {
+	padding: 1.97em;
+	padding-left: 1ex;
 	padding-bottom: 0;
 	border-top: dotted #1c1c1c 1px;
 }

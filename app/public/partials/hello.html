@@ -32,7 +32,9 @@
 	<!-- -->
 	<div class="process span12">
 		<div class="row">
-			<h3 class="contributeTitle span7">Contribute</h3>
+			<h3 class="contributeTitle span4">Contribute</h3>
+			<h3 class="contributeTitle span3" 
+			ng-class="{ hide: !canHazContribution() }">How often?</h3>
 			<!-- hearts -->
 			<h3 class="contributeHearts span3">
 				<span ng-repeat="thing in contributions">
@@ -59,23 +61,27 @@
 			<div>
 				<div class="freqThing" ng-repeat="thing in contributions">
 					<div class="row freq-group" ng-class="{ peerSelected: thing.canHaz}" >
-						<div class="freq-choice" ng-click="setFrequency(thing, 'once')"
+						<div class="freq-choice once" ng-click="setFrequency(thing, 'once')"
 							ng-class="{ 
 								selected: 
 									thing.canHaz &&
 									!thing.recurring
 							}">
-							<div class="heart once">♥</div>
+							<div class="heart-group">
+								<div class="heart">♥</div>
+							</div>
 							<label>once</label>
 						</div>
-						<div class="freq-choice" ng-click="setFrequency(thing, 'month')"
+						<div class="freq-choice monthly" ng-click="setFrequency(thing, 'month')"
 							ng-class="{ 
 								selected: 
 									thing.canHaz &&
 									thing.recurring && 
 									isEqual(thing.frequency, 'month') 
 							}">
-							<div class="copper heart monthly">♥</div>
+							<div class="heart-group">
+								<div class="copper heart">♥</div>
+							</div>
 							<label>monthly</label>
 						</div>
 						<div class="freq-choice" ng-click="setFrequency(thing, 'week')"
@@ -85,10 +91,12 @@
 								thing.recurring && 
 								isEqual(thing.frequency, 'week') 
 							}">
-							<div class="copper heart">♥</div>
-							<div class="copper heart">♥</div>
-							<div class="copper heart">♥</div>
-							<div class="copper heart">♥</div>
+							<div class="heart-group">
+								<div class="copper heart heart-row">♥</div>
+								<div class="copper heart heart-row">♥</div>
+								<div class="copper heart heart-row">♥</div>
+								<div class="copper heart heart-row">♥</div>
+							</div>
 							<label>weekly</label>
 						</div>
 						<div class="freq-choice" ng-click="setFrequency(thing, 'day')"
@@ -98,10 +106,12 @@
 								thing.recurring && 
 								isEqual(thing.frequency, 'day') 
 							}">
-							<div class="copper heart">♥♥♥♥♥</div>
-							<div class="copper heart">♥♥♥♥♥</div>
-							<div class="copper heart">♥♥♥♥♥</div>
-							<div class="copper heart">♥♥♥♥♥</div>
+							<div class="heart-group">
+								<div class="copper heart heart-row">♥♥♥♥♥</div>
+								<div class="copper heart heart-row">♥♥♥♥♥</div>
+								<div class="copper heart heart-row">♥♥♥♥♥</div>
+								<div class="copper heart heart-row">♥♥♥♥♥</div>
+							</div>
 							<label>daily</label>
 						</div>
 					</div>
@@ -110,16 +120,22 @@
 		</div>
 
 		<div class="total span3">
-			<p>You've selected things that come to <strong>{{priceNow() | currency}}</strong> now, and
-			{{pricePerMonth() | currency}} each month after that.</p>
-			<div id="contributeButton">
-				<button class="btn" ng-click="toContribute()">Contribute</button>
+			<div class="totalContainer">
+				<div ng-class="{ hide: !canHazContribution() }">
+					<p>You've selected things that come to <strong>{{priceNow() | currency}}</strong> now, and
+					{{pricePerMonth() | currency}} each month after that.</p>
+					<div id="contributeButton">
+						<button class="btn btn-inverse" ng-click="toContribute()">Contribute</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 
 	<div class="support span12">
-		<div class="row"><h3 class="contributeTitle span7">Supported by the following monthly contributions</h3></div>
+		<div class="row">
+			<h3 class="contributeTitle span7">Supported by the following monthly contributions</h3>
+		</div>
 		<div class="supportRow" ng-repeat="thing in profile.getSupport()">
 			<span class="supportText">A {{thing.unit}} of {{thing.name}}.</span>
 			<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>

@@ -203,6 +203,18 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return member.backers;
 	};
 
+	$scope.canHazContribution = function () {
+		var canHaz = false;
+
+		angular.forEach($scope.contributions, function (thing) {
+			if (thing.canHaz) {
+				canHaz = true;
+			}
+		});
+
+		return canHaz;
+	};
+
 	var perMonthMultiplier = function (frequency) {
 		switch (frequency) {
 			case 'day': 
@@ -265,7 +277,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	$scope.isEqual = function (a, b) {
 		return a === b;
-	}
+	};
 
 	$scope.toContribute = function() {
 		// TODO: Can we $watch on the functions?

@@ -1,14 +1,43 @@
 'use strict';
 
 /* jasmine specs for controllers go here */
+beforeEach(module('myApp.services'));
 
-describe('MyCtrl1', function(){
-  var myCtrl1;
+describe('HelloCtrl', function(){
 
-  beforeEach(function(){
-    myCtrl1 = new MyCtrl1();
-  });
+  var scope;
+  var ctrl;
+  var $httpBackend;
 
+  beforeEach(inject(function($injector, $rootScope, $controller) {
+    $httpBackend = $injector.get('$httpBackend');
+    $httpBackend.when('GET', '/who/phil')
+    .respond({
+      name: "Phil",
+      present: "<p>Hi.</p>",
+      passions: ['good', 'things'],
+      communities: ['copper', 'heart']
+    });
+
+    $httpBackend.when('GET', '/things/phil?n=4')
+    .respond([]);
+
+    $httpBackend.when('GET', '/contributions/phil')
+    .respond([]);
+
+    $httpBackend.when('GET', '/support/phil')
+    .respond({});
+
+    $httpBackend.when('GET', '/support/phil/names')
+    .respond([]);
+
+    scope = $rootScope.$new();
+    ctrl = $controller(HelloCtrl, 
+      {
+        $scope: scope
+      });
+    
+  }));
 
   it('should ....', function() {
     //spec body
@@ -16,16 +45,17 @@ describe('MyCtrl1', function(){
 });
 
 
-describe('MyCtrl2', function(){
-  var myCtrl2;
+// TODO: Test all the controllers.
+// describe('ContributeCtrl', function(){
+//   var contribute;
 
 
-  beforeEach(function(){
-    myCtrl2 = new MyCtrl2();
-  });
+//   beforeEach(function(){
+//     contribute = new ContributeCtrl(session);
+//   });
 
 
-  it('should ....', function() {
-    //spec body
-  });
-});
+//   it('should ....', function() {
+//     //spec body
+//   });
+// });

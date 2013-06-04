@@ -7,13 +7,24 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	var member = {};
 	session.pageName = "hello";
 
+	var redirectToEntrance = function (reason) {
+		// called in failure situations.
+		console.log(reason);
+		$location.path('/entrance');
+	};
+
 	// TODO: Rename to something related to binding
 	// to route params, as that's what we're really doing.
-	var initialize = function (success) {
+	var initialize = function (success, failure) {
 
 		var hadSuccess = false;
-		var defaultProfileName = "phil"; // TODO: Will be going away, soon.
-		profile.username = $routeParams.who || defaultProfileName;
+		
+		if (!$routeParams.who) {
+			failure("Someone didn't tell us the username of the profile to show.");
+			return;
+		}
+		
+		profile.username = $routeParams.who;
 
 		var isInitialized = function () {
 			return profile
@@ -176,9 +187,12 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		});
 	};
 
-	initialize(function() {
-		loadSession(bindToSession);
-	});
+	initialize(
+		function() {
+			loadSession(bindToSession);
+		}, 
+		redirectToEntrance
+	);
 
 	//-----------------------------------------------------------
 	// $scope things

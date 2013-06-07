@@ -29,6 +29,13 @@ var database = {
 	securePort: process.env.DB_SECURE_PORT || 5984
 };
 
+// can be passed directly into connect-redis
+var redis = {
+	host: process.env.REDIS_HOST || "localhost",
+	port: process.env.REDIS_PORT,
+	pass: process.env.REDIS_PASSWORD
+};
+
 var stripePublicTest = process.env.STRIPE_PUBLIC_TEST || 'missing stripe public key';
 var stripePublicLive = process.env.STRIPE_PUBLIC_LIVE || 'missing stripe public key';
 var stripeApiTest  = process.env.STRIPE_API_TEST || 'missing stripe api key';
@@ -85,6 +92,10 @@ exports.entranceUsernames = function() {
 exports.database = function() {
 	return overrides.database || database;
 };
+
+exports.redis = function() {
+	return overrides.redis || redis;
+}
 
 exports.port = function() {
 	return overrides.port || port;

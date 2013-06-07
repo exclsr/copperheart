@@ -12,7 +12,8 @@ var express = require('express')
 	, config  = require('./config.js')
 	, auth    = require('./lib/auth.js')
 	, db      = require('./lib/database.js').db
-	, qs      = require('querystring');
+	, qs      = require('querystring')
+	, redis   = require('connect-redis')(express);
 
 var apiKey;
 if (config.isProduction()) {
@@ -36,7 +37,22 @@ app.configure(function(){
 	// Required for auth:
 	// TODO: Consolidate these things somewhere appropriate.
 	app.use(express.cookieParser());
+});
+
+app.configure('production', function() {
+	app.use(express.session(
+	{
+		store: new redis(config.redis()),
+		secret: config.sessionSecret()
+	}));
+});
+
+app.configure('development', function(){
 	app.use(express.session({ secret: config.sessionSecret() }));
+	app.use(express.errorHandler());
+});
+
+app.configure(function() {
 	app.use(auth.initialize());
 	app.use(auth.session());
 	// end-required for auth.
@@ -44,9 +60,7 @@ app.configure(function(){
 	app.use(app.router);
 });
 
-app.configure('development', function(){
-	app.use(express.errorHandler());
-});
+
 
 app.get('/config/stripe-api-key', function (req, res) {
 	if (config.isProduction()) {

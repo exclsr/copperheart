@@ -542,7 +542,9 @@ app.get('/profile/:username', function (req, res) {
 app.get('/profile/:username/image', function (req, res) {
 	db.profileImages.get(req.params.username, res, function (err) {
 		if (err) {
-			res.send(404);
+			// We don't have to do anything, here, as the db
+			// pipe takes care of it. Log if you want.
+			// res.send(404);
 		}
 	});
 });

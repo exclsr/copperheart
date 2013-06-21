@@ -12,8 +12,10 @@ function TopLevelCtrl(session, $scope, $http) {
 			// TODO: Put role stuff in database and get via /whoami
 			$http.get('/whoami/role')
 			.success(function (role) {
-				patron.role = role;
 				session.patron = patron;
+				if ($scope.isSignedIn()) {
+					session.patron.role = role;
+				}
 			})
 			.error(function() {
 				session.patron = patron;

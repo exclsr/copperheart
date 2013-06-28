@@ -77,6 +77,8 @@ function EditCtrl(session, $scope, $http) {
 		who.name = $scope.name;
 		who.present = $scope.present;
 
+		// TODO: This maybe creates an extra record in the database
+		// the first time this is called.
 		var putWho = $http.put('/patron/who', who);
 		putWho.success(function (data) {
 			success();

@@ -359,6 +359,8 @@ var db = function (dbConfig) {
 				createViews();
 			}
 			else {
+				// TODO: Database creation isn't working on OS X.
+				// View creation works fine, however.
 				cradleDb.create();
 				createViews();
 			}

@@ -5,10 +5,11 @@
 //
 var cradle = require('cradle');
 var nano = require('nano');
-var config  = require('../config.js');
+var defaultConfig  = require('../config.js').database();
 
-var db = function (dbConfig) {
+var db = function (config) {
 
+	var dbConfig = config || defaultConfig;
 	var couchHost = dbConfig.host || 'http://localhost';
 	var couchPort = dbConfig.port || 5984;
 	var databaseName = dbConfig.name || 'sandbox';
@@ -667,6 +668,6 @@ var db = function (dbConfig) {
 			save : saveContribution
 		}
 	};
-}(config.database()); // closure
+};
 
 exports.db = db;

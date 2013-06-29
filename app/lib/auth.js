@@ -5,7 +5,7 @@
 //
 var passport = require('passport')
   , GoogleStrategy = require('passport-google').Strategy
-  , db = require('./database.js').db;
+  , db = require('./database.js').db();
 
 var allowedUsers = []; // TODO: Get from db
 

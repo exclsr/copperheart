@@ -11,7 +11,7 @@ var express = require('express')
 	, path    = require('path')
 	, config  = require('./config.js')
 	, auth    = require('./lib/auth.js')
-	, db      = require('./lib/database.js').db
+	, db      = require('./lib/database.js').db()
 	, qs      = require('querystring')
 	, redis   = require('connect-redis')(express);
 

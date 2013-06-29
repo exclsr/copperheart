@@ -1163,5 +1163,9 @@ http.createServer(app).listen(app.get('port'), function(){
 		mode = "production";
 	}
 	console.log("Mode: " + mode);
+	db.init(function () {
+		// TODO: Maybe show an error if things failed.
+		console.log("Database: Ready");
+	});
 
 });

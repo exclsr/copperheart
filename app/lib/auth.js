@@ -182,6 +182,9 @@ var authMiddleware = function(req, res, next) {
 	middleware(req, res, next);
 };
 
+// TODO: This should probably be refactored away, by using
+// dependency injection.
+db.init();
 
 exports.firstRun = firstRun;
 exports.authMiddleware = authMiddleware;

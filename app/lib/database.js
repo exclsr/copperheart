@@ -80,7 +80,7 @@ var db = function (config) {
 	// }
 	var nanoDb = nano(dbUrl);
 	
-	var getCookieToken = function () {
+	var getCookieToken = function (callback) {
 		nanoDb.auth(dbConfig.username, dbConfig.password, 
 			function (err, body, headers) {
 				if (err) {
@@ -89,25 +89,81 @@ var db = function (config) {
 					return;
 				}
 				handleNewCouchCookie(headers);
+				callback();
 			}
 		);
 	};
 
-	if (dbConfig.useAuthentication) {
-		getCookieToken();
-	}
-	else {
-		database = nano({
-			url: dbUrl
-		}).use(databaseName);
-	}
+	var keepDatabaseServerActive = function() {
+		// So, our database host likes to go to sleep if it feels
+		// there is nothing important to do, resulting in 50-second
+		// response times, or in some cases timing out after a minute,
+		// and giving us 500 errors.
+		var relax = function() {
+			var opts = {
+				db: databaseName,
+				path: '/'
+			};
+
+			nanoDb.relax(opts, function (error, response, headers) {
+				if (error) { 
+					// don't care?
+				}
+				else {
+					handleNewCouchCookie(headers);
+				}
+			});
+		};
+
+		var fiveMinutes = 5 * 60 * 1000;
+		setInterval(relax, fiveMinutes);
+	};
+
+	var establishDatabaseConnection = function (callback) {
+
+		var ready = function() {
+			keepDatabaseServerActive();
+			if (callback) {
+				callback();
+			}
+		}
+
+		if (dbConfig.useAuthentication) {
+			getCookieToken(ready);
+		}
+		else {
+			console.log('establishDatabaseConnection');
+			database = nano({
+				url: dbUrl
+			}).use(databaseName);
+			ready();
+		}
+	};
 
 
 	var getContributionId = function (backerId, memberId) {
 		return backerId + "-" + memberId;
 	};
 
-	var createViews = function() {
+
+	var createViews = function (callback) {
+
+		var isDesignDocReady = {
+			profiles: false,
+			patrons: false,
+			things: false,
+			contributions: false
+		};
+
+		var maybeReady = function (readyDocName) {
+			isDesignDocReady[readyDocName] = true;
+			for (doc in isDesignDocReady) {
+				if (!isDesignDocReady[doc]) {
+					return;
+				}
+			}
+			callback();
+		};
 
 		// TODO: 'profiles' isn't quite right, maybe.
 		// Also, the attachments are a work in progress.
@@ -142,7 +198,13 @@ var db = function (config) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				cradleDb.save(profilesDesignDoc.url, profilesDesignDoc.body); 
+				cradleDb.save(profilesDesignDoc.url, profilesDesignDoc.body, 
+					function() {
+						maybeReady("profiles");
+					}); 
+			}
+			else {
+				maybeReady("profiles");
 			}
 		});
 
@@ -209,7 +271,14 @@ var db = function (config) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				cradleDb.save(patronsDesignDoc.url, patronsDesignDoc.body); 
+				cradleDb.save(patronsDesignDoc.url, patronsDesignDoc.body, 
+					function() {
+						maybeReady("patrons");
+					}
+				); 
+			}
+			else {
+				maybeReady("patrons");
 			}
 		});
 
@@ -242,7 +311,14 @@ var db = function (config) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				cradleDb.save(thingsDesignDoc.url, thingsDesignDoc.body); 
+				cradleDb.save(thingsDesignDoc.url, thingsDesignDoc.body,
+					function() {
+						maybeReady("things");
+					}
+				); 
+			}
+			else {
+				maybeReady("things");
 			}
 		});
 
@@ -343,12 +419,19 @@ var db = function (config) {
 				// TODO: Add a mechanism for knowing when views
 				// themselves have updated, to save again at the
 				// appropriate times.
-				cradleDb.save(contributionsDesignDoc.url, contributionsDesignDoc.body); 
+				cradleDb.save(contributionsDesignDoc.url, contributionsDesignDoc.body, 
+					function() {
+						maybeReady("contributions");
+					}
+				); 
+			}
+			else {
+				maybeReady("contributions");
 			}
 		});
 	};
 
-	var createDatabaseAndViews = function() {
+	var createDatabaseAndViews = function (callback) {
 		// Create database! We use cradle to create
 		// our database and views, as it's a little
 		// easier than via nano.
@@ -357,13 +440,12 @@ var db = function (config) {
 				throw (err);
 			}
 			else if (exists) {
-				createViews();
+				createViews(callback);
 			}
 			else {
-				// TODO: Database creation isn't working on OS X.
-				// View creation works fine, however.
-				cradleDb.create();
-				createViews();
+				nanoDb.db.create(databaseName, function() {
+					createViews(callback);
+				});
 			}
 		});
 	};
@@ -615,35 +697,22 @@ var db = function (config) {
 		getPatronByUsername(username, gotPatron, failure);
 	};
 
-	var keepDatabaseServerActive = function() {
-		// So, our database host likes to go to sleep if it feels
-		// there is nothing important to do, resulting in 50-second
-		// response times, or in some cases timing out after a minute,
-		// and giving us 500 errors.
-		var relax = function() {
-			var opts = {
-				db: databaseName,
-				path: '/'
-			};
-
-			nanoDb.relax(opts, function (error, response, headers) {
-				if (error) { 
-					// don't care?
-				}
-				else {
-					handleNewCouchCookie(headers);
-				}
-			});
-		};
-
-		var fiveMinutes = 5 * 60 * 1000;
-		setInterval(relax, fiveMinutes);
+	var doInit = function (callback) {
+		createDatabaseAndViews(function() {
+			establishDatabaseConnection(callback);
+		});
 	};
 
-	createDatabaseAndViews();
-	keepDatabaseServerActive();
+	// TODO: This is only for testing. Where should this code be?
+	var doDestroy = function (callback) {
+		nanoDb.db.destroy(databaseName, callback);
+	};
 
 	return {
+		init : doInit,
+		onlyForTest : {
+			destroy : doDestroy
+		},
 		profileImages : {
 			get : getProfileImageByUsername
 		},

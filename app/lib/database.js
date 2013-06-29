@@ -132,7 +132,6 @@ var db = function (config) {
 			getCookieToken(ready);
 		}
 		else {
-			console.log('establishDatabaseConnection');
 			database = nano({
 				url: dbUrl
 			}).use(databaseName);
@@ -567,17 +566,21 @@ var db = function (config) {
 					// existingPatron = existingPatron[0];
 
 					// Update the existing contribution.
+					patron._id = existingPatron._id;
 					patron._rev = existingPatron._rev;
-					database.insert(patron, 
-					function (error, response, headers) {
-						if (error) {
-							failure(error);
-						} 
-						else {
-							handleNewCouchCookie(headers);
-							success();
+					
+					database.insert(
+						patron, 
+						function (error, response, headers) {
+							if (error) {
+								failure(error);
+							} 
+							else {
+								handleNewCouchCookie(headers);
+								success();
+							}
 						}
-					});
+					);
 				}
 			},
 			failure

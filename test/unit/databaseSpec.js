@@ -13,31 +13,32 @@ var testDbConfig = {
 };
 
 var db;
+var patronEmail;
+var patron;
 
 beforeEach(function() {
 	db = require('../../app/lib/database.js').db(testDbConfig);
+	patronEmail = 'email@domain.com';
+	patron = {
+		id: 'this-is-some@id',
+		email: patronEmail,
+		username: 'dontcare',
+		backers: {},
+		backing: {}
+	}
 });
 
 afterEach(function (done) {
 	db.onlyForTest.destroy(done);
 });
 
+var error = function (error) {
+	if (error) throw error;
+}
+
 describe('Database', function(){
+
 	it('can save and get patrons', function (done) {
-
-		var patronEmail = 'email@domain.com';
-		var patron = {
-			id: 'this-is-some@id',
-			email: patronEmail,
-			username: 'dontcare',
-			backers: {},
-			backing: {}
-		};
-
-		var handleError = function (error) {
-			if (error) throw error;
-		}
-
 		db.init(function() {
 			db.patrons.save(patron, 
 				function() {
@@ -47,11 +48,57 @@ describe('Database', function(){
 						assert.equal(savedPatron.username, patron.username, "patron username");
 						done();
 					}, 
-					handleError);
+					error);
 				},
-				handleError
+				error
 			);
 		});
 	});
-	
+
+	it('can update patrons', function (done) {
+
+		var updatePatronAgain = function () {
+			patron.name = "second-update";
+			db.patrons.save(patron,
+				function() {
+					db.patrons.get(patron.email,
+						function (patronData) {
+							assert.equal(patron.name, patronData.name, "patron name not updated (2nd)");
+							done();
+						},
+						error
+					);
+				},
+				error);
+		};
+
+		var updatePatron = function() {
+			patron.name = "first-update";
+			patron.backers = {
+				"first": "first",
+				"update": "update"
+			};
+			db.patrons.save(patron, 
+				function() {
+					db.patrons.get(patron.email, 
+						function (patronData) {
+							assert.equal(patron.name, patronData.name, "patron name not updated");
+							assert.equal(patron.backers[0], patronData.backers[0], "patron backers not updated");
+							assert.equal(patron.backers[1], patronData.backers[1], "patron backers not updated");
+							updatePatronAgain();
+						}, 
+						error
+					);
+				},
+			error);
+		};
+
+		db.init(function() {
+			db.patrons.save(patron, 
+				updatePatron,
+				error
+			);
+		});
+	});
+
 });

@@ -53,7 +53,7 @@ app.configure('development', function(){
 });
 
 app.configure(function() {
-	app.use(auth.initialize());
+	app.use(auth.initialize(db));
 	app.use(auth.session());
 	// end-required for auth.
 	app.use(express.methodOverride());

@@ -4,9 +4,9 @@
 // The thing that knows about authentication.
 //
 var passport = require('passport')
-  , GoogleStrategy = require('passport-google').Strategy
-  , db = require('./database.js').db();
+  , GoogleStrategy = require('passport-google').Strategy;
 
+var db = undefined;
 var allowedUsers = []; // TODO: Get from db
 
 var googleReturnUrl = '/auth/google/return';
@@ -182,15 +182,12 @@ var authMiddleware = function(req, res, next) {
 	middleware(req, res, next);
 };
 
-// TODO: This should probably be refactored away, by using
-// dependency injection.
-db.init();
-
 exports.firstRun = firstRun;
 exports.authMiddleware = authMiddleware;
 exports.googleReturnUrl = googleReturnUrl;
 
-exports.initialize = function() {
+exports.initialize = function(database) {
+	db = database;
 	return passport.initialize();
 };
 exports.session = function() {

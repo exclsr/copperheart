@@ -50,16 +50,17 @@ var db = function (config) {
 
 	// TODO: This initializes our database. Should
 	// rename the method.
+	var cookieToken;
 	var handleNewCouchCookie = function (headers) {
 		var dbUrl = couchHost + ':' + couchPort;
-		var cookieToken;
 
 		if (headers && headers['set-cookie']) {
 			cookieToken = headers['set-cookie'];
 		}
 
 		// TODO: do we want this useAuth flag?
-		if (dbConfig.useAuthentication && cookieToken) {
+		if ((dbConfig.useAuthentication || dbConfig.useCookies) 
+			&& cookieToken) {
 			database = nano({
 				url: dbUrl,
 				cookie: cookieToken
@@ -85,13 +86,49 @@ var db = function (config) {
 			function (err, body, headers) {
 				if (err) {
 					// TODO: Freak out.
+					console.log("Failed to get cookie token");
 					console.log(err);
 					return;
 				}
 				handleNewCouchCookie(headers);
-				callback();
+				if (callback) {
+					callback();
+				}
 			}
 		);
+	};
+
+	// Connect to the database, callback with the response.
+	// Can be useful for debugging.
+	var doRelax = function (callback) {
+		var headers = {
+			"X-CouchDB-WWW-Authenticate": "Cookie",
+			cookie: cookieToken
+		}
+
+		var opts = {
+			db: databaseName,
+			path: '',
+			headers: headers
+		};
+
+		nanoDb.relax(opts, function (error, response, headers) {
+			if (error) {
+				if (error['status-code'] === 401) {
+					// Unauthorized. 
+					// TODO: Review logs to see if we need this.
+					console.log("Called reauth from relax.");
+					getCookieToken();
+				}
+			}
+			else {
+				handleNewCouchCookie(headers);
+			}
+
+			if (callback) {
+				callback(error, response, headers);
+			}
+		});
 	};
 
 	var keepDatabaseServerActive = function() {
@@ -99,24 +136,19 @@ var db = function (config) {
 		// there is nothing important to do, resulting in 50-second
 		// response times, or in some cases timing out after a minute,
 		// and giving us 500 errors.
-		var relax = function() {
-			var opts = {
-				db: databaseName,
-				path: '/'
-			};
-
-			nanoDb.relax(opts, function (error, response, headers) {
-				if (error) { 
-					// don't care?
-				}
-				else {
-					handleNewCouchCookie(headers);
-				}
-			});
-		};
 
 		var fiveMinutes = 5 * 60 * 1000;
-		setInterval(relax, fiveMinutes);
+		setInterval(doRelax, fiveMinutes);
+
+		var reauth = function() {
+			getCookieToken();
+		};
+
+		// Reauthorize with the server every twelve hours.
+		// TODO: This is obviously a bad design. Get a handle
+		// on what is actually happening.
+		var twelveHours = 12 * 60 * 60 * 1000;
+		setInterval(reauth, twelveHours);
 	};
 
 	var establishDatabaseConnection = function (callback) {
@@ -128,7 +160,7 @@ var db = function (config) {
 			}
 		}
 
-		if (dbConfig.useAuthentication) {
+		if (dbConfig.useAuthentication || dbConfig.useCookies) {
 			getCookieToken(ready);
 		}
 		else {
@@ -712,6 +744,7 @@ var db = function (config) {
 	};
 
 	return {
+		relax: doRelax,
 		init : doInit,
 		onlyForTest : {
 			destroy : doDestroy

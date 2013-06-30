@@ -1149,6 +1149,18 @@ app.post('/stripe/webhook', function (req, res) {
 	res.send("<3");
 });
 
+// TODO: Make this dev only
+// app.get('/relax', function (req, res) {
+// 	db.relax(function (error, response, headers) {
+// 		if (error) {
+// 			res.send(error);
+// 		}
+// 		else {
+// 			res.send(response);
+// 		}
+// 	});
+// });
+
 // Lastly ...
 // This needs to be at the bottom, so things like
 // /whoami, /card or /contributions still work.

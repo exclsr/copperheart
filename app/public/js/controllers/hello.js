@@ -51,6 +51,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			profile.present = who.present;
 			profile.passions = who.passions;
 			profile.communities = who.communities;
+			profile.imageUrl = "/profile/" + profile.username + "/image";
 			maybeSuccess();
 		};
 
@@ -222,6 +223,9 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 	$scope.profile.getBackers = function() {
 		return member.backers;
+	};
+	$scope.profile.getImageUrl = function() {
+		return profile.imageUrl;
 	};
 
 	$scope.canHazContribution = function () {

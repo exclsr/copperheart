@@ -4,7 +4,11 @@
 <div class="view">
 <div class="profile span12">
 	<div class="whoContainer span12">
+		
 		<div class="who span6">
+			<div class="whoImageContainer">
+				<img id="whoImage" ng-src="{{profile.getImageUrl()}}" width="215"/>
+			</div>
 			<h3 id="whoName">{{profile.getName()}}</h3>
 			<div id="whoPresent" ng-bind-html="profile.getPresent()">
 			</div>

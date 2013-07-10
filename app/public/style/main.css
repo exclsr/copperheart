@@ -175,7 +175,15 @@ ul {
 #whoName {
 	/*color: #96401E;*/
 }
-
+.whoImageContainer {
+	float: left;
+}
+#whoImage {
+	padding: 10px;
+	padding-left: 0;
+	padding-right: 1em;
+	padding-top: 20px;
+}
 
 .process {
 	color: black;

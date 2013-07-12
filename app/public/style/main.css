@@ -187,6 +187,11 @@ ul {
 .whoContainer, .projectContainer, .whoStuffContainer {
 	height: 100%;
 }
+.projectContainer {
+	background-color: #666;
+	color: white;
+}
+
 .whoStuffContainer {
 	background-color: white;
 }
@@ -221,14 +226,6 @@ ul {
 	margin-left: 3em;
 }
 
-.details {
-	background-color: #333;
-	color: white;
-/*
-	padding: 5em;
-	padding-top: 1em;
-	padding-left: 2.5em;*/
-}
 .photoCredit {
 	text-align: right;
 	font-size: 10pt;

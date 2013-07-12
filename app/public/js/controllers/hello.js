@@ -13,6 +13,14 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		$location.path('/entrance');
 	};
 
+	var paths = $location.path().split('/')
+	if (paths.indexOf("community") > 0) {
+		$scope.hack = true;
+	}
+	else {
+		$scope.hack = false;
+	}
+
 	// TODO: Rename to something related to binding
 	// to route params, as that's what we're really doing.
 	var initialize = function (success, failure) {
@@ -224,9 +232,21 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	$scope.profile.getBackers = function() {
 		return member.backers;
 	};
+
+	$scope.profile.getHelloUrl = function() {
+		return '#/hello/' + profile.username;
+	}
 	$scope.profile.getImageUrl = function() {
 		return profile.imageUrl;
 	};
+	$scope.profile.getBackgroundUrl = function() {
+		return '#/hello/' + profile.username + '/background';
+	};
+	$scope.profile.getCommunityUrl = function (community) {
+		var communityIndex = profile.communities.indexOf(community);
+		return "#/hello/" + profile.username + '/community/' + communityIndex;
+	};
+
 
 	$scope.canHazContribution = function () {
 		var canHaz = false;

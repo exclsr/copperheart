@@ -3,35 +3,86 @@
 
 <div class="view">
 <div class="profile span12">
-	<div class="whoContainer span12">
-		
-		<div class="who span6">
-			<div class="whoImageContainer">
-				<img id="whoImage" ng-src="{{profile.getImageUrl()}}" width="215"/>
-			</div>
-			<h3 id="whoName">{{profile.getName()}}</h3>
-			<div id="whoPresent" ng-bind-html="profile.getPresent()">
+
+	<div class="whatContainer">
+		<div class="helloContainer projectContainer span11 row" ng-show="hack">
+			<div class="details row" style="margin: 0">
+				<div class="span6" style="margin: 0; box-sizing: border-box;
+					padding-left: 1.4em; padding-right: 1.4em">
+					<h3>{{profile.getCommunities()[0].name}}</h3>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque cursus fermentum mi, non hendrerit est venenatis id. Sed massa magna, sodales non scelerisque eu, venenatis ut tellus. Phasellus volutpat porta tellus non vestibulum.</p> 
+
+					<p>Cras adipiscing tortor non posuere tincidunt. Morbi a risus consectetur, sagittis ligula nec, fringilla nibh. Duis dignissim pharetra lorem non ullamcorper. Duis eleifend odio at mauris ultricies, at hendrerit elit mollis. Morbi pretium erat id venenatis rhoncus. Nam lobortis risus ut rhoncus mollis.</p>
+
+					<p>Cras adipiscing tortor non posuere tincidunt. Morbi a risus consectetur.</p>
+
+					<!-- <div>abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz</div> -->
+				</div>
+
+				<div class="span5" style="margin: 0; margin-top: 0.5em">
+					<img src="http://placekitten.com/g/1250/625" 
+						class="img-polaroid" 
+						style="background-color: #ccc"/>
+					<div class="photoCredit">photo credit: yes</div>
+				</div>
 			</div>
 		</div>
-		
-		<div class="projects span4">
-			<h3>Communities</h3>
-			<ul>
-				<!-- TODO: Is data binding to the href based on 
-					 user input an injection-attack issue? -->
-				<li ng-repeat="community in profile.getCommunities()">
-					<a href="{{community.url}}">{{community.name}}</a>
-				</li>
-			</ul>
 
-			<!-- TODO: Have a list of past projects in here, somehow. -->
+		<div class="whoContainer span12" ng-hide="hack">
+			<div class="span3 whoStuffContainer">
+				<div class="whoImageContainer">
+					<img id="whoImage" ng-src="{{profile.getImageUrl()}}"/>
+				</div>
+				
+				<div style="text-align: center">
+					<div id="whoName">{{profile.getName()}}</div>
+				</div>
+			</div>
 
-			<h3>Passions</h3>
-			<ul>
-				<li ng-repeat="passion in profile.getPassions()">{{passion}}</li>
-			</ul>
+			<div class="who span5" style="margin-left: 0">
+				<h3>Hello</h3>
+				<div id="whoPresent" ng-bind-html="profile.getPresent()">
+				</div>
+			</div>
+			
+			<div class="projects span3">
+				<h3>Communities</h3>
+				<ul>
+					<li ng-repeat="community in profile.getCommunities()">
+						<a href="{{profile.getCommunityUrl(community)}}">{{community.name}}</a>
+					</li>
+				</ul>
+
+				<!-- TODO: Have a list of past projects in here, somehow. -->
+			</div>
 		</div>
 	</div>
+
+	<div class="helloContainer span11 row clear: left" style="margin-top: 0;">
+		<div>
+			<div>
+				<ul class="communityNav">
+					<!-- TODO: Use ng-click to not hit the server -->
+					<li>
+						<a href="{{profile.getBackgroundUrl()}}"><img src="/img/arrow-left.png" class="backgroundArrow"/></a>
+						<a href="{{profile.getBackgroundUrl()}}">background</a>
+					</li>
+					<li>
+						<a href="{{profile.getHelloUrl()}}">
+						<img src="http://placekitten.com/g/70/50"/></a></li>
+					<li ng-repeat="community in profile.getCommunities()">
+						<a href="{{profile.getCommunityUrl(community)}}">
+							<img src="http://placekitten.com/50/50"/>
+						</a>
+					</li>
+					<li>
+						<a href="{{profile.getBackgroundUrl()}}">future plans</a>
+						<a href="{{profile.getBackgroundUrl()}}"><img src="/img/arrow-right.png" class="backgroundArrow"/></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>	
 
 	<!-- -->
 	<div class="process span12">

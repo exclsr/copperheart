@@ -5,6 +5,10 @@ body {
 	font-size: 12pt;
 	padding: 0;
 }
+html, body, .container, .angularView, .view, .profile {
+	height: 100%;
+}
+
 .debug {
 	border: solid 1px red;
 }
@@ -164,11 +168,30 @@ ul {
 	padding-top: 1ex;
 	height: 100%;
 }
+.who {
+	box-sizing: border-box;
+	padding: 2em;
+	padding-top: 1ex;
+}
 .projects {
 	background: #f3f3f3;
+	margin-left: 0;
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+.whatContainer {
+	height: 320px;
+	margin-bottom: 1.4em;
+}
+
+.whoContainer, .projectContainer, .whoStuffContainer {
+	height: 100%;
+}
+.whoStuffContainer {
+	background-color: white;
 }
 .whoContainer {
-	height: 300px;
+/*	background-color: white;*/
 }
 
 
@@ -176,14 +199,60 @@ ul {
 	/*color: #96401E;*/
 }
 .whoImageContainer {
-	float: left;
+	padding: 1em;
+	padding-top: 1.5em;
 }
 #whoImage {
 	padding: 10px;
 	padding-left: 0;
 	padding-right: 1em;
 	padding-top: 20px;
+	padding: 0;
+	width: 100%;
 }
+.backgroundArrow {
+	width: 16px;
+	opacity: 0.5;
+	vertical-align: top;
+	margin-top: 0.4ex;
+}
+
+.helloContainer {
+	margin-left: 3em;
+}
+
+.details {
+	background-color: #333;
+	color: white;
+/*
+	padding: 5em;
+	padding-top: 1em;
+	padding-left: 2.5em;*/
+}
+.photoCredit {
+	text-align: right;
+	font-size: 10pt;
+}
+
+
+.communityNav {
+	margin-right: auto; 
+	margin-left: auto; 
+	text-align: center;
+}
+
+.communityNav li {
+	display: inline-block;
+	margin-right: 1.3ex;
+}
+
+.communityNav > li > a {
+	color: #aaa;
+}
+.communityNav > li > a:hover {
+	color: #222;
+}
+
 
 .process {
 	color: black;

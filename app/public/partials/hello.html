@@ -5,10 +5,10 @@
 <div class="profile span12">
 
 	<div class="whatContainer">
-		<div class="helloContainer projectContainer span11 row" ng-show="hack">
+		<div class="helloContainer projectContainer span11 row" ng-show="getCommunity()">
 			<div class="span6" style="margin: 0; box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
-				<h3>{{profile.getCommunities()[0].name}}</h3>
+				<h3>{{getCommunity().name}}</h3>
 
 				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque cursus fermentum mi, non hendrerit est venenatis id. Sed massa magna, sodales non scelerisque eu, venenatis ut tellus. Phasellus volutpat porta tellus non vestibulum.</p> 
 
@@ -25,7 +25,7 @@
 			</div>
 		</div>
 
-		<div class="whoContainer span12" ng-hide="hack">
+		<div class="whoContainer span12" ng-hide="getCommunity()">
 			<div class="span3 whoStuffContainer">
 				<div class="whoImageContainer">
 					<img id="whoImage" ng-src="{{profile.getImageUrl()}}"/>
@@ -66,9 +66,10 @@
 					</li>
 					<li>
 						<a href="{{profile.getHelloUrl()}}">
-						<img ng-src="{{profile.getImageUrl()}}" width="66"></a></li>
+						<img ng-src="{{profile.getImageUrl()}}" width="66"></a>
+					</li>
 					<li ng-repeat="community in profile.getCommunities()">
-						<a href="{{profile.getCommunityUrl(community)}}">
+						<a ng-click="showCommunity(community)">
 							<img src="http://placekitten.com/50/50"/>
 						</a>
 					</li>

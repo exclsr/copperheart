@@ -3,8 +3,11 @@
 function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	var profile = {};
+	var community = undefined;
+
 	var patron = {};
 	var member = {};
+
 	session.pageName = "hello";
 
 	var redirectToEntrance = function (reason) {
@@ -12,14 +15,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		console.log(reason);
 		$location.path('/entrance');
 	};
-
-	var paths = $location.path().split('/')
-	if (paths.indexOf("community") > 0) {
-		$scope.hack = true;
-	}
-	else {
-		$scope.hack = false;
-	}
 
 	// TODO: Rename to something related to binding
 	// to route params, as that's what we're really doing.
@@ -60,6 +55,16 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			profile.passions = who.passions;
 			profile.communities = who.communities;
 			profile.imageUrl = "/profile/" + profile.username + "/image";
+
+			// Set the active community if there is one.
+			var communityIndex = $routeParams.communityId;
+			if (communityIndex >= 0 && communityIndex < profile.communities.length) {
+				community = profile.communities[communityIndex];
+			}
+			else {
+				community = undefined;
+			}
+
 			maybeSuccess();
 		};
 
@@ -212,8 +217,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	// only using very simple getters for our
 	// $scope properties. 
 	//
-	// How do we feel about that?
-	//
+	// How do we feel about that? 
 	$scope.profile.getName = function() {
 	 	return profile.name;
 	};
@@ -242,9 +246,25 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	$scope.profile.getBackgroundUrl = function() {
 		return '#/hello/' + profile.username + '/background';
 	};
-	$scope.profile.getCommunityUrl = function (community) {
+
+	var getCommunityPath = function (community) {
 		var communityIndex = profile.communities.indexOf(community);
-		return "#/hello/" + profile.username + '/community/' + communityIndex;
+		var path = '/hello/' + profile.username;
+		if (communityIndex >= 0) {
+			path += '/community/' + communityIndex;
+		}
+		return path;
+	}
+	$scope.profile.getCommunityUrl = function (community) {
+		return "#" + getCommunityPath(community);
+	};
+
+	$scope.showCommunity = function (community) {
+		$location.path(getCommunityPath(community));
+	};
+
+	$scope.getCommunity = function () {
+		return community;
 	};
 
 

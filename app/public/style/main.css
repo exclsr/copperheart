@@ -248,6 +248,7 @@ ul {
 }
 .communityNav > li > a:hover {
 	color: #222;
+	cursor: pointer;
 }
 
 

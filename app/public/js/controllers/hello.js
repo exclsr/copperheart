@@ -259,12 +259,23 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return "#" + getCommunityPath(community);
 	};
 
+
 	$scope.showCommunity = function (community) {
 		$location.path(getCommunityPath(community));
 	};
 
 	$scope.getCommunity = function () {
 		return community;
+	};
+	$scope.getCommunityImageUrl = function (community) {
+		if (!community) {
+			return '';
+		}
+		var imageUrl = '/profile/' + profile.username + '/community/';
+		imageUrl += profile.communities.indexOf(community);
+		imageUrl += '/image';
+
+		return imageUrl;
 	};
 
 

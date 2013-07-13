@@ -550,6 +550,31 @@ app.get('/profile/:username/image', function (req, res) {
 	});
 });
 
+app.get('/profile/:username/community/:communityId/image', function (req, res) {
+
+	var success = function (profile) {
+		var community = profile.communities[req.params.communityId];
+		if (community) {
+			db.communityImages.get(req.params.username, community.name, res,
+				function (err) {
+					// We use pipes to transfer stuff, so we don't really
+					// care about this error at the moment.
+				}
+			);
+		}
+		else {
+			res.send(404); // not found
+		}
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	db.profiles.getByUsername(req.params.username, success, failure);
+});
+
 // Public and private data of a patron
 // TODO: Rename? Yes, to 'member'
 app.get('/member', ensureIsMember, function (req, res) {
@@ -599,6 +624,34 @@ app.post('/member/profileImage', ensureIsMember, function (req, res) {
 		}
 		else {
 			db.profileImages.save(patron.username, data, function (err) {
+				if (err) {
+					console.log(err);
+					res.send(jsonError);
+				}
+				else {
+					res.send({ok: true});
+				}
+			});
+		}
+	});
+});
+
+app.post('/member/communityImage/:communityId', ensureIsMember, function (req, res) {
+	var patron = req.user;
+	var jsonError = {
+		ok: false,
+		error: {
+			status: 500
+		}
+	};
+
+	fs.readFile(req.files.communityImage.path, function (err, data) {
+		if (err) {
+			console.log(err);
+			res.send(jsonError);
+		}
+		else {
+			db.communityImages.save(patron.username, data, function (err) {
 				if (err) {
 					console.log(err);
 					res.send(jsonError);

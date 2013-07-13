@@ -2,6 +2,7 @@
 // database.js
 //
 // The thing that knows about our database implementation.
+// The api is at the bottom.
 //
 var cradle = require('cradle');
 var nano = require('nano');
@@ -701,28 +702,29 @@ var db = function (config) {
 		);
 	};
 
-	var getProfileImageByUsername = function(username, res, callback) {
-		// Stream the profile image to 'res'
+	var streamImageAttachment = function (patron, attachmentName, res, callback) {
+		// Stream the image to 'res'
+		var docId = patron._id;
+		res.type("image/jpeg");
+		var readStream;
+		// We access the database via getPatronByUsername right before
+		// making this call, so we don't have to refresh our cookies.
+		// TODO: We should check anyway. Check the docs to see if headers
+		// are returned in this callback, or what.
+		readStream = database.attachment.get(docId, attachmentName, function (err) {
+			if (err) {
+				callback(err);
+			}
+		});
 
+		// TODO: Consider setting 'end' to false so we can
+		// maybe send an error code if we mess up.
+		readStream.pipe(res);
+	};
+
+	var getImageByUsername = function (username, attachmentName, res, callback) {
 		var gotPatron = function (patron) {
-			var docId = patron._id;
-			var attachmentName = "profile.jpg";
-
-			res.type("image/jpeg");
-			var readStream;
-			// We access the database via getPatronByUsername right before
-			// making this call, so we don't have to refresh our cookies.
-			// TODO: We should check anyway. Check the docs to see if headers
-			// are returned in this callback, or what.
-			readStream = database.attachment.get(docId, attachmentName, function (err) {
-				if (err) {
-					callback(err);
-				}
-			});
-
-			// TODO: Consider setting 'end' to false so we can
-			// maybe send an error code if we mess up.
-			readStream.pipe(res);
+			streamImageAttachment(patron, attachmentName, res, callback);
 		};
 
 		var failure = function (err) {
@@ -730,6 +732,10 @@ var db = function (config) {
 		};
 
 		getPatronByUsername(username, gotPatron, failure);
+	};
+
+	var getProfileImageByUsername = function (username, res, callback) {
+		getImageByUsername(username, "profile.jpg", res, callback);
 	};
 
 	var saveProfileImageByUsername = function(username, imageData, callback) {
@@ -762,6 +768,15 @@ var db = function (config) {
 		getPatronByUsername(username, gotPatron, failure);
 	};
 
+	var getCommunityImageByUsername = function (username, communityName, res, callback) {
+		// TODO: Sanitize the communityName.
+		getImageByUsername(username, communityName + ".jpg", res, callback);
+	};
+
+	var saveCommunityImageByUsername = function () {
+		// ...
+	};
+
 	var doInit = function (callback) {
 		createDatabaseAndViews(function() {
 			establishDatabaseConnection(callback);
@@ -785,6 +800,10 @@ var db = function (config) {
 		},
 		profiles : {
 			getByUsername : getProfileByUsername
+		},
+		communityImages : {
+			get : getCommunityImageByUsername,
+			save: saveCommunityImageByUsername
 		},
 		patrons : {
 			get : getPatron,

@@ -26,23 +26,23 @@
 		</div>
 
 		<div class="helloContainer whoContainer span11 row" ng-hide="getCommunity()">
-			<div class="span3 whoStuffContainer">
-				<div class="whoImageContainer">
-					<img id="whoImage" ng-src="{{profile.getImageUrl()}}"/>
+			<div class="span8 column first pitch">
+				<div class="span3 first column">
+					<div class="whoImageContainer">
+						<img id="whoImage" ng-src="{{profile.getImageUrl()}}"/>
+						<div style="text-align: center">
+							<div id="whoName">{{profile.getName()}}</div>
+						</div>
+					</div>
 				</div>
-				
-				<div style="text-align: center">
-					<div id="whoName">{{profile.getName()}}</div>
-				</div>
-			</div>
 
-			<div class="who span5" style="margin-left: 0">
-				<h3>Hello</h3>
-				<div id="whoPresent" ng-bind-html="profile.getPresent()">
+				<div class="span5 column">
+					<h3>Hello</h3>
+					<div id="whoPresent" ng-bind-html="profile.getPresent()">
+					</div>
 				</div>
 			</div>
-			
-			<div class="projects span3">
+			<div class="projects span3 column">
 				<h3>Communities</h3>
 				<ul>
 					<li ng-repeat="community in profile.getCommunities()">

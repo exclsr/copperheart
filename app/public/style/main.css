@@ -174,46 +174,41 @@ ul {
 }
 .helloContainer {
 	margin-left: 3em;
+	margin-right: 0;
+	padding-right: 0;
 }
 
 .whoContainer, .projectContainer, .whoStuffContainer {
 	height: 100%;
 }
-
-
-
-.who, .projects {
-	background: #fff;
-	padding: 1em;
-	padding-top: 1ex;
-	height: 100%;
-}
-.who {
-	box-sizing: border-box;
-	padding: 2em;
-	padding-top: 1ex;
-}
-.projects {
-	background: #f3f3f3;
-	margin-left: 0;
-	padding-bottom: 0;
-	margin-bottom: 0;
-}
-
-.whoStuffContainer {
+.whoContainer {
 	background-color: white;
 }
-.whoImageContainer {
-	padding: 1em;
-	padding-top: 1.5em;
+.column {
+	height: 100%;
+	margin-left: 1em;
+	box-sizing: border-box;
 }
-#whoImage {
-	padding: 10px;
-	padding-left: 0;
-	padding-right: 1em;
-	padding-top: 20px;
-	padding: 0;
-	width: 100%;
+.column.first {
+	margin-left: 0;
+}
+
+.whoImageContainer {
+	padding: 1em; 
+	padding-left: 2em;
+	padding-top: 1.3em;
+}
+#whoName {
+	margin-top: 1.4em;
+}
+
+.projects {
+	background: #f3f3f3;
+
+	float: right;
+	margin-left: 0;
+	padding-left: 1em;	
+	box-sizing: content-box; /* default */
 }
 
 

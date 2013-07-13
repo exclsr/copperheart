@@ -4,7 +4,14 @@
 <div class="span12">
 
 	<div class="currentlyDoing" style="padding-top: 1em">
+
 		<h3>who are you, what are you working on?</h3>
+		<div class="span3">
+			<img ng-src="{{profileImageUrl}}"/>
+			<input uploader type="file" data-url="member/profileImage" name="profileImage"		
+				onUpload="profileImageUploaded()"/>
+		</div>
+
 		<div class="who span6" style="height: 315px">
 			<input ng-model="name" class="name" type="text"/>
 			<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>

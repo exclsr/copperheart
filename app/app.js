@@ -8,6 +8,7 @@ var express = require('express')
 	, user    = require('./routes/user')
 	, http    = require('http')
 	, https   = require('https')
+	, fs      = require('fs')
 	, path    = require('path')
 	, config  = require('./config.js')
 	, auth    = require('./lib/auth.js')
@@ -580,6 +581,34 @@ app.get('/member', ensureIsMember, function (req, res) {
 	};
 
 	db.patrons.get(req.user.email, gotMember, failure);
+});
+
+app.post('/member/profileImage', ensureIsMember, function (req, res) {
+	var patron = req.user;
+	var jsonError = {
+		ok: false,
+		error: {
+			status: 500
+		}
+	};
+
+	fs.readFile(req.files.profileImage.path, function (err, data) {
+		if (err) {
+			console.log(err);
+			res.send(jsonError);
+		}
+		else {
+			db.profileImages.save(patron.username, data, function (err) {
+				if (err) {
+					console.log(err);
+					res.send(jsonError);
+				}
+				else {
+					res.send({ok: true});
+				}
+			});
+		}
+	});
 });
 
 app.put('/member/things', ensureIsMember, function (req, res) {
@@ -1161,12 +1190,15 @@ app.post('/stripe/webhook', function (req, res) {
 // 	});
 // });
 
+
 // Lastly ...
 // This needs to be at the bottom, so things like
 // /whoami, /card or /contributions still work.
 app.get('/:username', function (req, res) {
 	res.redirect("/#/hello/" + req.params.username);
 });
+
+
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log("Express server listening on port " + app.get('port'));

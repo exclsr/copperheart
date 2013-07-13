@@ -727,7 +727,37 @@ var db = function (config) {
 
 		var failure = function (err) {
 			callback(err);
-		}
+		};
+
+		getPatronByUsername(username, gotPatron, failure);
+	};
+
+	var saveProfileImageByUsername = function(username, imageData, callback) {
+
+		var gotPatron = function (patron) {
+			var docId  = patron._id;
+			var docRev = patron._rev;
+			var attachmentName = "profile.jpg";
+			var contentType = "image/jpeg";
+
+			var options = {
+				rev: docRev
+			};
+
+			database.attachment.insert(docId, attachmentName, imageData, 
+				contentType, options, function (err) {
+				if (err) {
+					callback(err);
+				}
+				else {
+					callback();
+				}
+			});
+		};
+
+		var failure = function (err) {
+			callback(err);
+		};
 
 		getPatronByUsername(username, gotPatron, failure);
 	};
@@ -750,7 +780,8 @@ var db = function (config) {
 			destroy : doDestroy
 		},
 		profileImages : {
-			get : getProfileImageByUsername
+			get : getProfileImageByUsername,
+			save : saveProfileImageByUsername
 		},
 		profiles : {
 			getByUsername : getProfileByUsername

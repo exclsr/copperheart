@@ -51,12 +51,12 @@ var fromOrdinal = function (input) {
 
 /* Directives */
 angular.module('myApp.directives', []).
-  directive('appVersion', ['version', function(version) {
+directive('appVersion', ['version', function(version) {
 	return function(scope, elm, attrs) {
 	  elm.text(version);
 	};
   }]).
-  directive('ordinal', function() {
+directive('ordinal', function() {
 	return {
 		restrict: 'A',
 		require: 'ngModel',
@@ -72,4 +72,28 @@ angular.module('myApp.directives', []).
 			ngModel.$formatters.push(toUser);
 		}
 	};
-});;
+  }).
+directive('uploader', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function(scope, elem, attr, ctrl) {
+			var onUpload = $parse(attr["onupload"]);
+			
+			elem.fileupload({
+				dataType: 'json',
+				done: function (e, data) {
+					var res = data.result;
+					if (res.error) {
+						// TODO: Set a flag or something.
+						console.log('error uploading file (see server log)');
+					}
+					else {
+						if (onUpload) {
+							onUpload(scope);
+						}
+					}
+				}
+			});
+		}
+	};
+});

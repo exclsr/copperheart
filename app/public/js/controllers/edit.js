@@ -21,6 +21,17 @@ function EditCtrl(session, $scope, $http) {
 		patron = session.patron;
 	};
 
+	var getNewProfileImageUrl = function(username) {
+		// Use a timestamp to convince everyone we need a new
+		// image from the server when a new file is uploaded.
+		return '/profile/' + username + '/image?' + Date.now();
+	};
+
+	$scope.profileImageUploaded = function () {
+		$scope.$apply(function () {
+			$scope.profileImageUrl = getNewProfileImageUrl($scope.username);
+		});
+	};
 
 	var saveWho = function(success) {
 		var who = {};
@@ -278,6 +289,8 @@ function EditCtrl(session, $scope, $http) {
 			$scope.passions = member.passions;
 			$scope.communities = member.communities;
 			$scope.hasStripeAccount = member.hasStripeAccount;
+
+			$scope.profileImageUrl = getNewProfileImageUrl(member.username);
 		});
 
 		memberRes.error(function(data, status, headers, config) {

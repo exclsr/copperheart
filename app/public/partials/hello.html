@@ -2,7 +2,7 @@
 <div ng-include src="'/partials/header.html'"></div>
 
 <div class="view">
-<div class="profile span12">
+<div class="hello span12">
 
 	<div class="whatContainer">
 		<div class="helloContainer projectContainer span11 row" ng-show="getCommunity()">
@@ -25,7 +25,7 @@
 			</div>
 		</div>
 
-		<div class="whoContainer span12" ng-hide="getCommunity()">
+		<div class="helloContainer whoContainer span11 row" ng-hide="getCommunity()">
 			<div class="span3 whoStuffContainer">
 				<div class="whoImageContainer">
 					<img id="whoImage" ng-src="{{profile.getImageUrl()}}"/>

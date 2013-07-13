@@ -5,7 +5,7 @@ body {
 	font-size: 12pt;
 	padding: 0;
 }
-html, body, .container, .angularView, .view, .profile {
+html, body, .container, .angularView, .view, .hello {
 	height: 100%;
 }
 
@@ -157,10 +157,30 @@ ul {
 	margin-top: 2em;
 }
 
-.profile {
+/***************************************************************
+ * Hello
+ ***************************************************************/
+.hello {
 	margin-left: 0;
 	background: #eee;
 }
+.whatContainer {
+	height: 320px;
+	margin-bottom: 1.4em;
+}
+.projectContainer {
+	background-color: #666;
+	color: white;
+}
+.helloContainer {
+	margin-left: 3em;
+}
+
+.whoContainer, .projectContainer, .whoStuffContainer {
+	height: 100%;
+}
+
+
 
 .who, .projects {
 	background: #fff;
@@ -179,29 +199,9 @@ ul {
 	padding-bottom: 0;
 	margin-bottom: 0;
 }
-.whatContainer {
-	height: 320px;
-	margin-bottom: 1.4em;
-}
-
-.whoContainer, .projectContainer, .whoStuffContainer {
-	height: 100%;
-}
-.projectContainer {
-	background-color: #666;
-	color: white;
-}
 
 .whoStuffContainer {
 	background-color: white;
-}
-.whoContainer {
-/*	background-color: white;*/
-}
-
-
-#whoName {
-	/*color: #96401E;*/
 }
 .whoImageContainer {
 	padding: 1em;
@@ -215,6 +215,8 @@ ul {
 	padding: 0;
 	width: 100%;
 }
+
+
 .backgroundArrow {
 	width: 16px;
 	opacity: 0.5;
@@ -222,15 +224,10 @@ ul {
 	margin-top: 0.4ex;
 }
 
-.helloContainer {
-	margin-left: 3em;
-}
-
 .photoCredit {
 	text-align: right;
 	font-size: 10pt;
 }
-
 
 .communityNav {
 	margin-right: auto; 
@@ -252,6 +249,7 @@ ul {
 }
 
 
+/* Hello: Process / contribute prelude */;
 .process {
 	color: black;
 	padding-top: 2em;
@@ -355,7 +353,9 @@ ul {
 }
 
 
-/* Contribution */
+/*********************************************************************
+/* Contribution 
+ *********************************************************************/
 .contributeTitle, .contributeHowOften {
 	padding-left: 1.85em;
 }

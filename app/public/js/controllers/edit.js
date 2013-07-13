@@ -21,56 +21,6 @@ function EditCtrl(session, $scope, $http) {
 		patron = session.patron;
 	};
 
-	var initialize = function() {
-		var memberRes = $http.get('/member');
-		memberRes.success(function (member) {
-			$scope.email = member.email;
-			$scope.username = member.username;
-			$scope.things = member.things;
-			$scope.name = member.name;
-			$scope.present = member.present;
-			$scope.passions = member.passions;
-			$scope.communities = member.communities;
-			$scope.hasStripeAccount = member.hasStripeAccount;
-		});
-
-		memberRes.error(function(data, status, headers, config) {
-			if (status === 401) {
-				// We're not logged in. There is a todo task in the
-				// top-level controller to address this, but in the 
-				// mean time, let's force-log-out, so we can at least
-				// log back in.
-				$scope.signOut();
-			}
-			else {
-				// TODO: Something terrible went wrong. Deal with it.
-				console.log(data);
-			}
-			
-		});
-
-		$http.get('/stripe/connect-client-id')
-		.success(function (stripeConnectClientId) {
-			$scope.stripeConnectClientId = stripeConnectClientId;
-		})
-		.error(function() {
-			// TODO: Stripe is down? Show a status.
-		});
-
-		// When 'things' changes, save to our database.
-		// Ignore the first time things is assigned.
-		$scope.$watch('things', 
-			function(newValue, oldValue) {
-				if (oldValue !== undefined) { 
-					saveThings($scope.things);
-				}
-			},
-			true // test if values change instead of refs
-			// basically, this 'true' is needed for watching
-			// the array elements.
-		);
-	};
-
 
 	var saveWho = function(success) {
 		var who = {};
@@ -119,7 +69,9 @@ function EditCtrl(session, $scope, $http) {
 		putCommunities.success(function (data) {
 			$scope.communities = communities;
 			console.log("<3");
-			callback();
+			if (callback) {
+				callback();	
+			}
 		});
 		putCommunities.error(function (data, status, headers, config) { 
 			// TODO: Oh ... no.
@@ -313,6 +265,71 @@ function EditCtrl(session, $scope, $http) {
 	$scope.getIcons = function () {
 		return icons;
 	}
+
+
+	var initialize = function() {
+		var memberRes = $http.get('/member');
+		memberRes.success(function (member) {
+			$scope.email = member.email;
+			$scope.username = member.username;
+			$scope.things = member.things;
+			$scope.name = member.name;
+			$scope.present = member.present;
+			$scope.passions = member.passions;
+			$scope.communities = member.communities;
+			$scope.hasStripeAccount = member.hasStripeAccount;
+		});
+
+		memberRes.error(function(data, status, headers, config) {
+			if (status === 401) {
+				// We're not logged in. There is a todo task in the
+				// top-level controller to address this, but in the 
+				// mean time, let's force-log-out, so we can at least
+				// log back in.
+				$scope.signOut();
+			}
+			else {
+				// TODO: Something terrible went wrong. Deal with it.
+				console.log(data);
+			}
+			
+		});
+
+		$http.get('/stripe/connect-client-id')
+		.success(function (stripeConnectClientId) {
+			$scope.stripeConnectClientId = stripeConnectClientId;
+		})
+		.error(function() {
+			// TODO: Stripe is down? Show a status.
+		});
+
+		// When 'things' changes, save to our database.
+		// Ignore the first time things is assigned.
+		$scope.$watch('things', 
+			function(newValue, oldValue) {
+				if (oldValue !== undefined) { 
+					saveThings($scope.things);
+				}
+			},
+			true // test if values change instead of refs
+			// basically, this 'true' is needed for watching
+			// the array elements.
+		);
+
+		$scope.$watch('communities',
+			function (newValue, oldValue) {
+				// TODO: This is just a hack to get things
+				// moving. We don't want to save to the 
+				// database with every keystroke. Something
+				// like this is great for stress testing, though.
+				if (newValue) {
+					saveCommunities(newValue);
+				}
+			},
+			true
+		);
+
+	};
 
 	bindToSession();
 	initialize();

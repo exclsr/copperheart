@@ -62,6 +62,18 @@
 		</div>
 	</div>
 
+
+
+	<div class="communities" style="clear: left">
+		<h3 style="padding-top: 2em">Communities</h3>
+		<div ng-repeat="community in communities" class="span6">
+			<input ng-model="community.name" class="name span6" type="text"/>
+			<textarea ng-model="community.description" class="span6" style="height: 225px;"></textarea>
+		</div>
+	</div>
+
+
+
 	<div class="things" style="clear: left">
 		<h3 style="padding-top: 1em">add a thing</h3>
 

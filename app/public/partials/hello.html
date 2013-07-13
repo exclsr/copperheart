@@ -9,12 +9,7 @@
 			<div class="span6" style="margin: 0; box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
 				<h3>{{getCommunity().name}}</h3>
-
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque cursus fermentum mi, non hendrerit est venenatis id. Sed massa magna, sodales non scelerisque eu, venenatis ut tellus. Phasellus volutpat porta tellus non vestibulum.</p> 
-
-				<p>Cras adipiscing tortor non posuere tincidunt. Morbi a risus consectetur, sagittis ligula nec, fringilla nibh. Duis dignissim pharetra lorem non ullamcorper. Duis eleifend odio at mauris ultricies, at hendrerit elit mollis. Morbi pretium erat id venenatis rhoncus. Nam lobortis risus ut rhoncus mollis.</p>
-
-				<!-- <div>abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz</div> -->
+				<div ng-bind-html="getCommunity().description"></div>
 			</div>
 
 			<div class="span5" style="margin: 0; margin-top: 1.2em">

@@ -607,7 +607,6 @@ app.get('/profile/:username/community/:communityId/icon', function (req, res) {
 
 
 // Public and private data of a patron
-// TODO: Rename? Yes, to 'member'
 app.get('/member', ensureIsMember, function (req, res) {
 	// TODO: Maybe not do 'ensureAuthenticated' here, and instead
 	// send back something empty if we're not logged in, and have 
@@ -626,6 +625,8 @@ app.get('/member', ensureIsMember, function (req, res) {
 		member.things = memberData.things || [];
 		member.name = memberData.name || "";
 		member.present = memberData.present || "";
+		member.background = memberData.background || "";
+		member.future = memberData.future || "";
 		member.passions = memberData.passions || [];
 		member.communities = memberData.communities || [];
 		// Don't transfer the actual token. We only care

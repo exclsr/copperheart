@@ -326,6 +326,8 @@ function EditCtrl(session, $scope, $http) {
 			$scope.things = member.things;
 			$scope.name = member.name;
 			$scope.present = member.present;
+			$scope.background = member.background;
+			$scope.future = member.future;
 			$scope.passions = member.passions;
 			$scope.communities = member.communities;
 			$scope.hasStripeAccount = member.hasStripeAccount;

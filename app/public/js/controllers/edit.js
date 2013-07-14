@@ -5,6 +5,8 @@ function EditCtrl(session, $scope, $http) {
 
 	session.pageName = "edit";
 	$scope.thing = {};
+	// TODO: Refactor this ugliness.
+	$scope.communityImageUrlTimetamps = {}; 
 
 	var patron = {};
 	var icons = [
@@ -30,6 +32,13 @@ function EditCtrl(session, $scope, $http) {
 	$scope.profileImageUploaded = function () {
 		$scope.$apply(function () {
 			$scope.profileImageUrl = getNewProfileImageUrl($scope.username);
+		});
+	};
+
+	$scope.communityImageUploaded = function (index) {
+		$scope.$apply(function () {
+			// hack ...
+			$scope.communityImageUrlTimetamps[index] = Date.now();
 		});
 	};
 
@@ -291,6 +300,9 @@ function EditCtrl(session, $scope, $http) {
 			$scope.hasStripeAccount = member.hasStripeAccount;
 
 			$scope.profileImageUrl = getNewProfileImageUrl(member.username);
+			for (var i=0; i < member.communities.length; i++) {
+				$scope.communityImageUrlTimetamps[i] = Date.now();
+			}
 		});
 
 		memberRes.error(function(data, status, headers, config) {
@@ -341,7 +353,6 @@ function EditCtrl(session, $scope, $http) {
 			},
 			true
 		);
-
 	};
 
 	bindToSession();

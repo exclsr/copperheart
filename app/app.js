@@ -638,6 +638,8 @@ app.post('/member/profileImage', ensureIsMember, function (req, res) {
 
 app.post('/member/communityImage/:communityId', ensureIsMember, function (req, res) {
 	var patron = req.user;
+	var community = patron.communities[req.params.communityId];
+	
 	var jsonError = {
 		ok: false,
 		error: {
@@ -645,23 +647,30 @@ app.post('/member/communityImage/:communityId', ensureIsMember, function (req, r
 		}
 	};
 
-	fs.readFile(req.files.communityImage.path, function (err, data) {
-		if (err) {
-			console.log(err);
-			res.send(jsonError);
-		}
-		else {
-			db.communityImages.save(patron.username, data, function (err) {
-				if (err) {
-					console.log(err);
-					res.send(jsonError);
-				}
-				else {
-					res.send({ok: true});
-				}
-			});
-		}
-	});
+	if (!community) {
+		jsonError.error.status = 404;
+		res.send(jsonError);
+	}
+	else {
+		fs.readFile(req.files.communityImage.path, function (err, data) {
+
+			if (err) {
+				console.log(err);
+				res.send(jsonError);
+			}
+			else {
+				db.communityImages.save(patron.username, community.name, data, function (err) {
+					if (err) {
+						console.log(err);
+						res.send(jsonError);
+					}
+					else {
+						res.send({ok: true});
+					}
+				});
+			}
+		});
+	}
 });
 
 app.put('/member/things', ensureIsMember, function (req, res) {

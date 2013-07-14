@@ -738,12 +738,10 @@ var db = function (config) {
 		getImageByUsername(username, "profile.jpg", res, callback);
 	};
 
-	var saveProfileImageByUsername = function(username, imageData, callback) {
-
+	var saveImageByUsername = function (username, attachmentName, imageData, callback) {
 		var gotPatron = function (patron) {
 			var docId  = patron._id;
 			var docRev = patron._rev;
-			var attachmentName = "profile.jpg";
 			var contentType = "image/jpeg";
 
 			var options = {
@@ -768,13 +766,18 @@ var db = function (config) {
 		getPatronByUsername(username, gotPatron, failure);
 	};
 
+	var saveProfileImageByUsername = function(username, imageData, callback) {
+		saveImageByUsername(username, "profile.jpg", imageData, callback);
+	};
+
 	var getCommunityImageByUsername = function (username, communityName, res, callback) {
 		// TODO: Sanitize the communityName.
 		getImageByUsername(username, communityName + ".jpg", res, callback);
 	};
 
-	var saveCommunityImageByUsername = function () {
-		// ...
+	var saveCommunityImageByUsername = function (username, communityName, imageData, callback) {
+		// TODO: Sanitize the communityName.
+		saveImageByUsername(username, communityName + ".jpg", imageData, callback);
 	};
 
 	var doInit = function (callback) {

@@ -78,20 +78,30 @@ directive('uploader', function ($parse) {
 		restrict: 'A',
 		link: function(scope, elem, attr, ctrl) {
 			var onUpload = $parse(attr["onupload"]);
-			
-			elem.fileupload({
-				dataType: 'json',
-				done: function (e, data) {
-					var res = data.result;
-					if (res.error) {
-						// TODO: Set a flag or something.
-						console.log('error uploading file (see server log)');
-					}
-					else {
-						if (onUpload) {
-							onUpload(scope);
+			var isInitialized = false;
+
+			attr.$observe('url', function (val) {
+				// Wait until 'data-url' has been interpolated
+				// before we call fileupload to initialize
+				// the jQuery uploader.
+
+				if (val && !isInitialized) {
+					isInitialized = true;
+					elem.fileupload({
+						dataType: 'json',
+						done: function (e, data) {
+							var res = data.result;
+							if (res.error) {
+								// TODO: Set a flag or something.
+								console.log('error uploading file (see server log)');
+							}
+							else {
+								if (onUpload) {
+									onUpload(scope);
+								}
+							}
 						}
-					}
+					});
 				}
 			});
 		}

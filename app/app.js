@@ -504,6 +504,8 @@ app.get('/who/:username', function (req, res) {
 		var publicWho = {};
 		publicWho.name = who.name || "";
 		publicWho.present = who.present || "";
+		publicWho.background = who.background || "";
+		publicWho.future = who.future || "";
 		publicWho.passions = who.passions || [];
 		publicWho.communities = who.communities || [];
 
@@ -540,6 +542,8 @@ app.get('/profile/:username', function (req, res) {
 	db.profiles.getByUsername(req.params.username, success, failure);
 });
 
+
+
 app.get('/profile/:username/image', function (req, res) {
 	db.profileImages.get(req.params.username, res, function (err) {
 		if (err) {
@@ -548,6 +552,15 @@ app.get('/profile/:username/image', function (req, res) {
 			// res.send(404);
 		}
 	});
+});
+
+var noop = function () { };
+app.get('/profile/:username/background/image', function (req, res) {
+	db.profileImages.getBackground(req.params.username, res, noop);
+});
+
+app.get('/profile/:username/future/image', function (req, res) {
+	db.profileImages.getFuture(req.params.username, res, noop);
 });
 
 var getCommunityImage = function (username, communityId, getImageFn, res) {
@@ -626,8 +639,7 @@ app.get('/member', ensureIsMember, function (req, res) {
 	db.patrons.get(req.user.email, gotMember, failure);
 });
 
-app.post('/member/profileImage', ensureIsMember, function (req, res) {
-	var patron = req.user;
+var saveProfileImage = function (patron, filepath, saveImageFn, res) {
 	var jsonError = {
 		ok: false,
 		error: {
@@ -635,13 +647,13 @@ app.post('/member/profileImage', ensureIsMember, function (req, res) {
 		}
 	};
 
-	fs.readFile(req.files.profileImage.path, function (err, data) {
+	fs.readFile(filepath, function (err, data) {
 		if (err) {
 			console.log(err);
 			res.send(jsonError);
 		}
 		else {
-			db.profileImages.save(patron.username, data, function (err) {
+			saveImageFn(patron.username, data, function (err) {
 				if (err) {
 					console.log(err);
 					res.send(jsonError);
@@ -652,6 +664,30 @@ app.post('/member/profileImage', ensureIsMember, function (req, res) {
 			});
 		}
 	});
+};
+
+app.post('/member/profileImage', ensureIsMember, function (req, res) {	
+	saveProfileImage(
+		req.user, 
+		req.files.profileImage.path,
+		db.profileImages.save,
+		res);
+});
+
+app.post('/member/backgroundImage', ensureIsMember, function (req, res) {	
+	saveProfileImage(
+		req.user, 
+		req.files.backgroundImage.path,
+		db.profileImages.saveBackground,
+		res);
+});
+
+app.post('/member/futureImage', ensureIsMember, function (req, res) {	
+	saveProfileImage(
+		req.user, 
+		req.files.futureImage.path,
+		db.profileImages.saveFuture,
+		res);
 });
 
 var saveCommunityImage = function (patron, communityId, filepath, saveImageFn, callback) {
@@ -755,6 +791,12 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	}
 	if (who.present !== undefined) {
 		patron.present = who.present;
+	}
+	if (who.background !== undefined) {
+		patron.background = who.background;
+	}
+	if (who.future !== undefined) {
+		patron.future = who.future;
 	}
 
 	db.patrons.save(patron, success, failure);

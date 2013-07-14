@@ -775,6 +775,25 @@ var db = function (config) {
 		saveImageByUsername(username, "profile.jpg", imageData, callback);
 	};
 
+
+	var getBackgroundImageByUsername = function (username, res, callback) {
+		getImageByUsername(username, "background.jpg", res, callback);
+	};
+
+	var saveBackgroundImageByUsername = function(username, imageData, callback) {
+		saveImageByUsername(username, "background.jpg", imageData, callback);
+	};
+
+
+	var getFutureImageByUsername = function (username, res, callback) {
+		getImageByUsername(username, "future.jpg", res, callback);
+	};
+
+	var saveFutureImageByUsername = function(username, imageData, callback) {
+		saveImageByUsername(username, "future.jpg", imageData, callback);
+	};
+
+
 	var sanitizeName = function (name) {
 		// TODO: sanitize name.
 		return name;
@@ -819,7 +838,11 @@ var db = function (config) {
 		},
 		profileImages : {
 			get : getProfileImageByUsername,
-			save : saveProfileImageByUsername
+			save : saveProfileImageByUsername,
+			getBackground : getBackgroundImageByUsername,
+			saveBackground : saveBackgroundImageByUsername,
+			getFuture : getFutureImageByUsername,
+			saveFuture : saveFutureImageByUsername
 		},
 		profiles : {
 			getByUsername : getProfileByUsername

@@ -29,10 +29,31 @@ function EditCtrl(session, $scope, $http) {
 		// image from the server when a new file is uploaded.
 		return '/profile/' + username + '/image?' + Date.now();
 	};
+	var getNewBackgroundImageUrl = function(username) {
+		// Use a timestamp to convince everyone we need a new
+		// image from the server when a new file is uploaded.
+		return '/profile/' + username + '/background/image?' + Date.now();
+	};
+	var getNewFutureImageUrl = function(username) {
+		// Use a timestamp to convince everyone we need a new
+		// image from the server when a new file is uploaded.
+		return '/profile/' + username + '/future/image?' + Date.now();
+	};
 
+	// TODO: Refactor
 	$scope.profileImageUploaded = function () {
 		$scope.$apply(function () {
 			$scope.profileImageUrl = getNewProfileImageUrl($scope.username);
+		});
+	};
+	$scope.backgroundImageUploaded = function () {
+		$scope.$apply(function () {
+			$scope.backgroundImageUrl = getNewBackgroundImageUrl($scope.username);
+		});
+	};
+	$scope.futureImageUploaded = function () {
+		$scope.$apply(function () {
+			$scope.futureImageUrl = getNewFutureImageUrl($scope.username);
 		});
 	};
 
@@ -54,6 +75,8 @@ function EditCtrl(session, $scope, $http) {
 		var who = {};
 		who.name = $scope.name;
 		who.present = $scope.present;
+		who.background = $scope.background;
+		who.future = $scope.future;
 
 		// TODO: This maybe creates an extra record in the database
 		// the first time this is called.
@@ -308,6 +331,8 @@ function EditCtrl(session, $scope, $http) {
 			$scope.hasStripeAccount = member.hasStripeAccount;
 
 			$scope.profileImageUrl = getNewProfileImageUrl(member.username);
+			$scope.backgroundImageUrl = getNewBackgroundImageUrl(member.username);
+			$scope.futureImageUrl = getNewFutureImageUrl(member.username);
 			for (var i=0; i < member.communities.length; i++) {
 				$scope.communityImageUrlTimestamps[i] = Date.now();
 				$scope.communityIconUrlTimestamps[i] = Date.now();
@@ -358,6 +383,22 @@ function EditCtrl(session, $scope, $http) {
 				// like this is great for stress testing, though.
 				if (newValue) {
 					saveCommunities(newValue);
+				}
+			},
+			true
+		);
+		$scope.$watch('background', 
+			function (newValue, oldValue) {
+				if (newValue) {
+					saveWho(function() {});
+				}
+			},
+			true
+		);
+		$scope.$watch('future', 
+			function (newValue, oldValue) {
+				if (newValue) {
+					saveWho(function() {});
 				}
 			},
 			true

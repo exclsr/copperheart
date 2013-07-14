@@ -97,6 +97,26 @@
 	</div>
 
 
+	<h3 style="clear: left">Background</h3>
+	<div class="span3">
+		<img ng-src="{{backgroundImageUrl}}"/>
+		<input uploader type="file" data-url="member/backgroundImage" name="backgroundImage"
+			onUpload="backgroundImageUploaded()"/>
+	</div>
+	<div class="who span6" style="height: 315px">
+		<textarea ng-model="background" class="span6" style="height: 225px;"></textarea>
+	</div>
+
+	<h3 style="clear: left">Future plans</h3>
+	<div class="span3">
+		<img ng-src="{{futureImageUrl}}"/>
+		<input uploader type="file" data-url="member/futureImage" name="futureImage"
+			onUpload="futureImageUploaded()"/>
+	</div>
+	<div class="who span6" style="height: 315px">
+		<textarea ng-model="future" class="span6" style="height: 225px;"></textarea>
+	</div>
+
 
 	<div class="things" style="clear: left">
 		<h3 style="padding-top: 1em">add a thing</h3>

@@ -3,7 +3,7 @@
 		<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
 	</a>
 
-	<span ng-show="!isSignedIn()">anonymous</span>
+	<span ng-show="!isSignedIn()">Welcome to <a href="#/about">Copper Heart</a>.</span>
 	<span ng-show="isSignedIn()">
 		{{patron.getUsername()}}</a> | 
 		<a href="/#/edit/contributions">contributions</a>

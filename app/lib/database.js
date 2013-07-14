@@ -605,7 +605,8 @@ var db = function (config) {
 					// Update the existing contribution.
 					patron._id = existingPatron._id;
 					patron._rev = existingPatron._rev;
-					
+					patron._attachments = existingPatron._attachments;
+
 					database.insert(
 						patron, 
 						function (error, response, headers) {

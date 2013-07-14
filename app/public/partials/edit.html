@@ -83,10 +83,15 @@
 				<textarea ng-model="community.description" class="span6" style="height: 225px;"></textarea>
 			</div>
 			<div class="span3">
-				<img ng-src="/profile/{{username}}/community/{{$index}}/image?{{communityImageUrlTimetamps[$index]}}"/>
-				<input uploader type="file" data-url="member/communityImage/{{$index}}" 
+				<img ng-src="/profile/{{username}}/community/{{$index}}/image?{{communityImageUrlTimestamps[$index]}}"/>
+				<input uploader type="file" data-url="member/community/{{$index}}/image" 
 				name="communityImage"		
 				onUpload="communityImageUploaded($index)">
+
+				<img ng-src="/profile/{{username}}/community/{{$index}}/icon?{{communityIconUrlTimestamps[$index]}}"/>
+				<input uploader type="file" data-url="member/community/{{$index}}/icon" 
+				name="communityIcon"		
+				onUpload="communityIconUploaded($index)">
 			</div>
 		</div>
 	</div>

@@ -550,12 +550,11 @@ app.get('/profile/:username/image', function (req, res) {
 	});
 });
 
-app.get('/profile/:username/community/:communityId/image', function (req, res) {
-
+var getCommunityImage = function (username, communityId, getImageFn, res) {
 	var success = function (profile) {
-		var community = profile.communities[req.params.communityId];
+		var community = profile.communities[communityId];
 		if (community) {
-			db.communityImages.get(req.params.username, community.name, res,
+			getImageFn(username, community.name, res,
 				function (err) {
 					// We use pipes to transfer stuff, so we don't really
 					// care about this error at the moment.
@@ -572,8 +571,27 @@ app.get('/profile/:username/community/:communityId/image', function (req, res) {
 		res.send(500);
 	};
 
-	db.profiles.getByUsername(req.params.username, success, failure);
+	db.profiles.getByUsername(username, success, failure);
+};
+
+app.get('/profile/:username/community/:communityId/image', function (req, res) {
+	getCommunityImage(
+		req.params.username, 
+		req.params.communityId, 
+		db.communityImages.get, 
+		res
+	);
 });
+
+app.get('/profile/:username/community/:communityId/icon', function (req, res) {
+	getCommunityImage(
+		req.params.username, 
+		req.params.communityId, 
+		db.communityImages.getIcon,
+		res
+	);
+});
+
 
 // Public and private data of a patron
 // TODO: Rename? Yes, to 'member'
@@ -636,10 +654,8 @@ app.post('/member/profileImage', ensureIsMember, function (req, res) {
 	});
 });
 
-app.post('/member/communityImage/:communityId', ensureIsMember, function (req, res) {
-	var patron = req.user;
-	var community = patron.communities[req.params.communityId];
-	
+var saveCommunityImage = function (patron, communityId, filepath, saveImageFn, callback) {
+	var community = patron.communities[communityId];
 	var jsonError = {
 		ok: false,
 		error: {
@@ -649,29 +665,53 @@ app.post('/member/communityImage/:communityId', ensureIsMember, function (req, r
 
 	if (!community) {
 		jsonError.error.status = 404;
-		res.send(jsonError);
+		callback(jsonError);
 	}
 	else {
-		fs.readFile(req.files.communityImage.path, function (err, data) {
+		fs.readFile(filepath, function (err, data) {
 
 			if (err) {
 				console.log(err);
-				res.send(jsonError);
+				callback(jsonError);
 			}
 			else {
-				db.communityImages.save(patron.username, community.name, data, function (err) {
+				saveImageFn(patron.username, community.name, data, function (err) {
 					if (err) {
 						console.log(err);
-						res.send(jsonError);
+						callback(jsonError);
 					}
 					else {
-						res.send({ok: true});
+						callback({ok: true});
 					}
 				});
 			}
 		});
 	}
+};
+
+// TODO: Refactor to be community/:id/image
+app.post('/member/community/:communityId/image', ensureIsMember, function (req, res) {
+	var patron = req.user;
+	var communityId = req.params.communityId
+	var filepath = req.files.communityImage.path;
+	var saveImageFn = db.communityImages.save;
+
+	saveCommunityImage(patron, communityId, filepath, saveImageFn, function (response) {
+		res.send(response);
+	});
 });
+
+app.post('/member/community/:communityId/icon', ensureIsMember, function (req, res) {
+	var patron = req.user;
+	var communityId = req.params.communityId
+	var filepath = req.files.communityIcon.path;
+	var saveImageFn = db.communityImages.saveIcon;
+
+	saveCommunityImage(patron, communityId, filepath, saveImageFn, function (response) {
+		res.send(response);
+	});
+});
+
 
 app.put('/member/things', ensureIsMember, function (req, res) {
 	var member = req.user;

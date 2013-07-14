@@ -567,7 +567,11 @@ var db = function (config) {
 	};
 
 	var getPatron = function (patronEmail, success, failure) {
-		patronsByEmail(success, failure, {key: patronEmail, firstOnly: true});
+		var options = {
+			key: patronEmail, 
+			firstOnly: true
+		};
+		patronsByEmail(success, failure, options);
 	};
 
 	var getPatronById = function (patronId, success, failure) {
@@ -770,14 +774,29 @@ var db = function (config) {
 		saveImageByUsername(username, "profile.jpg", imageData, callback);
 	};
 
+	var sanitizeName = function (name) {
+		// TODO: sanitize name.
+		return name;
+	}
+
 	var getCommunityImageByUsername = function (username, communityName, res, callback) {
-		// TODO: Sanitize the communityName.
-		getImageByUsername(username, communityName + ".jpg", res, callback);
+		var name = sanitizeName(communityName);
+		getImageByUsername(username, name + ".jpg", res, callback);
 	};
 
 	var saveCommunityImageByUsername = function (username, communityName, imageData, callback) {
-		// TODO: Sanitize the communityName.
-		saveImageByUsername(username, communityName + ".jpg", imageData, callback);
+		var name = sanitizeName(communityName);
+		saveImageByUsername(username, name + ".jpg", imageData, callback);
+	};
+
+	var getCommunityIconByUsername = function (username, communityName, res, callback) {
+		var name = sanitizeName(communityName);
+		getImageByUsername(username, name + "icon.jpg", res, callback);
+	};
+
+	var saveCommunityIconByUsername = function (username, communityName, imageData, callback) {
+		var name = sanitizeName(communityName);
+		saveImageByUsername(username, name + "icon.jpg", imageData, callback);
 	};
 
 	var doInit = function (callback) {
@@ -806,7 +825,9 @@ var db = function (config) {
 		},
 		communityImages : {
 			get : getCommunityImageByUsername,
-			save: saveCommunityImageByUsername
+			save: saveCommunityImageByUsername,
+			getIcon : getCommunityIconByUsername,
+			saveIcon : saveCommunityIconByUsername
 		},
 		patrons : {
 			get : getPatron,

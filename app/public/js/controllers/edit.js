@@ -6,7 +6,8 @@ function EditCtrl(session, $scope, $http) {
 	session.pageName = "edit";
 	$scope.thing = {};
 	// TODO: Refactor this ugliness.
-	$scope.communityImageUrlTimetamps = {}; 
+	$scope.communityImageUrlTimestamps = {};
+	$scope.communityIconUrlTimestamps = {};
 
 	var patron = {};
 	var icons = [
@@ -35,12 +36,19 @@ function EditCtrl(session, $scope, $http) {
 		});
 	};
 
+	// hack ...
 	$scope.communityImageUploaded = function (index) {
 		$scope.$apply(function () {
-			// hack ...
-			$scope.communityImageUrlTimetamps[index] = Date.now();
+			$scope.communityImageUrlTimestamps[index] = Date.now();
 		});
 	};
+	$scope.communityIconUploaded = function (index) {
+		$scope.$apply(function () {
+			$scope.communityIconUrlTimestamps[index] = Date.now();
+		});
+	};
+	// end? hack.
+
 
 	var saveWho = function(success) {
 		var who = {};
@@ -301,7 +309,8 @@ function EditCtrl(session, $scope, $http) {
 
 			$scope.profileImageUrl = getNewProfileImageUrl(member.username);
 			for (var i=0; i < member.communities.length; i++) {
-				$scope.communityImageUrlTimetamps[i] = Date.now();
+				$scope.communityImageUrlTimestamps[i] = Date.now();
+				$scope.communityIconUrlTimestamps[i] = Date.now();
 			}
 		});
 

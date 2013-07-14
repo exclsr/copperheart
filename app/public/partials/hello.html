@@ -65,7 +65,7 @@
 					</li>
 					<li ng-repeat="community in profile.getCommunities()">
 						<a ng-click="showCommunity(community)">
-							<img src="http://placekitten.com/50/50"/>
+							<img ng-src="{{getCommunityIconUrl(community)}}" width="50"/>
 						</a>
 					</li>
 					<li>

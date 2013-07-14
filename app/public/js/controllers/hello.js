@@ -247,7 +247,11 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return '#/hello/' + profile.username + '/background';
 	};
 
-	var getCommunityPath = function (community) {
+	$scope.getCommunity = function () {
+		return community;
+	};
+
+	var getCommunityProfilePath = function (community) {
 		var communityIndex = profile.communities.indexOf(community);
 		var path = '/hello/' + profile.username;
 		if (communityIndex >= 0) {
@@ -256,26 +260,26 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return path;
 	}
 	$scope.profile.getCommunityUrl = function (community) {
-		return "#" + getCommunityPath(community);
+		return "#" + getCommunityProfilePath(community);
 	};
-
-
 	$scope.showCommunity = function (community) {
-		$location.path(getCommunityPath(community));
+		$location.path(getCommunityProfilePath(community));
 	};
 
-	$scope.getCommunity = function () {
-		return community;
-	};
-	$scope.getCommunityImageUrl = function (community) {
+
+	var getCommunityImagePath = function (community) {
 		if (!community) {
 			return '';
 		}
-		var imageUrl = '/profile/' + profile.username + '/community/';
-		imageUrl += profile.communities.indexOf(community);
-		imageUrl += '/image';
-
-		return imageUrl;
+		var path = '/profile/' + profile.username + '/community/';
+		path += profile.communities.indexOf(community);
+		return path;
+	};
+	$scope.getCommunityImageUrl = function (community) {
+		return getCommunityImagePath(community) + '/image';
+	};
+	$scope.getCommunityIconUrl = function (community) {
+		return getCommunityImagePath(community) + '/icon';
 	};
 
 

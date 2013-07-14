@@ -238,9 +238,16 @@ ul {
 .communityNav > li > a {
 	color: #aaa;
 }
-.communityNav > li > a:hover {
+.communityNav > li a:hover {
 	color: #222;
 	cursor: pointer;
+}
+
+.iconContainer {
+	padding: 3px;
+}
+.softHighlight {
+	border: dotted 1px #1c1c1c;
 }
 
 

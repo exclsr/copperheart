@@ -64,9 +64,12 @@
 						<img ng-src="{{profile.getImageUrl()}}" width="66"></a>
 					</li>
 					<li ng-repeat="community in profile.getCommunities()">
-						<a ng-click="showCommunity(community)">
-							<img ng-src="{{getCommunityIconUrl(community)}}" width="50"/>
-						</a>
+						<div ng-class="{ softHighlight: isEqual(community, getCommunity()) }" 
+						class="iconContainer">
+							<a ng-click="showCommunity(community)">
+								<img ng-src="{{getCommunityIconUrl(community)}}" width="50"/>
+							</a>
+						</div>
 					</li>
 					<li>
 						<a href="{{profile.getBackgroundUrl()}}">future plans</a>

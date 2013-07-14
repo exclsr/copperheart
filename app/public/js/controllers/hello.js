@@ -317,6 +317,10 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	$scope.startContributing = function () {
 		session.isContributing = true;
 	};
+	$scope.stopContributing = function () {
+		session.isContributing = false;
+		session.save();
+	};
 
 
 	$scope.canHazContribution = function () {
@@ -403,5 +407,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 		$location.path('/contribute');
 	};
+
 }
 HelloCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams'];

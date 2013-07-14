@@ -272,6 +272,15 @@ ul {
 	text-decoration: underline;
 }
 
+.stopContributing {
+	text-align: right; 
+	cursor: pointer; 
+	font-size: smaller;
+}
+.stopContributing a {
+	color: #999;
+}
+
 /* Hello: Process / contribute prelude */;
 .process {
 	color: black;

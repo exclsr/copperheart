@@ -80,7 +80,7 @@
 		</div>
 	</div>
 
-	<div class="helloContainer span11 row clear: left" style="margin-top: 0;">
+	<div class="helloContainer span11 row" style="margin-top: 0;">
 		<div>
 			<div>
 				<ul class="communityNav">
@@ -110,8 +110,17 @@
 		</div>
 	</div>	
 
+	<div class="helloContainer startContributing span11 row"
+		ng-class="{ active: isContributing() }">
+		<div ng-click="startContributing()">
+			<!-- TODO: Scroll down to the process div, maybe -->
+			<span class="copper heart">♥</span>
+			<span class="text" ng-hide="isContributing()">Contribute</span>
+		</div>
+	</div>
+
 	<!-- -->
-	<div class="process span12">
+	<div class="process span12" ng-show="isContributing()">
 		<div class="row">
 			<h3 class="contributeTitle span4">Contribute</h3>
 			<h3 class="contributeTitle span3" 
@@ -213,6 +222,7 @@
 		</div>
 	</div>
 
+<!--
 	<div class="support span12">
 		<div class="row">
 			<h3 class="contributeTitle span7">Supported by the following monthly contributions</h3>
@@ -232,5 +242,6 @@
 			</span>
 		</div>
 	</div>
+-->
 </div>
 </div>

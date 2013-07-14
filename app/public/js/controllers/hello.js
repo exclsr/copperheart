@@ -309,6 +309,14 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return $location.path().split('/').indexOf("background") >= 0;
 	};
 
+	$scope.isContributing = function () {
+		// TODO: Also return true if the patron has some contributions
+		// from a previous session.
+		return session.isContributing;
+	};
+	$scope.startContributing = function () {
+		session.isContributing = true;
+	};
 
 
 	$scope.canHazContribution = function () {

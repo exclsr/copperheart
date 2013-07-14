@@ -236,7 +236,7 @@ ul {
 }
 
 .communityNav > li > a {
-	color: #aaa;
+	color: #777;
 }
 .communityNav > li a:hover {
 	color: #222;
@@ -250,6 +250,22 @@ ul {
 	border: dotted 1px #1c1c1c;
 }
 
+.startContributing {
+	padding: 0.5em;
+	text-align: center; 
+	cursor: pointer; 
+}
+.startContributing:hover, .startContributing.active {
+	background-color: #ddd;
+	
+}
+.startContributing .heart {
+	margin-right: 1ex;
+	margin-left: -0.3ex;
+}
+.startContributing:hover .text {
+	text-decoration: underline;
+}
 
 /* Hello: Process / contribute prelude */;
 .process {

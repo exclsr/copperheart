@@ -20,6 +20,7 @@ function EditCtrl(session, $scope, $http) {
 		'globe', 'wrench', 'briefcase'
 	];
 
+
 	var bindToSession = function () {
 		patron = session.patron;
 	};
@@ -383,7 +384,7 @@ function EditCtrl(session, $scope, $http) {
 				// moving. We don't want to save to the 
 				// database with every keystroke. Something
 				// like this is great for stress testing, though.
-				if (newValue) {
+				if (oldValue !== undefined) {
 					saveCommunities(newValue);
 				}
 			},
@@ -391,7 +392,7 @@ function EditCtrl(session, $scope, $http) {
 		);
 		$scope.$watch('background', 
 			function (newValue, oldValue) {
-				if (newValue) {
+				if (oldValue !== undefined) {
 					saveWho(function() {});
 				}
 			},
@@ -399,7 +400,7 @@ function EditCtrl(session, $scope, $http) {
 		);
 		$scope.$watch('future', 
 			function (newValue, oldValue) {
-				if (newValue) {
+				if (oldValue !== undefined) {
 					saveWho(function() {});
 				}
 			},

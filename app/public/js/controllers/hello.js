@@ -52,9 +52,13 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		var onWhoReady = function (who) {
 			profile.name = who.name;
 			profile.present = who.present;
+			profile.background = who.background;
+			profile.future = who.future;
 			profile.passions = who.passions;
 			profile.communities = who.communities;
 			profile.imageUrl = "/profile/" + profile.username + "/image";
+			profile.backgroundUrl = "/profile/" + profile.username + "/background/image";
+			profile.futureUrl = "/profile/" + profile.username + "/future/image";
 
 			// Set the active community if there is one.
 			var communityIndex = $routeParams.communityId;
@@ -223,7 +227,13 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 	$scope.profile.getPresent = function() {
 		return profile.present;
-	}
+	};
+	$scope.profile.getBackground = function() {
+		return profile.background;
+	};
+	$scope.profile.getFuture = function() {
+		return profile.future;
+	};
 	$scope.profile.getCommunities = function() {
 		return profile.communities;
 	};
@@ -239,12 +249,21 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	$scope.profile.getHelloUrl = function() {
 		return '#/hello/' + profile.username;
-	}
-	$scope.profile.getImageUrl = function() {
-		return profile.imageUrl;
 	};
 	$scope.profile.getBackgroundUrl = function() {
 		return '#/hello/' + profile.username + '/background';
+	};
+	$scope.profile.getFutureUrl = function() {
+		return '#/hello/' + profile.username + '/future';
+	};
+	$scope.profile.getImageUrl = function() {
+		return profile.imageUrl;
+	};
+	$scope.profile.getBackgroundImageUrl = function() {
+		return profile.backgroundUrl;
+	};
+	$scope.profile.getFutureImageUrl = function() {
+		return profile.futureUrl;
 	};
 
 	$scope.getCommunity = function () {
@@ -281,6 +300,15 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	$scope.getCommunityIconUrl = function (community) {
 		return getCommunityImagePath(community) + '/icon';
 	};
+
+
+	$scope.showFuture = function () {
+		return $location.path().split('/').indexOf("future") >= 0;
+	};
+	$scope.showBackground = function () {
+		return $location.path().split('/').indexOf("background") >= 0;
+	};
+
 
 
 	$scope.canHazContribution = function () {

@@ -20,7 +20,8 @@
 			</div>
 		</div>
 
-		<div class="helloContainer whoContainer span11 row" ng-hide="getCommunity()">
+		<div class="helloContainer whoContainer span11 row" 
+			ng-hide="getCommunity() || showBackground() || showFuture() ">
 			<div class="span8 column first pitch">
 				<div class="span3 first column">
 					<div class="whoImageContainer">
@@ -48,6 +49,35 @@
 				<!-- TODO: Have a list of past projects in here, somehow. -->
 			</div>
 		</div>
+
+		<div class="helloContainer background span11 row" ng-show="showBackground()">
+			<div class="span6" style="margin: 0; box-sizing: border-box;
+				padding-left: 1.4em; padding-right: 1.4em">
+				<h3>Background</h3>
+				<div ng-bind-html="profile.getBackground()"></div>
+			</div>
+
+			<div class="span5" style="margin: 0; margin-top: 1.2em">
+				<img ng-src="{{profile.getBackgroundImageUrl()}}" 
+					class="img-polaroid" 
+					style="background-color: #ccc"/>
+				<div class="photoCredit">photo credit: yes</div>
+			</div>
+		</div>
+
+		<div class="helloContainer future span11 row" ng-show="showFuture()">
+			<div class="span6" style="margin: 0; margin-top: 1.2em">
+				<img ng-src="{{profile.getFutureImageUrl()}}" 
+					class="img-polaroid" 
+					style="background-color: #ccc"/>
+				<div class="photoCredit" style="text-align: left">photo credit: yes</div>
+			</div>
+			<div class="span5" style="margin: 0; box-sizing: border-box;
+				padding-left: 1.4em; padding-right: 1.4em">
+				<h3>Future plans</h3>
+				<div ng-bind-html="profile.getFuture()"></div>
+			</div>
+		</div>
 	</div>
 
 	<div class="helloContainer span11 row clear: left" style="margin-top: 0;">
@@ -72,8 +102,8 @@
 						</div>
 					</li>
 					<li>
-						<a href="{{profile.getBackgroundUrl()}}">future plans</a>
-						<a href="{{profile.getBackgroundUrl()}}"><img src="/img/arrow-right.png" class="backgroundArrow"/></a>
+						<a href="{{profile.getFutureUrl()}}">future plans</a>
+						<a href="{{profile.getFutureUrl()}}"><img src="/img/arrow-right.png" class="futureArrow"/></a>
 					</li>
 				</ul>
 			</div>

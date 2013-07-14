@@ -212,7 +212,7 @@ ul {
 }
 
 
-.backgroundArrow {
+.backgroundArrow, .futureArrow {
 	width: 16px;
 	opacity: 0.5;
 	vertical-align: top;

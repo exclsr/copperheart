@@ -14,6 +14,7 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
     $routeProvider.when('/:who/hello', hello);
     $routeProvider.when('/hello/:who', hello);
     $routeProvider.when('/hello/:who/background', hello);
+    $routeProvider.when('/hello/:who/future', hello);
     $routeProvider.when('/hello/:who/community/:communityId', hello);
     $routeProvider.when('/hello', hello);
     $routeProvider.when('/contribute', {templateUrl: 'partials/contribute.html', controller: ContributeCtrl});

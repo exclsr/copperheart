@@ -248,24 +248,20 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return member.backers;
 	};
 
-	$scope.profile.getHelloUrl = function() {
+	var getHelloUrl = function () {
 		return '#/hello/' + profile.username;
+	}
+	$scope.profile.getHelloUrl = function() {
+		return getHelloUrl();
 	};
 	$scope.profile.getBackgroundUrl = function() {
-		if (profile) {
-			return '#/hello/' + profile.username + '/background';
-		}
-		else {
-			return placeholderUrl;
-		}
+		return getHelloUrl() + '/background';
 	};
 	$scope.profile.getFutureUrl = function() {
-		if (profile) {
-			return '#/hello/' + profile.username + '/future';	
-		}
-		else { 
-			return placeholderUrl
-		}
+		return getHelloUrl() + '/future';	
+	};
+	$scope.profile.getSupportUrl = function () {
+		return getHelloUrl() + '/support';
 	};
 	$scope.profile.getImageUrl = function() {
 		return profile ? profile.imageUrl : placeholderUrl;

@@ -21,7 +21,7 @@
 		</div>
 
 		<div class="helloContainer whoContainer span11 row" 
-			ng-hide="isShowingCommunity() || showBackground() || showFuture() ">
+			ng-hide="isShowingCommunity() || showBackground() || showFuture() || showSupport()">
 			<div class="span8 column first pitch">
 				<div class="span3 first column">
 					<div class="whoImageContainer">
@@ -86,6 +86,26 @@
 				<h3>Future plans</h3>
 				<div ng-bind-html="profile.getFuture()"></div>
 			</div>
+		</div>
+
+		<!-- TODO: We'll want to design this a bit. -->
+		<div class="helloContainer support span11 row" ng-show="showSupport()">
+			<div class="support">
+				<h3>{{profile.getName()}} is supported by the following monthly contributions</h3>
+				<div class="supportRow" ng-repeat="thing in profile.getSupport()">
+					<span class="supportText">A {{thing.unit}} of {{thing.name}}.</span>
+					<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>
+				</div>
+			</div>
+
+			<div class="backers">
+				<h3>and backed by the following people</h3>
+				<div class="backersContent">
+					<span ng-repeat="backer in profile.getBackers()">
+						{{backer}} <span ng-show="$middle">,</span>
+					</span>
+				</div>
+			</div>	
 		</div>
 	</div>
 
@@ -233,27 +253,5 @@
 	<div class="span11 helloContainer stopContributing" ng-show="isContributing()">
 		<a ng-click="stopContributing()">Close</a>
 	</div>
-
-<!--
-	<div class="support span12">
-		<div class="row">
-			<h3 class="contributeTitle span7">Supported by the following monthly contributions</h3>
-		</div>
-		<div class="supportRow" ng-repeat="thing in profile.getSupport()">
-			<span class="supportText">A {{thing.unit}} of {{thing.name}}.</span>
-			<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>
-		</div>
-	</div>
-
-	<div class="backers span12">
-		<div class="row"><h3 class="contributeTitle span7">Backed by the following people</h3></div>
-		<div class="backersContent">
-			<span ng-repeat="backer in profile.getBackers()">
-				{{backer}}
-				<span ng-show="$middle">,</span>
-			</span>
-		</div>
-	</div>
--->
 </div>
 </div>

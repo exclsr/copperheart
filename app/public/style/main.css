@@ -520,16 +520,16 @@ ul {
 	margin-top: 2em;
 }
 
-.support {
-	
-}
 
+.helloContainer.support {
+	padding-left: 3em;
+	padding-right: 3em;
+}
 .supportRow {
 	line-height: 1.5em; 
 	margin-left: 4.75ex;
 }
 .supportText {
-	margin-left: 1ex;
 	margin-right: 1ex;
 }
 
@@ -537,8 +537,8 @@ ul {
 	margin-top: 1.5em;
 }
 .backersContent {
-	margin-left: 5.25ex;
 	margin-bottom: 1em;
+	margin-left: 4.75ex;
 }
 
 /* Contribution page */

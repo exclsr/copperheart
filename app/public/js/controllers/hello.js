@@ -321,12 +321,17 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		}
 	};
 
-
+	var locationHasToken = function (token) {
+		return $location.path().split('/').indexOf(token) >= 0;
+	};
 	$scope.showFuture = function () {
-		return $location.path().split('/').indexOf("future") >= 0;
+		return locationHasToken("future");
 	};
 	$scope.showBackground = function () {
-		return $location.path().split('/').indexOf("background") >= 0;
+		return locationHasToken("background");
+	};
+	$scope.showSupport = function () {
+		return locationHasToken("support");
 	};
 
 	$scope.isContributing = function () {

@@ -611,6 +611,7 @@ var db = function (config) {
 						patron, 
 						function (error, response, headers) {
 							if (error) {
+								console.log("Failure saving patron.");
 								failure(error);
 							} 
 							else {
@@ -707,29 +708,47 @@ var db = function (config) {
 		);
 	};
 
-	var streamImageAttachment = function (patron, attachmentName, res, callback) {
+	var streamImageAttachment = function (patron, attachmentName, headers, res, callback) {
 		// Stream the image to 'res'
 		var docId = patron._id;
 		res.type("image/jpeg");
 		var readStream;
-		// We access the database via getPatronByUsername right before
-		// making this call, so we don't have to refresh our cookies.
-		// TODO: We should check anyway. Check the docs to see if headers
-		// are returned in this callback, or what.
-		readStream = database.attachment.get(docId, attachmentName, function (err) {
+
+		headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
+		headers["cookie"] = cookieToken;
+
+		var opts = {
+			db: databaseName,
+			headers: headers,
+			method: "GET",
+			doc: docId,
+			att: attachmentName,
+			encoding: null
+		};
+
+		readStream = nanoDb.relax(opts, function (err) {
 			if (err) {
 				callback(err);
 			}
 		});
+		// We access the database via getPatronByUsername right before
+		// making this call, so we don't have to refresh our cookies.
+		// TODO: We should check anyway. Check the docs to see if headers
+		// are returned in this callback, or what.
+		// readStream = database.attachment.get(docId, attachmentName, function (err) {
+		// 	if (err) {
+		// 		callback(err);
+		// 	}
+		// });
 
 		// TODO: Consider setting 'end' to false so we can
 		// maybe send an error code if we mess up.
 		readStream.pipe(res);
 	};
 
-	var getImageByUsername = function (username, attachmentName, res, callback) {
+	var getImageByUsername = function (username, attachmentName, headers, res, callback) {
 		var gotPatron = function (patron) {
-			streamImageAttachment(patron, attachmentName, res, callback);
+			streamImageAttachment(patron, attachmentName, headers, res, callback);
 		};
 
 		var failure = function (err) {
@@ -739,8 +758,8 @@ var db = function (config) {
 		getPatronByUsername(username, gotPatron, failure);
 	};
 
-	var getProfileImageByUsername = function (username, res, callback) {
-		getImageByUsername(username, "profile.jpg", res, callback);
+	var getProfileImageByUsername = function (username, headers, res, callback) {
+		getImageByUsername(username, "profile.jpg", headers, res, callback);
 	};
 
 	var saveImageByUsername = function (username, attachmentName, imageData, callback) {
@@ -776,8 +795,8 @@ var db = function (config) {
 	};
 
 
-	var getBackgroundImageByUsername = function (username, res, callback) {
-		getImageByUsername(username, "background.jpg", res, callback);
+	var getBackgroundImageByUsername = function (username, headers, res, callback) {
+		getImageByUsername(username, "background.jpg", headers, res, callback);
 	};
 
 	var saveBackgroundImageByUsername = function(username, imageData, callback) {
@@ -785,8 +804,8 @@ var db = function (config) {
 	};
 
 
-	var getFutureImageByUsername = function (username, res, callback) {
-		getImageByUsername(username, "future.jpg", res, callback);
+	var getFutureImageByUsername = function (username, headers, res, callback) {
+		getImageByUsername(username, "future.jpg", headers, res, callback);
 	};
 
 	var saveFutureImageByUsername = function(username, imageData, callback) {
@@ -799,9 +818,9 @@ var db = function (config) {
 		return name;
 	}
 
-	var getCommunityImageByUsername = function (username, communityName, res, callback) {
+	var getCommunityImageByUsername = function (username, communityName, headers, res, callback) {
 		var name = sanitizeName(communityName);
-		getImageByUsername(username, name + ".jpg", res, callback);
+		getImageByUsername(username, name + ".jpg", headers, res, callback);
 	};
 
 	var saveCommunityImageByUsername = function (username, communityName, imageData, callback) {
@@ -809,9 +828,9 @@ var db = function (config) {
 		saveImageByUsername(username, name + ".jpg", imageData, callback);
 	};
 
-	var getCommunityIconByUsername = function (username, communityName, res, callback) {
+	var getCommunityIconByUsername = function (username, communityName, headers, res, callback) {
 		var name = sanitizeName(communityName);
-		getImageByUsername(username, name + "icon.jpg", res, callback);
+		getImageByUsername(username, name + "icon.jpg", headers, res, callback);
 	};
 
 	var saveCommunityIconByUsername = function (username, communityName, imageData, callback) {

@@ -545,7 +545,7 @@ app.get('/profile/:username', function (req, res) {
 
 
 app.get('/profile/:username/image', function (req, res) {
-	db.profileImages.get(req.params.username, res, function (err) {
+	db.profileImages.get(req.params.username, req.headers, res, function (err) {
 		if (err) {
 			// We don't have to do anything, here, as the db
 			// pipe takes care of it. Log if you want.
@@ -556,18 +556,18 @@ app.get('/profile/:username/image', function (req, res) {
 
 var noop = function () { };
 app.get('/profile/:username/background/image', function (req, res) {
-	db.profileImages.getBackground(req.params.username, res, noop);
+	db.profileImages.getBackground(req.params.username, req.headers, res, noop);
 });
 
 app.get('/profile/:username/future/image', function (req, res) {
-	db.profileImages.getFuture(req.params.username, res, noop);
+	db.profileImages.getFuture(req.params.username, req.headers, res, noop);
 });
 
-var getCommunityImage = function (username, communityId, getImageFn, res) {
+var getCommunityImage = function (username, communityId, getImageFn, headers, res) {
 	var success = function (profile) {
 		var community = profile.communities[communityId];
 		if (community) {
-			getImageFn(username, community.name, res,
+			getImageFn(username, community.name, headers, res,
 				function (err) {
 					// We use pipes to transfer stuff, so we don't really
 					// care about this error at the moment.
@@ -592,6 +592,7 @@ app.get('/profile/:username/community/:communityId/image', function (req, res) {
 		req.params.username, 
 		req.params.communityId, 
 		db.communityImages.get, 
+		req.headers,
 		res
 	);
 });
@@ -601,6 +602,7 @@ app.get('/profile/:username/community/:communityId/icon', function (req, res) {
 		req.params.username, 
 		req.params.communityId, 
 		db.communityImages.getIcon,
+		req.headers,
 		res
 	);
 });

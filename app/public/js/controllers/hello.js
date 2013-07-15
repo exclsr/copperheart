@@ -313,7 +313,12 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		}
 	};
 	$scope.getCommunityIconUrl = function (community) {
-		return getCommunityImagePath(community) + '/icon';
+		if (!community) {
+			return placeholderUrl;
+		}
+		else {
+			return getCommunityImagePath(community) + '/icon';	
+		}
 	};
 
 

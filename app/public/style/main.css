@@ -103,7 +103,7 @@ ul {
 
 
 .entrance {
-
+	min-height: 600px;
 }
 
 .entrance .profile {
@@ -115,6 +115,7 @@ ul {
 	margin: 2.5em;
 	margin-top: 0;
 
+	min-height: 405px;
 }
 .entrance .profile h3 {
 	text-align: center;

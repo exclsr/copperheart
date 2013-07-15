@@ -105,7 +105,7 @@ var db = function (config) {
 		var headers = {
 			"X-CouchDB-WWW-Authenticate": "Cookie",
 			cookie: cookieToken
-		}
+		};
 
 		var opts = {
 			db: databaseName,
@@ -709,28 +709,33 @@ var db = function (config) {
 	};
 
 	var streamImageAttachment = function (patron, attachmentName, headers, res, callback) {
-		// Stream the image to 'res'
 		var docId = patron._id;
-		res.type("image/jpeg");
-		var readStream;
 
-		headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
-		headers["cookie"] = cookieToken;
+		var _headers = {};
+		_headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
+		_headers["cookie"] = cookieToken.toString();
+		// TODO: This works for Chrome. Are there other browser behaviors
+		// that we need to care about?
+		_headers["if-none-match"] = headers["if-none-match"];
 
+		var attName = encodeURIComponent(attachmentName);
 		var opts = {
 			db: databaseName,
-			headers: headers,
+			headers: _headers,
 			method: "GET",
 			doc: docId,
-			att: attachmentName,
+			params: {},
+			att: attName,
 			encoding: null
 		};
 
-		readStream = nanoDb.relax(opts, function (err) {
+		var readStream = nanoDb.relax(opts, function (err) {
 			if (err) {
 				callback(err);
 			}
 		});
+
+
 		// We access the database via getPatronByUsername right before
 		// making this call, so we don't have to refresh our cookies.
 		// TODO: We should check anyway. Check the docs to see if headers
@@ -743,6 +748,9 @@ var db = function (config) {
 
 		// TODO: Consider setting 'end' to false so we can
 		// maybe send an error code if we mess up.
+
+		// Stream the image to 'res'
+		res.type("image/jpeg");
 		readStream.pipe(res);
 	};
 

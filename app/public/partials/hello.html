@@ -5,7 +5,7 @@
 <div class="hello span12">
 
 	<div class="whatContainer">
-		<div class="helloContainer projectContainer span11 row" ng-show="getCommunity()">
+		<div class="helloContainer projectContainer span11 row" ng-show="isShowingCommunity()">
 			<div class="span6" style="margin: 0; box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
 				<h3>{{getCommunity().name}}</h3>
@@ -14,14 +14,14 @@
 
 			<div class="span5" style="margin: 0; margin-top: 1.2em">
 				<img ng-src="{{getCommunityImageUrl(getCommunity())}}" 
-					class="img-polaroid" 
+					class="img-polaroid communityImage"
 					style="background-color: #ccc"/>
 				<div class="photoCredit">photo credit: yes</div>
 			</div>
 		</div>
 
 		<div class="helloContainer whoContainer span11 row" 
-			ng-hide="getCommunity() || showBackground() || showFuture() ">
+			ng-hide="isShowingCommunity() || showBackground() || showFuture() ">
 			<div class="span8 column first pitch">
 				<div class="span3 first column">
 					<div class="whoImageContainer">
@@ -86,7 +86,7 @@
 				<ul class="communityNav">
 					<!-- TODO: Use ng-click to not hit the server -->
 					<li>
-						<a href="{{profile.getBackgroundUrl()}}"><img src="/img/arrow-left.png" class="backgroundArrow"/></a>
+						<a href="{{profile.getBackgroundUrl()}}"><img src="/img/arrow-left.png" height="16" class="backgroundArrow"/></a>
 						<a href="{{profile.getBackgroundUrl()}}">background</a>
 					</li>
 					<li>
@@ -97,7 +97,7 @@
 						<div ng-class="{ softHighlight: isEqual(community, getCommunity()) }" 
 						class="iconContainer">
 							<a ng-click="showCommunity(community)">
-								<img ng-src="{{getCommunityIconUrl(community)}}" width="50"/>
+								<img class="communityIcon" ng-src="{{getCommunityIconUrl(community)}}" width="50" height="50"/>
 							</a>
 						</div>
 					</li>

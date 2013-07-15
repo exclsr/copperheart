@@ -4,6 +4,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	var profile = {};
 	var community = undefined;
+	var placeholderUrl = "/img/placeholder.png";
 
 	var patron = {};
 	var member = {};
@@ -228,7 +229,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	$scope.profile.getPresent = function() {
 		return profile.present;
 	};
-	$scope.profile.getBackground = function() {
+	$scope.profile.getBackground = function() {		
 		return profile.background;
 	};
 	$scope.profile.getFuture = function() {
@@ -251,13 +252,23 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return '#/hello/' + profile.username;
 	};
 	$scope.profile.getBackgroundUrl = function() {
-		return '#/hello/' + profile.username + '/background';
+		if (profile) {
+			return '#/hello/' + profile.username + '/background';
+		}
+		else {
+			return placeholderUrl;
+		}
 	};
 	$scope.profile.getFutureUrl = function() {
-		return '#/hello/' + profile.username + '/future';
+		if (profile) {
+			return '#/hello/' + profile.username + '/future';	
+		}
+		else { 
+			return placeholderUrl
+		}
 	};
 	$scope.profile.getImageUrl = function() {
-		return profile.imageUrl;
+		return profile ? profile.imageUrl : placeholderUrl;
 	};
 	$scope.profile.getBackgroundImageUrl = function() {
 		return profile.backgroundUrl;
@@ -266,6 +277,9 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return profile.futureUrl;
 	};
 
+	$scope.isShowingCommunity = function () {
+		return ($routeParams.communityId !== undefined);
+	};
 	$scope.getCommunity = function () {
 		return community;
 	};
@@ -295,7 +309,12 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return path;
 	};
 	$scope.getCommunityImageUrl = function (community) {
-		return getCommunityImagePath(community) + '/image';
+		if (!community) {
+			return placeholderUrl;
+		}
+		else {
+			return getCommunityImagePath(community) + '/image';
+		}
 	};
 	$scope.getCommunityIconUrl = function (community) {
 		return getCommunityImagePath(community) + '/icon';

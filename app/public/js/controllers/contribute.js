@@ -2,7 +2,6 @@
 
 function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 
-	session.pageName = "contribute";
 	var contributionTo = undefined;
 	var patron = undefined;
 

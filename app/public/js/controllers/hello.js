@@ -9,8 +9,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	var patron = {};
 	var member = {};
 
-	session.pageName = "hello";
-
 	var redirectToEntrance = function (reason) {
 		// called in failure situations.
 		console.log(reason);

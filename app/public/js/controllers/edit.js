@@ -3,7 +3,6 @@
 /* Controllers */
 function EditCtrl(session, $scope, $http) {
 
-	session.pageName = "edit";
 	$scope.thing = {};
 	// TODO: Refactor this ugliness.
 	$scope.communityImageUrlTimestamps = {};

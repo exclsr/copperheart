@@ -2,8 +2,6 @@
 
 function ThanksCtrl(session, $scope, $http) {
 
-	session.pageName = "contribute/thanks";
-
 	var toMember = session.activeContribution.profile;
 	var contributions = session.contributions[toMember.username];
 

@@ -1,7 +1,7 @@
 'use strict';
 
 /* Controllers */
-function EditCtrl(session, $scope, $http) {
+function EditCtrl(session, $scope, $http, $routeParams) {
 
 	$scope.thing = {};
 	// TODO: Refactor this ugliness.
@@ -319,6 +319,9 @@ function EditCtrl(session, $scope, $http) {
 
 
 	var initialize = function() {
+		
+		$scope.subEdit = $routeParams.subEdit || 'profile';
+		
 		var memberRes = $http.get('/member');
 		memberRes.success(function (member) {
 			$scope.email = member.email;
@@ -410,4 +413,4 @@ function EditCtrl(session, $scope, $http) {
 	bindToSession();
 	initialize();
 }
-EditCtrl.$inject = ['session', '$scope', '$http'];
+EditCtrl.$inject = ['session', '$scope', '$http', '$routeParams'];

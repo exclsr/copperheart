@@ -752,6 +752,10 @@ select.paymentDay {
 
 
 /* Edit page */
+.nav-tabs > .active > a, .nav-tabs > .active > a:hover {
+	background-color: #eee;
+}
+
 .name {
 	font-size: 18pt !important;
 	height: 26px !important;

@@ -418,10 +418,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		});
 	};
 
-	$scope.isEqual = function (a, b) {
-		return a === b;
-	};
-
 	$scope.toContribute = function() {
 		// TODO: Can we $watch on the functions?
 		session.activeContribution.priceNow = $scope.priceNow();

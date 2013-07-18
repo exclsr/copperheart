@@ -77,5 +77,9 @@ function TopLevelCtrl(session, $scope, $http) {
 			console.log(data);
 		});
 	};
+
+	$scope.isEqual = function (a, b) {
+		return a === b;
+	};
 }
 TopLevelCtrl.$inject = ['session', '$scope', '$http'];

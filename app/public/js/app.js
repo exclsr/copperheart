@@ -7,6 +7,7 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
   config(['$routeProvider', function($routeProvider) {
     
     var hello = { templateUrl: 'partials/hello.html', controller: HelloCtrl };
+    var edit = { templateUrl: 'partials/edit.html', controller: EditCtrl };
 
   	$routeProvider.when('/entrance', {templateUrl: 'partials/entrance.html', controller: EntranceCtrl});
     $routeProvider.when('/about', {templateUrl: 'partials/about.html', controller: AboutCtrl});
@@ -22,5 +23,6 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
     $routeProvider.when('/contribute/thanks', {templateUrl: 'partials/thanks.html', controller: ThanksCtrl});
     $routeProvider.when('/edit', {templateUrl: 'partials/edit.html', controller: EditCtrl});
     $routeProvider.when('/edit/contributions', {templateUrl: 'partials/editContributions.html', controller: EditContributionsCtrl});
+    $routeProvider.when('/edit/:subEdit', {templateUrl: 'partials/edit.html', controller: EditCtrl});
     $routeProvider.otherwise({redirectTo: '/entrance'});
   }]);

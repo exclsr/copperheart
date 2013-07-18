@@ -3,123 +3,131 @@
 <div class="view">
 <div class="span12">
 
-	<div class="currentlyDoing" style="padding-top: 1em">
+	<ul class="nav nav-tabs" style="padding-top: 1em">
+		<li ng-class="{ active: isEqual(subEdit, 'profile') }"><a href="#/edit">profile</a></li>
+		<li ng-class="{ active: isEqual(subEdit, 'things') }"><a href="#/edit/things">things</a></li>
+		<li ng-class="{ active: isEqual(subEdit, 'account') }"><a href="#/edit/account">account</a></li>
+	</ul>
 
-		<h3>who are you, what are you working on?</h3>
-		<div class="span3">
-			<img ng-src="{{profileImageUrl}}"/>
-			<input uploader type="file" data-url="member/profileImage" name="profileImage"		
-				onUpload="profileImageUploaded()"/>
-		</div>
+	<div ng-hide="!isEqual(subEdit, 'profile')">
+		<div class="currentlyDoing">
 
-		<div class="who span6" style="height: 315px">
-			<input ng-model="name" class="name" type="text"/>
-			<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
-			<button class="btn" ng-click="saveProfile()">Save</button>
-		</div>
-
-		<div class="projects span8" style="clear: left; float: left; margin-top: 2em">
-			<div class="span4">
-				<h3>Communities</h3>
-				<ul style="margin-bottom: 0">
-					<li ng-repeat="community in communities" class="communityContainer">
-						<span class=""><a href="{{community.url}}">{{community.name}}</a></span>
-						<span class="thingTrashIcon" ng-click="deleteCommunity(community)">
-							<i class="icon-trash" 
-							style="margin-left: 1.5ex; margin-bottom: 2px; vertical-align: bottom"></i>
-						</span>
-					</li>
-				</ul>
-
-				<ul ng-hide="isAtCommunityLimit()" style="margin-top: 0">
-					<li>
-						<form ng-submit="saveCommunity()">
-							<input ng-model="newCommunity.name" type="text" style="margin-top: 10px"
-							placeholder="community name" />
-							<input ng-model="newCommunity.url" type="text" style="margin-top: -8px" 
-							placeholder="web address (url)" />
-							<button type="submit" class="btn" style="margin-top: -18px">Add</button>
-						</form>
-					</li>
-				</ul>
-			</div>
-
-			<!--
-			TODO: Soon ...
- 			<input type="text"/>
-			<input class="span4" type="text"/>
- 			-->
- 			<div class="span3">
-				<h3>Passions</h3>
-				<ul style="margin-bottom: 0">
-					<li ng-repeat="passion in passions" class="passionContainer">
-						<span class="">{{passion}}</span>
-						<span class="thingTrashIcon" ng-click="deletePassion(passion)">
-							<i class="icon-trash" 
-							style="margin-left: 1.5ex; margin-bottom: 2px; vertical-align: bottom"></i>
-						</span>
-					</li>
-				</ul>
-
-				<ul ng-hide="isAtPassionLimit()" style="margin-top: 0">
-					<li>
-						<form ng-submit="savePassion()">
-							<input ng-model="newPassion" type="text" style="margin-top: 10px"/>
-							<button type="submit" class="btn">Add</button>
-						</form>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-
-
-
-	<div class="communities" style="clear: left">
-		<h3 style="padding-top: 2em">Communities</h3>
-		<div ng-repeat="community in communities">
-			<div class="span6">
-				<input ng-model="community.name" class="name span6" type="text"/>
-				<textarea ng-model="community.description" class="span6" style="height: 225px;"></textarea>
-			</div>
+			<h3>who are you, what are you working on?</h3>
 			<div class="span3">
-				<img ng-src="/profile/{{username}}/community/{{$index}}/image?{{communityImageUrlTimestamps[$index]}}"/>
-				<input uploader type="file" data-url="member/community/{{$index}}/image" 
-				name="communityImage"		
-				onUpload="communityImageUploaded($index)">
-
-				<img ng-src="/profile/{{username}}/community/{{$index}}/icon?{{communityIconUrlTimestamps[$index]}}"/>
-				<input uploader type="file" data-url="member/community/{{$index}}/icon" 
-				name="communityIcon"		
-				onUpload="communityIconUploaded($index)">
+				<img ng-src="{{profileImageUrl}}"/>
+				<input uploader type="file" data-url="member/profileImage" name="profileImage"		
+					onUpload="profileImageUploaded()"/>
 			</div>
+
+			<div class="who span6" style="height: 315px">
+				<input ng-model="name" class="name" type="text"/>
+				<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
+				<button class="btn" ng-click="saveProfile()">Save</button>
+			</div>
+
+			<div class="projects span8" style="clear: left; float: left; margin-top: 2em">
+				<div class="span4">
+					<h3>Communities</h3>
+					<ul style="margin-bottom: 0">
+						<li ng-repeat="community in communities" class="communityContainer">
+							<span class=""><a href="{{community.url}}">{{community.name}}</a></span>
+							<span class="thingTrashIcon" ng-click="deleteCommunity(community)">
+								<i class="icon-trash" 
+								style="margin-left: 1.5ex; margin-bottom: 2px; vertical-align: bottom"></i>
+							</span>
+						</li>
+					</ul>
+
+					<ul ng-hide="isAtCommunityLimit()" style="margin-top: 0">
+						<li>
+							<form ng-submit="saveCommunity()">
+								<input ng-model="newCommunity.name" type="text" style="margin-top: 10px"
+								placeholder="community name" />
+								<input ng-model="newCommunity.url" type="text" style="margin-top: -8px" 
+								placeholder="web address (url)" />
+								<button type="submit" class="btn" style="margin-top: -18px">Add</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+
+				<!--
+				TODO: Soon ...
+	 			<input type="text"/>
+				<input class="span4" type="text"/>
+	 			-->
+	 			<div class="span3">
+					<h3>Passions</h3>
+					<ul style="margin-bottom: 0">
+						<li ng-repeat="passion in passions" class="passionContainer">
+							<span class="">{{passion}}</span>
+							<span class="thingTrashIcon" ng-click="deletePassion(passion)">
+								<i class="icon-trash" 
+								style="margin-left: 1.5ex; margin-bottom: 2px; vertical-align: bottom"></i>
+							</span>
+						</li>
+					</ul>
+
+					<ul ng-hide="isAtPassionLimit()" style="margin-top: 0">
+						<li>
+							<form ng-submit="savePassion()">
+								<input ng-model="newPassion" type="text" style="margin-top: 10px"/>
+								<button type="submit" class="btn">Add</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="communities" style="clear: left">
+			<h3 style="padding-top: 2em">Communities</h3>
+			<div ng-repeat="community in communities">
+				<div class="span6">
+					<input ng-model="community.name" class="name span6" type="text"/>
+					<textarea ng-model="community.description" class="span6" style="height: 225px;"></textarea>
+				</div>
+				<div class="span3">
+					<img ng-src="/profile/{{username}}/community/{{$index}}/image?{{communityImageUrlTimestamps[$index]}}"/>
+					<input uploader type="file" data-url="member/community/{{$index}}/image" 
+					name="communityImage"		
+					onUpload="communityImageUploaded($index)">
+
+					<img ng-src="/profile/{{username}}/community/{{$index}}/icon?{{communityIconUrlTimestamps[$index]}}"/>
+					<input uploader type="file" data-url="member/community/{{$index}}/icon" 
+					name="communityIcon"		
+					onUpload="communityIconUploaded($index)">
+				</div>
+			</div>
+		</div>
+
+
+		<h3 style="clear: left">Background</h3>
+		<div class="span3">
+			<img ng-src="{{backgroundImageUrl}}"/>
+			<input uploader type="file" data-url="member/backgroundImage" name="backgroundImage"
+				onUpload="backgroundImageUploaded()"/>
+		</div>
+		<div class="who span6" style="height: 315px">
+			<textarea ng-model="background" class="span6" style="height: 225px;"></textarea>
+		</div>
+
+		<h3 style="clear: left">Future plans</h3>
+		<div class="span3">
+			<img ng-src="{{futureImageUrl}}"/>
+			<input uploader type="file" data-url="member/futureImage" name="futureImage"
+				onUpload="futureImageUploaded()"/>
+		</div>
+		<div class="who span6" style="height: 315px">
+			<textarea ng-model="future" class="span6" style="height: 225px;"></textarea>
 		</div>
 	</div>
 
 
-	<h3 style="clear: left">Background</h3>
-	<div class="span3">
-		<img ng-src="{{backgroundImageUrl}}"/>
-		<input uploader type="file" data-url="member/backgroundImage" name="backgroundImage"
-			onUpload="backgroundImageUploaded()"/>
-	</div>
-	<div class="who span6" style="height: 315px">
-		<textarea ng-model="background" class="span6" style="height: 225px;"></textarea>
-	</div>
-
-	<h3 style="clear: left">Future plans</h3>
-	<div class="span3">
-		<img ng-src="{{futureImageUrl}}"/>
-		<input uploader type="file" data-url="member/futureImage" name="futureImage"
-			onUpload="futureImageUploaded()"/>
-	</div>
-	<div class="who span6" style="height: 315px">
-		<textarea ng-model="future" class="span6" style="height: 225px;"></textarea>
-	</div>
-
-
-	<div class="things" style="clear: left">
-		<h3 style="padding-top: 1em">add a thing</h3>
+	<div ng-show="isEqual(subEdit, 'things')">
+		<h3>add a thing</h3>
 
 		<div class="newThingContainer span10">
 			<label class="span3">
@@ -135,7 +143,7 @@
 			<div class="span1" style="text-align: right">
 				<button class="btn" ng-click="addThing()">Add</button>
 			</div>
-
+			
 			<div class="span10" style="clear: left">
 				<div style="padding-top: 1em; padding-left: 1.5em">
 					<span class="glyph-choice" ng-repeat="icon in getIcons()">
@@ -148,7 +156,16 @@
 					</span>
 				</div>
 			</div>
-		</div>
+
+<!-- 			<div style="clear: left; padding-top: 1em">
+				<label class="span7">
+					If I received 
+					<input ng-model="thing.goal" placeholder="(e.g. 30)" type="text" class="span1"/> 
+					of these each month, that would cover all my costs.
+				</label>
+
+			</div>
+ -->		</div>
 
 
 		<h3 style="clear: left; padding-top: 1.5em">things <small>:: {{things.length}}</h3>
@@ -169,27 +186,29 @@
 		</div>		
 	</div>
 
-	<h3 style="clear: left; padding-top: 1.5em">contribution destination</h3>
-	<div class="span4" ng-show="hasStripeAccount">
-		<p>Connected to your Stripe account.</p>
-	</div>
-	<div class="span4" ng-hide="hasStripeAccount">
-		<a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id={{stripeConnectClientId}}&scope=read_write" class="stripe-connect light-blue"><span>Connect with Stripe</span></a>
-	</div>
+	<div ng-show="isEqual(subEdit, 'account')">
+		<h3 style="clear: left;">contribution destination</h3>
+		<div class="span4" ng-show="hasStripeAccount">
+			<p>Connected to your Stripe account.</p>
+		</div>
+		<div class="span4" ng-hide="hasStripeAccount">
+			<a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id={{stripeConnectClientId}}&scope=read_write" class="stripe-connect light-blue"><span>Connect with Stripe</span></a>
+		</div>
 
-	<h3 style="clear: left; padding-top: 1.5em">profile name</h3>
-	<div class="span7">
-		<form ng-submit="saveProfile()">
-			<input ng-model="username" class="name" type="text"/> 
-			<h3 style="display: inline"><small>:: {{email}}</small></h3>
-			<div style="margin-bottom: 1.5em">
-				<button type="submit" class="btn">Save</button>
-			</div>
-		</form>
-	</div>
+		<h3 style="clear: left; padding-top: 1.5em">profile name</h3>
+		<div class="span7">
+			<form ng-submit="saveProfile()">
+				<input ng-model="username" class="name" type="text"/> 
+				<h3 style="display: inline"><small>:: {{email}}</small></h3>
+				<div style="margin-bottom: 1.5em">
+					<button type="submit" class="btn">Save</button>
+				</div>
+			</form>
+		</div>
 
-	<div style="margin-bottom: 2em">
-		&nbsp;
+		<div style="margin-bottom: 2em">
+			&nbsp;
+		</div>
 	</div>
 </div>
 </div>

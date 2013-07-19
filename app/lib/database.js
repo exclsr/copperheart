@@ -17,7 +17,7 @@ var db = function (config) {
 
 	var database;
 	var cradleDb;
-716
+
 	// Connect to Couch! 
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.

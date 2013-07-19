@@ -17,7 +17,7 @@ var db = function (config) {
 
 	var database;
 	var cradleDb;
-
+716
 	// Connect to Couch! 
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.
@@ -712,8 +712,10 @@ var db = function (config) {
 		var docId = patron._id;
 
 		var _headers = {};
-		_headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
-		_headers["cookie"] = cookieToken.toString();
+		if (dbConfig.useAuthentication) {
+			_headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
+			_headers["cookie"] = cookieToken.toString();			
+		}
 		// TODO: This works for Chrome. Are there other browser behaviors
 		// that we need to care about?
 		_headers["if-none-match"] = headers["if-none-match"];

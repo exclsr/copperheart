@@ -266,14 +266,8 @@ app.get('/things/:username', function (req, res) {
 		}
 		else {
 			// TODO: Consider doing this limitation at the data layer.
-			res.send(
-				things.slice(
-					0, 
-					Math.min(
-						things.length, 
-						req.query.n)
-				)
-			);
+			var thingsCount = Math.min(things.length, req.query.n);
+			res.send(things.slice(0, thingsCount));
 		}
 	};
 

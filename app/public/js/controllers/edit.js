@@ -288,6 +288,7 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 		newThing.unit = $scope.thing.unit;
 		newThing.price = parseNumber($scope.thing.price);
 		newThing.glyph = $scope.thing.glyph;
+		newThing.goal = $scope.thing.goal;
 		newThing.frequency = "month"; // TODO: Don't need this?
 
 		things.push(newThing);

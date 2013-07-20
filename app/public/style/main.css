@@ -829,7 +829,7 @@ select.paymentDay {
 .editThingContainer {
 	padding-left: 0;
 }
-.editThingContainer.odd {
+.odd .editThingContainer {
 	background-color: #bbb;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;

@@ -712,7 +712,7 @@ var db = function (config) {
 		var docId = patron._id;
 
 		var _headers = {};
-		 if (dbConfig.useCookies) {
+		 if (dbConfig.useCookies || dbConfig.useAuthentication) {
 			_headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
 			_headers["cookie"] = cookieToken.toString();			
 		}

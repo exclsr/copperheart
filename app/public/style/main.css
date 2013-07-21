@@ -278,7 +278,7 @@ ul {
 }
 
 .communityNav > li > a {
-	color: #777;
+	color: #96401E;
 }
 .communityNav > li a:hover {
 	color: #222;
@@ -287,9 +287,16 @@ ul {
 
 .iconContainer {
 	padding: 3px;
+	opacity: 0.9;
+}
+.iconContainer:hover {
+	opacity: 1.0;
 }
 .softHighlight {
-	border: dotted 1px #1c1c1c;
+	border: none;
+	border-bottom: dotted 1px;
+	border-color: #96401E;
+	opacity: 1.0;
 }
 
 .startContributing {
@@ -303,12 +310,17 @@ ul {
 }
 .startContributing.active {
 	margin-bottom: 0;
+	cursor: default;
 }
 .startContributing .heart {
 	margin-right: 1ex;
 	margin-left: -0.3ex;
 }
+.startContributing .text {
+	color: #96401E;
+}
 .startContributing:hover .text {
+	color: #222;
 	text-decoration: underline;
 }
 

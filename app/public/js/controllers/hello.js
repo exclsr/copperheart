@@ -271,6 +271,13 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return profile.futureUrl;
 	};
 
+	$scope.isShowingHello = function () {
+		var isNotShowingHello = $scope.isShowingCommunity() 
+		|| $scope.showBackground() 
+		|| $scope.showFuture() 
+		|| $scope.showSupport();
+		return !isNotShowingHello;
+	};
 	$scope.isShowingCommunity = function () {
 		return ($routeParams.communityId !== undefined);
 	};

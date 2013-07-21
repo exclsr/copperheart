@@ -21,7 +21,7 @@
 		</div>
 
 		<div class="helloContainer whoContainer span11 row" 
-			ng-hide="isShowingCommunity() || showBackground() || showFuture() || showSupport()">
+			ng-hide="!isShowingHello()">
 			<div class="span8 column first pitch">
 				<div class="span3 first column">
 					<div class="whoImageContainer">
@@ -107,12 +107,14 @@
 						<a href="{{profile.getBackgroundUrl()}}"><img src="/img/arrow-left.png" height="16" class="backgroundArrow"/></a>
 						<a href="{{profile.getBackgroundUrl()}}">background</a>
 					</li>
-					<li>
+					<li class="iconContainer" ng-class="{ softHighlight: isShowingHello() }">
 						<a href="{{profile.getHelloUrl()}}">
 						<img ng-src="{{profile.getImageUrl()}}" width="66"></a>
 					</li>
 					<li ng-repeat="community in profile.getCommunities()">
-						<div ng-class="{ softHighlight: isEqual(community, getCommunity()) }" 
+						<div ng-class="{ 
+							softHighlight: isEqual(community, getCommunity()) 
+						}" 
 						class="iconContainer">
 							<a ng-click="showCommunity(community)">
 								<img class="communityIcon" ng-src="{{getCommunityIconUrl(community)}}" width="50" height="50"/>

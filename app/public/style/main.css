@@ -219,20 +219,30 @@ ul {
 }
 
 .supportBarContainer {
-	margin-right: 1.5em; 
-	margin-left: 0.25ex;
+	margin-left: 0.1ex;
+	margin-bottom: 5em;
+}
+.supportBarContainer.active {
+	margin-bottom: 0;
 }
 .supportBar {
-	border: solid 1px #aaa;
+	border: solid 1px #ddd;
 }
 .supportBarFill {
 	background: #96401E; 
-	opacity: 0.8; 
+	opacity: 0.3; 
 	height: 5px
+}
+.supportBarContainer.active .supportBar {
+	
+}
+.supportBarContainer.active .details a {
+	color: #999;
 }
 .supportBarContainer .details {
 	font-size: small; 
 	text-align: right; 
+	opacity: 0.8;
 }
 
 .communityImage {
@@ -284,9 +294,9 @@ ul {
 
 .startContributing {
 	padding: 0.5em;
+	box-sizing: border-box;
 	text-align: center; 
 	cursor: pointer; 
-	margin-bottom: 5em;
 }
 .startContributing:hover, .startContributing.active {
 	background-color: #ddd;
@@ -305,7 +315,7 @@ ul {
 .stopContributing {
 	text-align: right; 
 	cursor: pointer; 
-	font-size: smaller;
+	font-size: small;
 }
 .stopContributing a {
 	color: #999;
@@ -317,6 +327,7 @@ ul {
 	padding-top: 2em;
 }
 .process h3 {
+	margin-top: 0;
 	color: #222;
 }
 
@@ -420,13 +431,13 @@ ul {
  *********************************************************************/
 .contributeTitle, .contributeHowOften {
 	padding-left: 1.85em;
-	padding-top: 1.2em;
+	padding-top: 1ex;
 }
 .hide {
 	visibility: hidden;
 }
 .contributeHearts {
-	padding-top: 1.2em;
+	padding-top: 1ex;
 	padding-left: 0.5em;
 }
 .heart, .contributeHearts {

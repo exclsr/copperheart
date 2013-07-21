@@ -35,7 +35,7 @@
 				<div class="span5 column">
 					<h3>Hello</h3>
 					<div id="whoPresent" ng-bind-html="profile.getPresent()">
-					</div>
+					</div>					
 				</div>
 			</div>
 			<div class="projects span3 column">
@@ -45,17 +45,6 @@
 						<a href="{{profile.getCommunityUrl(community)}}">{{community.name}}</a>
 					</li>
 				</ul>
-
-				<h3 style="margin-top: 0.5em">Support strength</h3>
-				<div class="supportBarContainer">
-					<div class="supportBar">
-						<div class="supportBarFill" style="width: 90%"></div>
-					</div>
-					<div class="details">
-						<a href="{{profile.getSupportUrl()}}">details</a>
-					</div>
-				</div>
-				
 			</div>
 		</div>
 
@@ -145,6 +134,17 @@
 			<!-- TODO: Scroll down to the process div, maybe -->
 			<span class="copper heart">♥</span>
 			<span class="text" ng-hide="isContributing()">Contribute</span>
+		</div>
+	</div>
+	<div class="helloContainer span11 row">
+		<div class="supportBarContainer"
+			ng-class="{ active: isContributing() }">
+			<div class="supportBar">
+				<div class="supportBarFill" style="width: 90%"></div>
+			</div>
+			<div class="details">
+				<a href="{{profile.getSupportUrl()}}">support details</a>
+			</div>
 		</div>
 	</div>
 
@@ -251,7 +251,7 @@
 		</div>
 	</div>
 	<div class="span11 helloContainer stopContributing" ng-show="isContributing()">
-		<a ng-click="stopContributing()">Close</a>
+		<a ng-click="stopContributing()">close</a>
 	</div>
 </div>
 </div>

@@ -169,7 +169,6 @@ ul {
 }
 .whatContainer {
 	height: 320px;
-	margin-bottom: 1.4em;
 }
 .projectContainer {
 	background-color: #666;
@@ -219,14 +218,15 @@ ul {
 }
 
 .supportBarContainer {
-	margin-left: 0.1ex;
-	margin-bottom: 5em;
+	margin-bottom: 0.2em;
 }
 .supportBarContainer.active {
 	margin-bottom: 0;
 }
 .supportBar {
 	border: solid 1px #ddd;
+	border-left: 0;
+	border-right: 0;
 }
 .supportBarFill {
 	background: #96401E; 
@@ -544,7 +544,7 @@ ul {
 }
 
 
-.helloContainer.support {
+.helloContainer.support, .helloContainer.future, .helloContainer.background {
 	background-color: #f3f3f3;
 	height: 100%;
 }

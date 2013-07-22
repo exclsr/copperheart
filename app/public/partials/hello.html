@@ -75,7 +75,7 @@
 		</div>
 
 		<div class="helloContainer future span11 row" ng-show="showFuture()">
-			<div class="span6" style="margin: 0; margin-top: 1.2em">
+			<div class="span6" style="margin: 0; margin-top: 1.2em; margin-left: 1.1em">
 				<img ng-src="{{profile.getFutureImageUrl()}}" 
 					class="img-polaroid" 
 					style="background-color: #ccc"/>
@@ -165,6 +165,17 @@
 		</div>
 	</div>
 
+	<div class="helloContainer span11 row">
+		<div class="supportBarContainer"
+			ng-class="{ active: isContributing() }">
+			<div class="supportBar">
+				<div class="supportBarFill" style="width: {{getSupportStrength()}}%"></div>
+			</div>
+			<div class="details">
+				<a href="{{profile.getSupportUrl()}}">support details</a>
+			</div>
+		</div>
+	</div>
 	<div class="helloContainer span11 row" style="margin-top: 0;">
 		<div>
 			<div>
@@ -203,17 +214,6 @@
 			<!-- TODO: Scroll down to the process div, maybe -->
 			<span class="copper heart">♥</span>
 			<span class="text" ng-hide="isContributing()">Contribute</span>
-		</div>
-	</div>
-	<div class="helloContainer span11 row">
-		<div class="supportBarContainer"
-			ng-class="{ active: isContributing() }">
-			<div class="supportBar">
-				<div class="supportBarFill" style="width: {{getSupportStrength()}}%"></div>
-			</div>
-			<div class="details">
-				<a href="{{profile.getSupportUrl()}}">support details</a>
-			</div>
 		</div>
 	</div>
 

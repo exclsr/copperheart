@@ -245,7 +245,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		}
 
 		var withGoals = [];
-		profile.things.forEach(function (thing) {
+		angular.forEach(profile.things, function (thing) {
 			if (thing.goal && thing.goal > 0) {
 				withGoals.push(thing);
 			}
@@ -270,6 +270,24 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			percent = Math.floor(100 * (member.support[thing.id].count / thing.goal));
 		}
 		return percent;
+	};
+
+	$scope.getSupportStrength = function () {
+		var thingsWithGoals = $scope.profile.getThingsWithGoals();
+		if (!thingsWithGoals)
+			return 0;
+
+		var priceTotal = 0;
+		var completeTotal = 0;
+
+		angular.forEach(thingsWithGoals, function (thing) {
+			var price = parseFloat(thing.price);
+			priceTotal += price;
+			completeTotal += $scope.getPercentOfGoalForThing(thing) * 0.01 * price;
+		});
+
+		var supportStrength = Math.ceil(100 * completeTotal / priceTotal);
+		return supportStrength;
 	};
 
 	// TODO: This URL stuff should be on the server side.

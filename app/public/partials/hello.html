@@ -195,7 +195,7 @@
 		<div class="supportBarContainer"
 			ng-class="{ active: isContributing() }">
 			<div class="supportBar">
-				<div class="supportBarFill" style="width: 90%"></div>
+				<div class="supportBarFill" style="width: {{getSupportStrength()}}%"></div>
 			</div>
 			<div class="details">
 				<a href="{{profile.getSupportUrl()}}">support details</a>

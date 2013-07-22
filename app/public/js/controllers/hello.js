@@ -181,9 +181,9 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 
 		if (!session.contributions[profile.username]) {
-		 	mergeThingsAndContributions(
-		 		profile.things, 
-		 		patron.contributions);
+			mergeThingsAndContributions(
+				profile.things, 
+				patron.contributions);
 		}
 		else {
 			mergeThingsAndContributions(
@@ -196,11 +196,25 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 
 
+	var scrollTo = function (elementId) {
+		// use jQuery for smooth scrolling.
+		$('html, body').animate({
+			scrollTop: $("#" + elementId).offset().top
+		}, 500);
+	};
+
 	var bindToSession = function() {
 		$scope.contributions = session.contributions[profile.username];
 		// When our local 'contributions' changes, update our session.
 		$scope.$watch('contributions', function() {
 			session.contributions[profile.username] = $scope.contributions;
+		});
+
+		$scope.boundSession = session;
+		$scope.$watch('boundSession.isContributing', function () {
+			if (session.isContributing) {
+				scrollTo('contributeStart');
+			} 
 		});
 	};
 
@@ -222,7 +236,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	//
 	// How do we feel about that? 
 	$scope.profile.getName = function() {
-	 	return profile.name;
+		return profile.name;
 	};
 	$scope.profile.getPresent = function() {
 		return profile.present;
@@ -427,6 +441,11 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return session.isContributing;
 	};
 	$scope.startContributing = function () {
+		if (session.isContributing) {
+			// Hack, because the watch method isn't effective
+			// in this situation (I think).
+			scrollTo('contributeStart');
+		}
 		session.isContributing = true;
 	};
 	$scope.stopContributing = function () {

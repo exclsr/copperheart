@@ -208,7 +208,7 @@
 		</div>
 	</div>	
 
-	<div class="helloContainer startContributing span11 row"
+	<div  id="contributeStart" class="helloContainer startContributing span11 row"
 		ng-class="{ active: isContributing() }">
 		<div ng-click="startContributing()">
 			<!-- TODO: Scroll down to the process div, maybe -->
@@ -319,7 +319,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="span11 helloContainer stopContributing" ng-show="isContributing()">
+	<div id="contributeEnd" class="span11 helloContainer stopContributing" ng-show="isContributing()">
 		<a ng-click="stopContributing()">close</a>
 	</div>
 </div>

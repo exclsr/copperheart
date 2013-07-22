@@ -38,13 +38,24 @@
 					</div>					
 				</div>
 			</div>
-			<div class="projects span3 column">
+			<div class="projects span3 column" style="position: relative">
 				<h3>Communities</h3>
 				<ul>
 					<li ng-repeat="community in profile.getCommunities()">
 						<a href="{{profile.getCommunityUrl(community)}}">{{community.name}}</a>
 					</li>
 				</ul>
+
+				<div style="
+					text-align: center; 
+					padding-right: 2em;
+					position: absolute;
+					box-sizing: border-box;
+					bottom: 4.9em;
+					width: 100%;
+				">
+					<button class="btn" ng-click="startContributing()">Contribute</button>
+				</div>
 			</div>
 		</div>
 

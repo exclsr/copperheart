@@ -239,6 +239,20 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	$scope.profile.getPassions = function() {
 		return profile.passions;
 	};
+	$scope.profile.getThingsWithGoals = function() {
+		if (!profile || !profile.things) {
+			return;
+		}
+
+		var withGoals = [];
+		profile.things.forEach(function (thing) {
+			if (thing.goal && thing.goal > 0) {
+				withGoals.push(thing);
+			}
+		});
+
+		return withGoals;
+	};
 	$scope.profile.getSupport = function() {
 		return member.support;
 	};
@@ -246,6 +260,19 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return member.backers;
 	};
 
+	$scope.getPercentOfGoalForThing = function (thing) {
+		if (!thing || !member || !member.support) {
+			return;
+		}
+
+		var percent = 0;
+		if (thing.goal > 0) {
+			percent = Math.floor(100 * (member.support[thing.id].count / thing.goal));
+		}
+		return percent;
+	};
+
+	// TODO: This URL stuff should be on the server side.
 	var getHelloUrl = function () {
 		return '#/hello/' + profile.username;
 	}

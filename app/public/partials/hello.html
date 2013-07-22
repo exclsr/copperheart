@@ -77,21 +77,74 @@
 			</div>
 		</div>
 
-		<!-- TODO: We'll want to design this a bit. -->
+
 		<div class="helloContainer support span11 row" ng-show="showSupport()">
-			<div class="support">
+			<div>
+				<div class="span5">
+					<h3 style="margin-top: 0">Goal progress</h3>
+					<div style="position: relative">
+						<!-- TODO: Deal with going over goals.
+						This is a dotted line at 100% of our goal.
+ 						<div style="border: none; border-left: dotted 1px #333; position: absolute;
+							width: 108px; height: 100%; padding-top: 1em; padding-bottom: 1em; 
+							top: -1em; bottom: -1em; right: 0; z-index: 100"></div>
+						-->
+ 						<div ng-repeat="thing in profile.getThingsWithGoals()" title="{{thing.name}}"
+							style="height: 15px; margin-bottom: 1ex">
+							<div class="glyph" 
+							style="
+								display: inline-block; 
+								margin: auto; 
+								vertical-align: middle;
+								margin-left: 4.25ex; 
+								margin-right: 1ex">
+								<i class="icon-{{thing.glyph}}"></i>
+							</div>
+							<div 
+								style="
+									width: 400px; 
+									border: solid 1px #ddd; 
+									height: 100%;
+									display: inline-block; 
+									vertical-align: middle">
+									<div style="
+										width: {{getPercentOfGoalForThing(thing)}}%; 
+										background-color: #96401E; 
+										opacity: 0.8;
+										height: 100%"></div>
+							</div>
+							<div style="display: inline-block"></div>
+						<!-- 
+							TODO: This is one way to extend the goal bar.
+							<div 
+								style="width: 80px; border: solid 1px green; height: 100%; 
+								position: relative;
+								display: inline-block; vertical-align: middle; z-index: 200">
+							</div> 
+						-->
+						</div>
+					</div>
+				</div>
+<!--
+		TODO: Things that aren't goals
+ 					<div class="span4" style="border: solid 1px green; height: 100%;">
+						<h3 style="margin-top: 0">Nice things</h3>
+					</div> -->
+			</div>	
+
+<!-- 			<div class="support" style="clear: left">
 				<h3>{{profile.getName()}} is supported by the following monthly contributions</h3>
 				<div class="supportRow" ng-repeat="thing in profile.getSupport()">
 					<span class="supportText">A {{thing.unit}} of {{thing.name}}.</span>
 					<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>
 				</div>
-			</div>
+			</div> -->
 
-			<div class="backers">
-				<h3>and backed by the following people</h3>
+			<div class="backers span7" style="clear: left; padding-top: 1em">
+				<h3>Backed by the following people</h3>
 				<div class="backersContent">
 					<span ng-repeat="backer in profile.getBackers()">
-						{{backer}} <span ng-show="$middle">,</span>
+						<span ng-show="$middle">,</span> {{backer}} 
 					</span>
 				</div>
 			</div>	
@@ -102,7 +155,7 @@
 		<div>
 			<div>
 				<ul class="communityNav">
-					<!-- TODO: Use ng-click to not hit the server -->
+					<!-- TODO: Use ng-click? to not hit the server -->
 					<li>
 						<a href="{{profile.getBackgroundUrl()}}"><img src="/img/arrow-left.png" height="16" class="backgroundArrow"/></a>
 						<a href="{{profile.getBackgroundUrl()}}">background</a>

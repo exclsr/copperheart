@@ -253,9 +253,41 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 		return withGoals;
 	};
+
 	$scope.profile.getSupport = function() {
 		return member.support;
 	};
+	$scope.getSupportWithoutGoals = function () {
+		if (!member || !member.support || !profile || !profile.things) {
+			return;
+		}
+
+		var support = [];
+		// The things in the support array don't have goals
+		// necessarily. Those are stored in the profile array.
+		//
+		// TODO: This is O(n^2). Maybe work around that by
+		// storing things via thing.id as a key.
+		angular.forEach(member.support, function (thing) {
+			angular.forEach(profile.things, function (profileThing) {
+				if (profileThing.id === thing.id) {
+					if (!profileThing.goal || profileThing.goal <= 0) {
+						support.push(thing);
+					}
+				}
+			});
+		});
+
+		return support;
+	};
+	// For hacking ng-repeat 
+	$scope.getFakeArray = function (length) {
+		var fakeArray = new Array(length);
+		fakeArray.push("ok");
+		return fakeArray;
+	};
+
+
 	$scope.profile.getBackers = function() {
 		return member.backers;
 	};
@@ -266,8 +298,13 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		}
 
 		var percent = 0;
+		var supportThing = member.support[thing.id];
+		if (!supportThing) {
+			return percent;
+		}
+
 		if (thing.goal > 0) {
-			percent = Math.floor(100 * (member.support[thing.id].count / thing.goal));
+			percent = Math.floor(100 * (supportThing.count / thing.goal));
 		}
 		return percent;
 	};

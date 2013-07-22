@@ -545,8 +545,8 @@ ul {
 
 
 .helloContainer.support {
-	/*padding-left: 3em;*/
-	padding-right: 3em;
+	background-color: #f3f3f3;
+	height: 100%;
 }
 .supportRow {
 	line-height: 1.5em; 

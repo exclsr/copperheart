@@ -92,7 +92,7 @@
 		<div class="helloContainer support span11 row" ng-show="showSupport()">
 			<div>
 				<div class="span5">
-					<h3 style="margin-top: 0">Goal progress</h3>
+					<h3>Supported goals</h3>
 					<div style="position: relative">
 						<!-- TODO: Deal with going over goals.
 						This is a dotted line at 100% of our goal.
@@ -136,20 +136,23 @@
 						</div>
 					</div>
 				</div>
-<!--
-		TODO: Things that aren't goals
- 					<div class="span4" style="border: solid 1px green; height: 100%;">
-						<h3 style="margin-top: 0">Nice things</h3>
-					</div> -->
+ 					<div class="span4">
+						<h3>Nice things</h3>
+						<div ng-repeat="thing in getSupportWithoutGoals()" title="{{thing.name}}">
+							<div class="glyph" 
+							style="
+								display: inline-block; 
+								margin: auto; 
+								vertical-align: middle;
+								margin-left: 4.25ex; 
+								margin-right: 1ex">
+								<i class="icon-{{thing.glyph}}"></i>
+							</div>
+							<span class="copper heart" style="margin-left: 3px; vertical-align: middle" 
+								ng-repeat="heart in getFakeArray(thing.count)">♥</span>
+						</div>
+					</div>
 			</div>	
-
-<!-- 			<div class="support" style="clear: left">
-				<h3>{{profile.getName()}} is supported by the following monthly contributions</h3>
-				<div class="supportRow" ng-repeat="thing in profile.getSupport()">
-					<span class="supportText">A {{thing.unit}} of {{thing.name}}.</span>
-					<span class="copper heart">♥</span> {{thing.count | number:0 }}</span>
-				</div>
-			</div> -->
 
 			<div class="backers span7" style="clear: left; padding-top: 1em">
 				<h3>Backed by the following people</h3>

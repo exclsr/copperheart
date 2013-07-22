@@ -27,6 +27,9 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		}
 		
 		profile.username = $routeParams.who;
+		profile.imageUrl = "/profile/" + profile.username + "/image";
+		profile.backgroundUrl = "/profile/" + profile.username + "/background/image";
+		profile.futureUrl = "/profile/" + profile.username + "/future/image";
 
 		var isInitialized = function () {
 			return profile
@@ -55,9 +58,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			profile.future = who.future;
 			profile.passions = who.passions;
 			profile.communities = who.communities;
-			profile.imageUrl = "/profile/" + profile.username + "/image";
-			profile.backgroundUrl = "/profile/" + profile.username + "/background/image";
-			profile.futureUrl = "/profile/" + profile.username + "/future/image";
 
 			// Set the active community if there is one.
 			var communityIndex = $routeParams.communityId;
@@ -326,7 +326,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return supportStrength;
 	};
 
-	// TODO: This URL stuff should be on the server side.
 	var getHelloUrl = function () {
 		return '#/hello/' + profile.username;
 	}
@@ -366,6 +365,8 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		return community;
 	};
 
+	// TODO: This URL stuff that depends on server data
+	// should be on the server side.
 	var getCommunityProfilePath = function (community) {
 		var communityIndex = profile.communities.indexOf(community);
 		var path = '/hello/' + profile.username;

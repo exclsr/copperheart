@@ -293,7 +293,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 	$scope.getPercentOfGoalForThing = function (thing) {
 		if (!thing || !member || !member.support) {
-			return;
+			return 0;
 		}
 
 		var percent = 0;

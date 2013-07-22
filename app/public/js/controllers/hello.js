@@ -283,7 +283,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	// For hacking ng-repeat 
 	$scope.getFakeArray = function (length) {
 		var fakeArray = new Array(length);
-		fakeArray.push("ok");
 		return fakeArray;
 	};
 

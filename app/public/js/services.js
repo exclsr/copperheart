@@ -3,7 +3,7 @@
 /* Services */
 
 angular.module('myApp.services', []).
-	value('version', '0.7').
+	value('version', '0.8').
 	factory('session', function() {
 		// session: use localStorage to maintain session
 		// state across visits to the page and refreshes.

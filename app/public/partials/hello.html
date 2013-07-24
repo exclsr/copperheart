@@ -63,7 +63,7 @@
 			<div class="span6" style="margin: 0; box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
 				<h3>Background</h3>
-				<div ng-bind-html="profile.getBackground()"></div>
+				<div ng-bind-html="profile.getBackground().description"></div>
 			</div>
 
 			<div class="span5" style="margin: 0; margin-top: 1.2em">
@@ -74,7 +74,9 @@
 						width: 480px;
 						height: 270px;
 						"/>
-				<div class="photoCredit">photo credit: yes</div>
+				<div class="photoCredit"
+					ng-show="profile.getBackground().photoCredit"
+				>photo credit: {{profile.getBackground().photoCredit}}</div>
 			</div>
 		</div>
 
@@ -87,12 +89,14 @@
 						width: 580px;
 						height: 270px;"
 					/>
-				<div class="photoCredit" style="text-align: left">photo credit: yes</div>
+				<div class="photoCredit" 
+					ng-show="profile.getFuture().photoCredit"
+					style="text-align: left">photo credit: {{profile.getFuture().photoCredit}}</div>
 			</div>
 			<div class="span5" style="margin: 0; box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
 				<h3>Future plans</h3>
-				<div ng-bind-html="profile.getFuture()"></div>
+				<div ng-bind-html="profile.getFuture().description"></div>
 			</div>
 		</div>
 

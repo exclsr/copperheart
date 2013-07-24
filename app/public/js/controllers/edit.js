@@ -146,6 +146,7 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 			$scope.newCommunity = {};
 			$scope.newCommunity.url = "";
 			$scope.newCommunity.name = "";
+			$scope.newCommunity.photoCredit = "";
 		});
 	};
 

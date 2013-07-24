@@ -16,7 +16,7 @@
 				<img ng-src="{{getCommunityImageUrl(getCommunity())}}" 
 					class="img-polaroid communityImage"
 					style="background-color: #ccc"/>
-				<div class="photoCredit">photo credit: yes</div>
+				<div ng-show="getCommunity().photoCredit" class="photoCredit">photo credit: {{getCommunity().photoCredit}}</div>
 			</div>
 		</div>
 

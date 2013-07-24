@@ -88,6 +88,12 @@
 				<div class="span6">
 					<input ng-model="community.name" class="name span6" type="text"/>
 					<textarea ng-model="community.description" class="span6" style="height: 225px;"></textarea>
+					<div style="text-align: right">
+						<label>
+							photo credit
+							<input ng-model="community.photoCredit" class="span3" type="text"/>
+						</label>
+					</div>
 				</div>
 				<div class="span3">
 					<img ng-src="/profile/{{username}}/community/{{$index}}/image?{{communityImageUrlTimestamps[$index]}}"/>

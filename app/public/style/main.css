@@ -23,6 +23,7 @@ a {
 	color: #96401E;
 }
 a:hover {
+	cursor: pointer;
 	color: black;
 }
 
@@ -771,6 +772,11 @@ select.paymentDay {
 }
 .noteSent {
 	margin-left: 1ex;
+}
+
+/* Edit contributions page */
+.stopped {
+	opacity: 0.5;
 }
 
 

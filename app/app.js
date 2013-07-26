@@ -443,6 +443,13 @@ app.get('/contributions', function (req, res) {
 	db.contributions.getByPatronId(patron.id, success, failure);
 });
 
+app.put('/contributions/stop', ensureAuthenticated, function (req, res) {
+	var toUsername = req.body.username;
+	// TODO: Stop contributions from req.user to toUsername
+	console.log(toUsername);
+	res.send("<3");
+});
+
 
 // TODO: Consider whether to do this. Basically, a
 // patron can have multiple Stripe customer ids, 

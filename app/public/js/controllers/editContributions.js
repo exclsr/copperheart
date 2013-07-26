@@ -121,5 +121,18 @@ function EditContributionsCtrl(session, $scope, $http) {
 			console.log("<3");
 		});
 	};
+
+	$scope.stopContribution = function (contribution) {
+		var who = {};
+		who.username = contribution.member.username;
+
+		var stop = $http.put('/contributions/stop', who);
+		stop.success(function (data) {
+			contribution.isStopped = true;
+		});
+		stop.error(function (data, status, headers, config) {
+			console.log(data);
+		});
+	};
 }
 EditContributionsCtrl.$inject = ['session', '$scope', '$http'];

@@ -126,7 +126,7 @@ function EditContributionsCtrl(session, $scope, $http) {
 		var who = {};
 		who.username = contribution.member.username;
 
-		var stop = $http.put('/contributions/stop', who);
+		var stop = $http.put('/commit/stop', who);
 		stop.success(function (data) {
 			contribution.isStopped = true;
 		});

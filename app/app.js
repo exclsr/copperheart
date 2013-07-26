@@ -443,13 +443,6 @@ app.get('/contributions', function (req, res) {
 	db.contributions.getByPatronId(patron.id, success, failure);
 });
 
-app.put('/contributions/stop', ensureAuthenticated, function (req, res) {
-	var toUsername = req.body.username;
-	// TODO: Stop contributions from req.user to toUsername
-	console.log(toUsername);
-	res.send("<3");
-});
-
 
 // TODO: Consider whether to do this. Basically, a
 // patron can have multiple Stripe customer ids, 
@@ -1343,6 +1336,15 @@ app.put('/commit/:toUsername/note', ensureAuthenticated, function (req, res) {
 		db.contributions.get(patron.id, member.id, gotContribution, failure);
 	};
 	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
+});
+
+app.put('/commit/stop', ensureAuthenticated, function (req, res) {
+	var toUsername = req.body.username;
+	// TODO: Stop contributions from req.user to toUsername
+	// 1. Remove from Stripe db.
+	// 2. Remove from our db.
+	console.log(toUsername);
+	res.send("<3");
 });
 
 app.post('/stripe/webhook', function (req, res) {

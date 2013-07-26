@@ -57,7 +57,7 @@ function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 			$scope.daysOfTheMonth.push(i);
 		}
 		// TODO: See if we can do this with our payment processor.
-		$scope.daysOfTheMonth.push('last');
+		// $scope.daysOfTheMonth.push('last');
 
 		var currentMonth = today.getMonth();
 		var paymentYear = today.getFullYear();

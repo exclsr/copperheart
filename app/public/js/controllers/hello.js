@@ -58,6 +58,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			profile.future = who.future;
 			profile.passions = who.passions;
 			profile.communities = who.communities;
+			profile.photoCredits = who.photoCredits;
 
 			// Set the active community if there is one.
 			var communityIndex = $routeParams.communityId;
@@ -249,6 +250,11 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 	$scope.profile.getCommunities = function() {
 		return profile.communities;
+	};
+	$scope.profile.getPhotoCredit = function(name) {
+		if (profile && profile.photoCredits) {
+			return profile.photoCredits[name];	
+		}
 	};
 	$scope.profile.getPassions = function() {
 		return profile.passions;

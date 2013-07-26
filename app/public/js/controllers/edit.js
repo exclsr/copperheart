@@ -110,6 +110,20 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 	}
 
 
+	var savePhotoCredits = function (photoCredits, callback) {
+		var putPhotoCredits = $http.put('/member/photo-credits', photoCredits);
+		putPhotoCredits.success(function (data) {
+			$scope.photoCredits = photoCredits;
+			console.log("<3");
+			if (callback) {
+				callback();
+			}
+		});
+		putPhotoCredits.error(function (data, status, headers, config) {
+			console.log(data);
+		});
+	}
+
 	$scope.isAtCommunityLimit = function() {
 		var communities = $scope.communities || [];
 		return communities.length >= 5;
@@ -335,6 +349,7 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 			$scope.future = member.future;
 			$scope.passions = member.passions;
 			$scope.communities = member.communities;
+			$scope.photoCredits = member.photoCredits;
 			$scope.hasStripeAccount = member.hasStripeAccount;
 
 			$scope.profileImageUrl = getNewProfileImageUrl(member.username);
@@ -406,6 +421,14 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 			function (newValue, oldValue) {
 				if (oldValue !== undefined) {
 					saveWho(function() {});
+				}
+			},
+			true
+		);
+		$scope.$watch('photoCredits',
+			function (newValue, oldValue) {
+				if (oldValue !== undefined) {
+					savePhotoCredits(newValue);
 				}
 			},
 			true

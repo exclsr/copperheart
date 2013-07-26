@@ -502,6 +502,7 @@ app.get('/who/:username', function (req, res) {
 		publicWho.future = who.future || "";
 		publicWho.passions = who.passions || [];
 		publicWho.communities = who.communities || [];
+		publicWho.photoCredits = who.photoCredits || {};
 
 		res.send(publicWho);
 	};
@@ -625,6 +626,7 @@ app.get('/member', ensureIsMember, function (req, res) {
 		member.future = memberData.future || "";
 		member.passions = memberData.passions || [];
 		member.communities = memberData.communities || [];
+		member.photoCredits = memberData.photoCredits || {};
 		// Don't transfer the actual token. We only care
 		// if the member has associated their stripe account
 		// with us.
@@ -795,6 +797,9 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	if (who.future !== undefined) {
 		patron.future = who.future;
 	}
+	if (who.photoCredits !== undefined) {
+		patron.photoCredits = who.photoCredits;
+	}
 
 	db.patrons.save(patron, success, failure);
 });
@@ -864,6 +869,25 @@ app.put('/member/username', ensureIsMember, function (req, res) {
 	db.patrons.save(member, success, failure);
 });
 
+app.put('/member/photo-credits', ensureIsMember, function (req, res) {
+	// TODO: Obvi refactoring with the code above.
+	var member = req.user;
+	var photoCredits = req.body;
+
+	var success = function (things) {
+		req.user = invalidateUser(req.user);
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	member.photoCredits = photoCredits;
+	db.patrons.save(member, success, failure);
+});
 
 
 

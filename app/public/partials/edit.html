@@ -117,11 +117,11 @@
 				onUpload="backgroundImageUploaded()"/>
 		</div>
 		<div class="who span6" style="height: 315px">
-			<textarea ng-model="background.description" class="span6" style="height: 225px;"></textarea>
+			<textarea ng-model="background" class="span6" style="height: 225px;"></textarea>
 			<div style="text-align: right">
 				<label>
 					photo credit
-					<input ng-model="background.photoCredit" class="span3" type="text"/>
+					<input ng-model="photoCredits['background']" class="span3" type="text"/>
 				</label>
 			</div>
 		</div>
@@ -133,11 +133,11 @@
 				onUpload="futureImageUploaded()"/>
 		</div>
 		<div class="who span6" style="height: 315px">
-			<textarea ng-model="future.description" class="span6" style="height: 225px;"></textarea>
+			<textarea ng-model="future" class="span6" style="height: 225px;"></textarea>
 			<div style="text-align: right">
 				<label>
 					photo credit
-					<input ng-model="future.photoCredit" class="span3" type="text"/>
+					<input ng-model="photoCredits['future']" class="span3" type="text"/>
 				</label>
 			</div>
 		</div>

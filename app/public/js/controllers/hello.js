@@ -212,10 +212,11 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		});
 
 		$scope.boundSession = session;
-		$scope.$watch('boundSession.isContributing', function () {
-			if (session.isContributing) {
+		$scope.$watch('boundSession.isContributing', function (newValue, oldValue) {
+			// We don't care unless we're explicitly changing from false to true.
+			if (oldValue === false && session.isContributing) {
 				scrollTo('contributeStart');
-			} 
+			}
 		});
 	};
 

@@ -149,7 +149,7 @@
 					</div>
 				</div>
  					<div class="span4">
-						<h3>Nice things</h3>
+						<h3 ng-show="canHazNiceThings()">Nice things</h3>
 						<div ng-repeat="thing in getSupportWithoutGoals()" title="{{thing.name}}">
 							<div class="glyph" 
 							style="

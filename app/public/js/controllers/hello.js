@@ -300,6 +300,11 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 		return support;
 	};
+	$scope.canHazNiceThings = function () {
+		var niceThings = $scope.getSupportWithoutGoals();
+		return niceThings && niceThings.length > 0;		
+	};
+
 	// For hacking ng-repeat 
 	$scope.getFakeArray = function (length) {
 		var fakeArray = new Array(length);

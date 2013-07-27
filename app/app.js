@@ -364,6 +364,30 @@ app.get('/contributions', function (req, res) {
 	db.contributions.getByPatronId(patron.id, success, failure);
 });
 
+//----------------------------------------------------------------
+// Patron-only actions
+//----------------------------------------------------------------
+app.put('/patron/who', ensureAuthenticated, function (req, res) {
+	var patron = req.user;
+	var who = req.body;
+
+	var success = function (things) {
+		req.user = invalidateUser(req.user);
+		res.send("<3");
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	if (who.name !== undefined) {
+		patron.name = who.name;
+	}
+	db.patrons.save(patron, success, failure);
+});
+
 
 //----------------------------------------------------------------
 // Public member data
@@ -559,7 +583,7 @@ app.get('/profile/:username/community/:communityId/icon', function (req, res) {
 // Member-only actions
 //----------------------------------------------------------------
 app.get('/member', ensureIsMember, function (req, res) {
-	// TODO: Maybe not do 'ensureAuthenticated' here, and instead
+	// TODO: Maybe not do 'ensureIsMember' here, and instead
 	// send back something empty if we're not logged in, and have 
 	// the client deal with that scenario.
 
@@ -724,12 +748,8 @@ app.put('/member/things', ensureIsMember, function (req, res) {
 });
 
 
-// TODO: Is this members only? Or is this also used on the
-// /edit/contributions page. Should probably separate the
-// concerns, if this is used on both the /edit/contributions
-// and the /edit pages.
-app.put('/patron/who', ensureAuthenticated, function (req, res) {
-	var patron = req.user;
+app.put('/member/who', ensureIsMember, function (req, res) {
+	var member = req.user;
 	var who = req.body;
 
 	var success = function (things) {
@@ -744,22 +764,22 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	};
 
 	if (who.name !== undefined) {
-		patron.name = who.name;
+		member.name = who.name;
 	}
 	if (who.present !== undefined) {
-		patron.present = who.present;
+		member.present = who.present;
 	}
 	if (who.background !== undefined) {
-		patron.background = who.background;
+		member.background = who.background;
 	}
 	if (who.future !== undefined) {
-		patron.future = who.future;
+		member.future = who.future;
 	}
 	if (who.photoCredits !== undefined) {
-		patron.photoCredits = who.photoCredits;
+		member.photoCredits = who.photoCredits;
 	}
 
-	db.patrons.save(patron, success, failure);
+	db.patrons.save(member, success, failure);
 });
 
 app.put('/member/passions', ensureIsMember, function (req, res) {

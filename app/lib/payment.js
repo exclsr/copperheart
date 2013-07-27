@@ -6,9 +6,8 @@
 var qs = require('querystring');
 var db, apiKey, stripeTestClientId;
 
-
-var getStripePlanId = function (patronId) {
-	var planId = patronId + '-contribution';
+var getStripePlanId = function (patronId, memberId) {
+	var planId = patronId + '-contribution-to-' + memberId;
 
 	if (stripeTestClientId) {
 		planId += '-' + stripeTestClientId;
@@ -52,19 +51,9 @@ var pricePerMonth = function(things) {
 	return pricePerMonth.toFixed(2);
 };
 
-var getStripePlanRequest = function (patronId, things, daysUntilFirstPayment) {
-	// This is one person's monthly contribution into to the pool.
-	//
-	// TODO: This is an important point if we ever want
-	// to have more than one person receiving money.
-	//
-	// Will need to update the things array to include 
-	// all other payments -- right now we're just working 
-	// with the active session. This will have to be taken 
-	// care of when there is more than one person receiving.
-
-	var planId = getStripePlanId(patronId);
-	var planName = patronId + ' contribution';
+var getStripePlanRequest = function (patronId, memberId, things, daysUntilFirstPayment) {
+	var planId = getStripePlanId(patronId, memberId);
+	var planName = patronId + ' contribution to ' + memberId;
 
 	if (stripeTestClientId) {
 		planName += ' created by ' + stripeTestClientId;
@@ -81,10 +70,6 @@ var getStripePlanRequest = function (patronId, things, daysUntilFirstPayment) {
 		interval_count: 1,
 		name: planName,
 		trial_period_days: daysUntilFirstPayment 
-		// TODO: calculate the trial period based on what day they want to pay.
-		// maybe. need to figure out how plans are first charged. a better way
-		// might be to just add things to a commit pool and take them out at
-		// a scheduled time (as per client's config).
 	};
 
 	return planRequest;
@@ -92,17 +77,20 @@ var getStripePlanRequest = function (patronId, things, daysUntilFirstPayment) {
 
 
 var commit = function (params, callback) {
-	var patronEmail, stripeToken, daysUntilPayment, things, patron;
+	var patronEmail, stripeToken, daysUntilPayment, paymentDay, things, patron;
 	var toMember = undefined;
 
 	patronEmail = params.patronEmail;
 	stripeToken = params.stripeToken;
 	daysUntilPayment = params.daysUntilPayment;
+	paymentDay = params.paymentDay;
+
 	things = params.things;
 	patron = params.patron;
 	toUsername = params.toUsername;
 	
 	var success = function (patronId) {
+		// TODO: Is patronId null?
 		callback(null, patronId);
 	};
 
@@ -136,10 +124,20 @@ var commit = function (params, callback) {
 
 			var createPlanAnew = function () {
 				var planRequest = getStripePlanRequest(
-									patron.id, things, daysUntilPayment);
+									patron.id, toMember.id, things, daysUntilPayment);
 				stripe.plans.create(planRequest, function (err, planResponse) {
-					// TODO: Do anything with the response?
-					err ? failure(err) : success(patron.id);
+					if (err) {
+						failure(err);
+						return;
+					}
+					else {
+						// TODO: Do anything with the response?
+						// Update the payment day and save to the database, 
+						// since Stripe doesn't save it for us.
+						patron.stripePaymentDays = patron.stripePaymentDays || {};
+						patron.stripePaymentDays[toMember.id] = paymentDay;
+						db.patrons.save(patron, success, failure);
+					}
 				});
 			};
 
@@ -149,7 +147,7 @@ var commit = function (params, callback) {
 			};
 
 			var deleteAndCreatePlan = function () {
-				var stripePlanId = getStripePlanId(patron.id);
+				var stripePlanId = getStripePlanId(patron.id, toMember.id);
 				stripe.plans.del(stripePlanId, handleDeleteResponse);
 			};
 
@@ -163,6 +161,9 @@ var commit = function (params, callback) {
 
 				patron.stripeIds = patron.stripeIds || {};
 				patron.stripeIds[toMember.id] = customerResponse.id;
+
+				patron.stripePaymentDays = patron.stripePaymentDays || {};
+				patron.stripePaymentDays[toMember.id] = paymentDay;
 				// TODO: What if we fail at this point? That's not cool,
 				// because then we have some stuff on the Stripe servers
 				// that isn't referenced on ours. That would be bad.
@@ -196,7 +197,7 @@ var commit = function (params, callback) {
 			// and associate them with a plan in one step.
 			var createPlanAndCustomer = function () {
 				var planRequest = getStripePlanRequest(
-									patron.id, things, daysUntilPayment);
+									patron.id, toMember.id, things, daysUntilPayment);
 				console.log("Creating plan ...");
 				// TODO: If we get a failure at this point, we have a data
 				// integrity issue, because it is likely a plan already exists.
@@ -391,6 +392,21 @@ var commitOnce = function (toUsername, stripeToken, things, callback) {
 	db.patrons.getByUsername(toUsername, success, failure);
 };
 
+var getContributionDay = function (patron, member, callback) {
+	var gotPatron = function (patron) {
+		if (patron.stripePaymentDays && patron.stripePaymentDays[member.id]) {
+			callback(null, patron.stripePaymentDays[member.id]);
+		}
+		else {
+			callback("Contribution not found from " + 
+				patron.id + " to " + member.id);
+		}
+	};
+
+	// TODO: Do we need this? Maybe not.
+	db.patrons.get(patron.id, gotPatron, callback);
+};
+
 
 // TODO: Consider whether to do this. Basically, a
 // patron can have multiple Stripe customer ids, 
@@ -452,6 +468,7 @@ exports.initialize = function(database, options) {
 exports.perMonthMultiplier = perMonthMultiplier;
 exports.commit = commit;
 exports.commitOnce = commitOnce;
+exports.getContributionDay = getContributionDay;
 exports.stripe = {
 	handleConnectResponse: _handleConnectResponse
 };

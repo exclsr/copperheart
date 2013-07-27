@@ -282,7 +282,8 @@ function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 				stripeToken: stripeToken,
 				things: things,
 				patronEmail: patronEmail,
-				daysUntilPayment: daysUntilPayment
+				daysUntilPayment: daysUntilPayment,
+				paymentDay: $scope.paymentDay
 			};
 				
 			var res = $http.put('/commit/' + contributionTo, data);

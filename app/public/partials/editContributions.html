@@ -15,7 +15,8 @@
 		<div class="row">
 			<h3 class="span3" style="margin-top: 0">contributing to</h3>
 			<div class="span4"></div>
-			<div class="span2" style="margin-top: 1.5ex">each month</div>
+			<div class="span1" style="margin-top: 1.5ex">monthly</div>
+			<div class="span1" style="margin-top: 1.5ex">date</div>
 		</div>
 
 		<div class="row" ng-repeat="contribution in contributions" ng-class="{ stopped: contribution.isStopped }">
@@ -32,11 +33,12 @@
 				</li>
 			</ul>
 			<div class="span1">{{contribution.pricePerMonth | currency}}</div>
-			<div class="span2" style="padding-left: 1.3em" ng-hide="contribution.isStopped">
+			<div class="span1">{{(contribution.day | ordinal) || '...'}}</div>
+			<div class="span2" ng-hide="contribution.isStopped">
 				<a ng-href="/#/hello/{{contribution.member.username}}">change</a> | 
 				<a ng-click="stopContribution(contribution)">stop</a>
 			</div>
-			<div class="span2" style="padding-left: 1.3em" ng-show="contribution.isStopped">
+			<div class="span2" ng-show="contribution.isStopped">
 				stopped
 			</div>
 		</div>

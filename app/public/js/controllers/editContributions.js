@@ -2,14 +2,14 @@
 
 function EditContributionsCtrl(session, $scope, $http) {
 
-	var hasCard = false;
+	// var hasCard = false;
 
-	$scope.hasCard = function() {
-		return hasCard;
-	};
-	$scope.hasNoCard = function() {
-		return $scope.card === {};
-	}
+	// $scope.hasCard = function() {
+	// 	return hasCard;
+	// };
+	// $scope.hasNoCard = function() {
+	// 	return $scope.card === {};
+	// }
 
 	// TODO: this is copied from hello.js. Make a service or something.
 	var perMonthMultiplier = function (frequency) {
@@ -50,12 +50,19 @@ function EditContributionsCtrl(session, $scope, $http) {
 					return pricePerMonth;
 				}(); // closure
 
+				$http.get('/contributions/' + contribution.member.username + '/when')
+				.success(function (data) {
+					contribution.day = parseInt(data);
+				});
+
 				$scope.contributions.push(contribution);
 			});
 		})
 		.error(function (data) {
 			console.log(data);
 		});
+
+		
 
 		$http.get('/whoami')
 		.success(function (patron) {

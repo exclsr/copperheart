@@ -337,6 +337,33 @@ app.get('/contributions', function (req, res) {
 });
 
 //----------------------------------------------------------------
+// Patron private data
+//----------------------------------------------------------------
+app.get('/contributions/:toUsername/when', ensureAuthenticated, function (req, res) {
+	var patron = req.user;
+
+	var gotMember = function (member) {
+		payment.getContributionDay(patron, member, function (err, data) {
+			if (err) {
+				console.log(err);
+				res.send(500);
+			}
+			else {
+				var paymentDay = "" + data;
+				res.send(paymentDay);		
+			}
+		});
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
+});
+
+//----------------------------------------------------------------
 // Patron-only actions
 //----------------------------------------------------------------
 app.put('/patron/who', ensureAuthenticated, function (req, res) {
@@ -831,6 +858,7 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 		patronEmail: req.body.patronEmail,
 		stripeToken: req.body.stripeToken,
 		daysUntilPayment: req.body.daysUntilPayment,
+		paymentDay: req.body.paymentDay,
 		things: req.body.things,
 		patron: req.user,
 		toUsername: req.params.toUsername 

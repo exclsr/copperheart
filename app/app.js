@@ -748,11 +748,8 @@ app.put('/member/things', ensureIsMember, function (req, res) {
 });
 
 
-app.put('/member/who', ensureIsMember, function (req, res) {
-	var member = req.user;
-	var who = req.body;
-
-	var success = function (things) {
+var saveMember = function (member, req, res) {
+	var success = function (data) {
 		req.user = invalidateUser(req.user);
 		res.send("<3");
 	};
@@ -762,6 +759,13 @@ app.put('/member/who', ensureIsMember, function (req, res) {
 		// TODO: Figure out an error message scheme.
 		res.send(500);
 	};
+
+	db.patrons.save(member, success, failure);
+};
+
+app.put('/member/who', ensureIsMember, function (req, res) {
+	var member = req.user;
+	var who = req.body;
 
 	if (who.name !== undefined) {
 		member.name = who.name;
@@ -779,92 +783,32 @@ app.put('/member/who', ensureIsMember, function (req, res) {
 		member.photoCredits = who.photoCredits;
 	}
 
-	db.patrons.save(member, success, failure);
+	saveMember(member, req, res);
 });
 
 app.put('/member/passions', ensureIsMember, function (req, res) {
-	// TODO: Obvi refactoring with the code above.
 	var member = req.user;
-	var passions = req.body;
-
-	var success = function (things) {
-		req.user = invalidateUser(req.user);
-		res.send("<3");
-	};
-
-	var failure = function (err) {
-		console.log(err);
-		// TODO: Figure out an error message scheme.
-		res.send(500);
-	};
-
-	member.passions = passions;
-	db.patrons.save(member, success, failure);
+	member.passions = req.body;
+	saveMember(member, req, res);
 });
-
 
 app.put('/member/communities', ensureIsMember, function (req, res) {
-	// TODO: Obvi refactoring with the code above.
 	var member = req.user;
-	var communities = req.body;
-
-	var success = function (things) {
-		req.user = invalidateUser(req.user);
-		res.send("<3");
-	};
-
-	var failure = function (err) {
-		console.log(err);
-		// TODO: Figure out an error message scheme.
-		res.send(500);
-	};
-
-	member.communities = communities;
-	db.patrons.save(member, success, failure);
+	member.communities = req.body;
+	saveMember(member, req, res);
 });
 
-
 app.put('/member/username', ensureIsMember, function (req, res) {
-	// TODO: Obvi refactoring with the code above.
 	var member = req.user;
-	var username = req.body.username;
-
-	var success = function (things) {
-		// TODO: When changing the username, we need to 
-		// invalidate the passport user as well.
-		req.user = invalidateUser(req.user);
-		res.send("<3");
-	};
-
-	var failure = function (err) {
-		console.log(err);
-		// TODO: Figure out an error message scheme.
-		res.send(500);
-	};
-
 	// TODO: Need to check for dups.
-	member.username = username;
-	db.patrons.save(member, success, failure);
+	member.username = req.body.username;
+	saveMember(member, req, res);
 });
 
 app.put('/member/photo-credits', ensureIsMember, function (req, res) {
-	// TODO: Obvi refactoring with the code above.
 	var member = req.user;
-	var photoCredits = req.body;
-
-	var success = function (things) {
-		req.user = invalidateUser(req.user);
-		res.send("<3");
-	};
-
-	var failure = function (err) {
-		console.log(err);
-		// TODO: Figure out an error message scheme.
-		res.send(500);
-	};
-
-	member.photoCredits = photoCredits;
-	db.patrons.save(member, success, failure);
+	member.photoCredits = req.body;
+	saveMember(member, req, res);
 });
 
 

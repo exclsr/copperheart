@@ -221,14 +221,6 @@ var ensureIsMember = function(req, res, next) {
 //----------------------------------------------------------------
 // Patron data
 //----------------------------------------------------------------
-var invalidateUser = function (user) {
-	// TODO: If performance is critical, an alternative to this
-	// is just to save whatever is in db.patrons.save(user) into
-	// req.user.
-	user.refreshFromDatabase = true;
-	return user;
-};
-
 var anonymousPatron = "anonymous";
 
 app.get('/whoami/role', function (req, res) {
@@ -372,7 +364,7 @@ app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	var who = req.body;
 
 	var success = function (things) {
-		req.user = invalidateUser(req.user);
+		req.user = auth.invalidateUser(req.user);
 		res.send("<3");
 	};
 
@@ -750,7 +742,7 @@ app.put('/member/things', ensureIsMember, function (req, res) {
 
 var saveMember = function (member, req, res) {
 	var success = function (data) {
-		req.user = invalidateUser(req.user);
+		req.user = auth.invalidateUser(req.user);
 		res.send("<3");
 	};
 
@@ -871,7 +863,7 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 		}
 		else {
 			console.log(patronId);
-			req.user = invalidateUser(req.user);
+			req.user = auth.invalidateUser(req.user);
 			res.send("<3");
 		}
 	};
@@ -954,7 +946,7 @@ app.get('/stripe/connect-response', ensureIsMember, function (req, res) {
 				redirect();
 			}
 			else {
-				req.user = invalidateUser(req.user);
+				req.user = auth.invalidateUser(req.user);
 			}
 		});
 	}

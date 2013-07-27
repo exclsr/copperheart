@@ -182,9 +182,18 @@ var authMiddleware = function(req, res, next) {
 	middleware(req, res, next);
 };
 
+var invalidateUser = function (user) {
+	// TODO: If performance is critical, an alternative to this
+	// is just to save whatever is in db.patrons.save(user) into
+	// req.user.
+	user.refreshFromDatabase = true;
+	return user;
+};
+
 exports.firstRun = firstRun;
 exports.authMiddleware = authMiddleware;
 exports.googleReturnUrl = googleReturnUrl;
+exports.invalidateUser = invalidateUser;
 
 exports.initialize = function(database) {
 	db = database;

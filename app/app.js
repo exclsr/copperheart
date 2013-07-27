@@ -1,13 +1,7 @@
-
-/**
- * Module dependencies.
- */
-
 var express = require('express')
 	, routes  = require('./routes')
 	, user    = require('./routes/user')
 	, http    = require('http')
-	, https   = require('https')
 	, fs      = require('fs')
 	, path    = require('path')
 	, redis   = require('connect-redis')(express)
@@ -17,17 +11,6 @@ var express = require('express')
 	, payment = require('./lib/payment.js')
 	;
 
-
-//----------------------------------------------------------------
-// Configuration
-//----------------------------------------------------------------
-var apiKey;
-if (config.isProduction()) {
-	apiKey = config.stripeApiLive(); 
-}
-else {
-	apiKey = config.stripeApiTest();
-}
 
 var app = express();
 
@@ -40,7 +23,7 @@ app.configure(function(){
 	app.use(express.logger('dev'));
 	app.use(express.bodyParser());
 	app.use(auth.firstRun); // TODO: Auth ...
-	// Required for auth:
+	// start-required for auth:
 	// TODO: Consolidate these things somewhere appropriate.
 	app.use(express.cookieParser());
 });
@@ -62,6 +45,7 @@ app.configure(function() {
 	app.use(auth.initialize(db));
 	app.use(auth.session());
 	// end-required for auth.
+	var apiKey = config.isProduction() ? config.stripeApiLive() : config.stripeApiTest();
 	var paymentOptions = {
 		apiKey: apiKey,
 		stripeTestClientId: config.stripeTestClientId()
@@ -73,12 +57,8 @@ app.configure(function() {
 
 
 app.get('/config/stripe-api-key', function (req, res) {
-	if (config.isProduction()) {
-		res.send(config.stripePublicLive());
-	}
-	else {
-		res.send(config.stripePublicTest());
-	}
+	var publicKey = config.isProduction() ? config.stripePublicLive() : config.stripePublicTest();
+	res.send(publicKey);
 });
 
 app.get('/entrance/usernames', function (req, res) {

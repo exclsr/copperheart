@@ -17,6 +17,10 @@ var express = require('express')
 	, payment = require('./lib/payment.js')
 	;
 
+
+//----------------------------------------------------------------
+// Configuration
+//----------------------------------------------------------------
 var apiKey;
 if (config.isProduction()) {
 	apiKey = config.stripeApiLive(); 
@@ -82,7 +86,7 @@ app.get('/entrance/usernames', function (req, res) {
 });
 
 //----------------------------------------------------------------
-// Data: Authentication
+// Authentication
 //----------------------------------------------------------------
 var loginFailureUrl = '/';
 
@@ -213,6 +217,10 @@ var ensureIsMember = function(req, res, next) {
 		" and try again.");
 };
 
+
+//----------------------------------------------------------------
+// Patron data
+//----------------------------------------------------------------
 var invalidateUser = function (user) {
 	// TODO: If performance is critical, an alternative to this
 	// is just to save whatever is in db.patrons.save(user) into
@@ -223,8 +231,6 @@ var invalidateUser = function (user) {
 
 var anonymousPatron = "anonymous";
 
-// Patron data that patrons want to know about
-// as they're wandering through the site.
 app.get('/whoami/role', function (req, res) {
 	res.send(getRole(req.user));
 });
@@ -261,79 +267,6 @@ app.get('/whoami', function (req, res) {
 	else {
 		res.send(anonymousPatron);
 	}
-});
-
-app.get('/things/:username', function (req, res) {
-
-	var success = function (things) {
-		if (!req.query.n || things.length === 0) {
-			res.send(things);
-		}
-		else {
-			// TODO: Consider doing this limitation at the data layer.
-			var thingsCount = Math.min(things.length, req.query.n);
-			res.send(things.slice(0, thingsCount));
-		}
-	};
-
-	var failure = function (err) {
-		console.log(err);
-		// TODO: Figure out an error message scheme.
-		res.send(500);
-	};
-
-	db.things.get(req.params.username, success, failure);
-});
-
-
-app.get('/support/:toUsername', function (req, res) {
-	var success = function (data) {
-
-		var things = {};
-		data.forEach(function (contribution) {
-			contribution.things.forEach(function (thing) {
-				// TODO: Doesn't take into account things
-				// with the same id and different prices.
-				// ... or does it?
-				if (things[thing.id]) {
-					things[thing.id].count += payment.perMonthMultiplier(thing.frequency);
-				}
-				else {
-					things[thing.id] = thing;
-					things[thing.id].count = payment.perMonthMultiplier(thing.frequency);
-				}
-			});
-		});
-		res.send(things);
-	};
-
-	var failure = function (err) {
-		console.log(err);
-		res.send(500);
-	};
-
-	var gotMember = function (memberData) {
-		db.contributions.getToMemberId(memberData.id, success, failure);
-	};
-
-	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
-});
-
-app.get('/support/:toUsername/names', function (req, res) {
-	
-	var success = function(data) {
-		res.send(data);
-	};
-
-	var failure = function (err) {
-		console.log(err);
-		res.send(500);
-	};
-
-	var gotMember = function (memberData) {
-		db.patrons.getBacking(memberData.id, success, failure);
-	};
-	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
 });
 
 app.get('/contributions/:toUsername', function (req, res) {
@@ -432,9 +365,84 @@ app.get('/contributions', function (req, res) {
 });
 
 
+//----------------------------------------------------------------
+// Public member data
+//----------------------------------------------------------------
+app.get('/things/:username', function (req, res) {
+
+	var success = function (things) {
+		if (!req.query.n || things.length === 0) {
+			res.send(things);
+		}
+		else {
+			// TODO: Consider doing this limitation at the data layer.
+			var thingsCount = Math.min(things.length, req.query.n);
+			res.send(things.slice(0, thingsCount));
+		}
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		// TODO: Figure out an error message scheme.
+		res.send(500);
+	};
+
+	db.things.get(req.params.username, success, failure);
+});
 
 
-// Public data of a person
+app.get('/support/:toUsername', function (req, res) {
+	var success = function (data) {
+
+		var things = {};
+		data.forEach(function (contribution) {
+			contribution.things.forEach(function (thing) {
+				// TODO: Doesn't take into account things
+				// with the same id and different prices.
+				// ... or does it?
+				if (things[thing.id]) {
+					things[thing.id].count += payment.perMonthMultiplier(thing.frequency);
+				}
+				else {
+					things[thing.id] = thing;
+					things[thing.id].count = payment.perMonthMultiplier(thing.frequency);
+				}
+			});
+		});
+		res.send(things);
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	var gotMember = function (memberData) {
+		db.contributions.getToMemberId(memberData.id, success, failure);
+	};
+
+	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
+});
+
+
+app.get('/support/:toUsername/names', function (req, res) {
+	
+	var success = function(data) {
+		res.send(data);
+	};
+
+	var failure = function (err) {
+		console.log(err);
+		res.send(500);
+	};
+
+	var gotMember = function (memberData) {
+		db.patrons.getBacking(memberData.id, success, failure);
+	};
+	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
+});
+
+
 app.get('/who/:username', function (req, res) {
 	var success = function (who) {
 		var publicWho = {};
@@ -480,7 +488,9 @@ app.get('/profile/:username', function (req, res) {
 });
 
 
-
+//----------------------------------------------------------------
+// Public member images
+//----------------------------------------------------------------
 app.get('/profile/:username/image', function (req, res) {
 	db.profileImages.get(req.params.username, req.headers, res, function (err) {
 		if (err) {
@@ -545,7 +555,9 @@ app.get('/profile/:username/community/:communityId/icon', function (req, res) {
 });
 
 
-// Public and private data of a patron
+//----------------------------------------------------------------
+// Member-only actions
+//----------------------------------------------------------------
 app.get('/member', ensureIsMember, function (req, res) {
 	// TODO: Maybe not do 'ensureAuthenticated' here, and instead
 	// send back something empty if we're not logged in, and have 
@@ -712,6 +724,10 @@ app.put('/member/things', ensureIsMember, function (req, res) {
 });
 
 
+// TODO: Is this members only? Or is this also used on the
+// /edit/contributions page. Should probably separate the
+// concerns, if this is used on both the /edit/contributions
+// and the /edit pages.
 app.put('/patron/who', ensureAuthenticated, function (req, res) {
 	var patron = req.user;
 	var who = req.body;
@@ -831,13 +847,10 @@ app.put('/member/photo-credits', ensureIsMember, function (req, res) {
 	db.patrons.save(member, success, failure);
 });
 
-// Some day we'll use jade for basic templating. 
-// For now, AngularJS in /public. 
-// 
-// app.get('/', routes.index);
-// app.get('/users', user.list);
 
-
+//----------------------------------------------------------------
+// Commitments 
+//----------------------------------------------------------------
 app.put('/commit/once/:toUsername', function (req, res) {
 	var stripeToken = req.body.stripeToken;
 	var things = req.body.things;
@@ -902,45 +915,6 @@ app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 	payment.commit(params, handleResponse);
 });
 
-app.get('/stripe/connect-client-id', ensureIsMember, function (req, res) {
-	res.send(config.stripeConnectClientId());
-});
-
-app.get('/stripe/connect-response', ensureIsMember, function (req, res) {
-	// TODO: Will this ever be called, with the 'ensureIsMember' middleware?
-	if (!isMember(req.user)) {
-		// TODO: Redirect to a formal error page in this situation.
-		res.send(401, // unauthorized
-		"Hey. It looks like you signed out in the middle of your Stripe " +
-		"authorization request.");
-		return;
-	}
-
-	var redirect = function () {
-		res.redirect('/#/edit');
-	};
-
-	if (req.query.error) {
-		// Stripe error. Neat.
-		console.log(req.query.error);
-		redirect();
-	}
-	else {
-		var stripeResponse = req.query;
-		var patronEmail = req.user.email;
-
-		payment.stripe.handleConnectResponse(stripeResponse, patronEmail, function (err) {
-			if (err) {
-				console.log(err);
-				redirect();
-			}
-			else {
-				req.user = invalidateUser(req.user);
-			}
-		});
-	}
-});
-
 // TODO: Allow anonymous folks to send messages, too. Perhaps by way of email,
 // or by saving them in the database under 'anonymous notes.''
 app.put('/commit/:toUsername/note', ensureAuthenticated, function (req, res) {
@@ -977,10 +951,62 @@ app.put('/commit/stop', ensureAuthenticated, function (req, res) {
 	res.send("<3");
 });
 
+
+//----------------------------------------------------------------
+// Stripe specifics
+//----------------------------------------------------------------
+// TODO: Why is this member only? What does this do?
+app.get('/stripe/connect-client-id', ensureIsMember, function (req, res) {
+	res.send(config.stripeConnectClientId());
+});
+
+// TODO: Why is this member only? What does this do?
+app.get('/stripe/connect-response', ensureIsMember, function (req, res) {
+	// TODO: Will this ever be called, with the 'ensureIsMember' middleware?
+	if (!isMember(req.user)) {
+		// TODO: Redirect to a formal error page in this situation.
+		res.send(401, // unauthorized
+		"Hey. It looks like you signed out in the middle of your Stripe " +
+		"authorization request.");
+		return;
+	}
+
+	var redirect = function () {
+		res.redirect('/#/edit');
+	};
+
+	if (req.query.error) {
+		// Stripe error. Neat.
+		console.log(req.query.error);
+		redirect();
+	}
+	else {
+		var stripeResponse = req.query;
+		var patronEmail = req.user.email;
+
+		payment.stripe.handleConnectResponse(stripeResponse, patronEmail, function (err) {
+			if (err) {
+				console.log(err);
+				redirect();
+			}
+			else {
+				req.user = invalidateUser(req.user);
+			}
+		});
+	}
+});
+
 app.post('/stripe/webhook', function (req, res) {
 	// don't realy care at this point.
 	res.send("<3");
 });
+
+
+// Some day we'll use jade for basic templating. 
+// For now, AngularJS in /public. 
+// 
+// app.get('/', routes.index);
+// app.get('/users', user.list);
 
 // TODO: Make this dev only
 // app.get('/relax', function (req, res) {
@@ -1015,5 +1041,4 @@ http.createServer(app).listen(app.get('port'), function(){
 		// TODO: Maybe show an error if things failed.
 		console.log("Database: Ready");
 	});
-
 });

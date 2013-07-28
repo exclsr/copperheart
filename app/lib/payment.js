@@ -241,6 +241,7 @@ var commit = function (params, callback) {
 			// First, save the contribution in the member data. We
 			// do this so we can create contribution views more easily,
 			// at the expense of space.
+			member.backers = member.backers || {}; // TODO: Into whatever makes this.
 			if (!member.backers[patron.id]) {
 				member.backers[patron.id] = patron.id;
 			}
@@ -248,6 +249,7 @@ var commit = function (params, callback) {
 				// In this special case, where a member is making a 
 				// contribution to herself, just make one call to the
 				// database, to avoid conflicts.
+				member.backing = member.backing || {};
 				if (!member.backing[member.id]) {
 					member.backing[member.id] = member.id;
 				}
@@ -255,6 +257,7 @@ var commit = function (params, callback) {
 			else {
 				// Save the contribution in the patron data. We do this
 				// so we can create a view for who is backing a member.
+				patron.backing = patron.backing || {};
 				if (!patron.backing[member.id]) {
 					patron.backing[member.id] = member.id;
 					// We're doing this async and we don't need to know

@@ -78,7 +78,6 @@ var getStripePlanRequest = function (patronId, memberId, things, daysUntilFirstP
 
 var commit = function (params, callback) {
 	var patronEmail, stripeToken, daysUntilPayment, paymentDay, things, patron;
-	var toMember = undefined;
 
 	patronEmail = params.patronEmail;
 	stripeToken = params.stripeToken;
@@ -100,7 +99,7 @@ var commit = function (params, callback) {
 
 	// This is called after we save the contribution data (below).
 	// Now we put the appropriate charges into the Stripe system.
-	var doStripeStuff = function () {
+	var doStripeStuff = function (toMember) {
 
 		var stripe;
 		if (toMember.stripeToken) {
@@ -158,7 +157,6 @@ var commit = function (params, callback) {
 			// means we need to create a customer for them in Stripe, 
 			// create a subscription plan for them, and associate the two.
 			var stripeCustomerCreated = function (customerResponse) {
-
 				patron.stripeIds = patron.stripeIds || {};
 				patron.stripeIds[toMember.id] = customerResponse.id;
 
@@ -219,62 +217,55 @@ var commit = function (params, callback) {
 		};
 	}
 
+	// TODO: Move to database layer?
+	var relateMemberWithPatron = function (member, callback) { 
+		// Save the contribution in the member data. We
+		// do this so we can create contribution views more easily,
+		// at the expense of space.
+		if (!member.backers) {
+			member.backers = {};
+		}
+		if (!patron.backing) {
+			patron.backing = {};
+		}
+
+		member.backers[patron.id] = patron.id;
+		patron.backing[member.id] = member.id;
+		
+		if (member.id === patron.id) {
+			member.backing[patron.id] = patron.id;
+			patron.backers[member.id] = member.id;
+		}
+		
+		db.patrons.save(member, function() {
+			db.patrons.save(patron, function() {
+				callback(member, patron, things);
+			}, failure);
+		}, failure);	
+	};
+
+	var saveContribution = function(member, patron, things, callback) {
+		// After saving the member in the backed
+		// member data, save the contribution as its 
+		// own document.
+		// ... then do Stripe stuff
+		var contribution = {};
+		contribution.backerId = patron.id;
+		contribution.memberId = member.id;
+		contribution.things = things;
+		db.contributions.save(contribution, callback, failure);
+	};
+
 	// To save the contribution, we need to get the ID of
 	// the person we're giving things to; we do so
 	// via the username, which was in the request url.
-	db.patrons.getByUsername(
-		toUsername, 
-		function (member) { 
-
-			var onMemberSave = function() {
-				// After saving the member in the backed
-				// member data, save the contribution as its 
-				// own document.
-				// ... then do Stripe stuff
-				var contribution = {};
-				contribution.backerId = patron.id;
-				contribution.memberId = member.id;
-				contribution.things = things;
-				db.contributions.save(contribution, doStripeStuff, failure);
-			}
-
-			// First, save the contribution in the member data. We
-			// do this so we can create contribution views more easily,
-			// at the expense of space.
-			member.backers = member.backers || {}; // TODO: Into whatever makes this.
-			if (!member.backers[patron.id]) {
-				member.backers[patron.id] = patron.id;
-			}
-			if (member.id === patron.id) {
-				// In this special case, where a member is making a 
-				// contribution to herself, just make one call to the
-				// database, to avoid conflicts.
-				member.backing = member.backing || {};
-				if (!member.backing[member.id]) {
-					member.backing[member.id] = member.id;
-				}
-			}
-			else {
-				// Save the contribution in the patron data. We do this
-				// so we can create a view for who is backing a member.
-				patron.backing = patron.backing || {};
-				if (!patron.backing[member.id]) {
-					patron.backing[member.id] = member.id;
-					// We're doing this async and we don't need to know
-					// when success occurs.
-					// TODO: This makes error handling a little harder,
-					// so think about what's up, now.
-					db.patrons.save(patron, function() {}, failure);
-				}
-			}
-
-			toMember = member;
-			db.patrons.save(member, onMemberSave, failure);
-		},
-		failure
-	);
-
-	return;
+	db.patrons.getByUsername(toUsername, function (member) {
+		relateMemberWithPatron(member, function (member, patron, things) {
+			saveContribution(member, patron, things, function () {
+				doStripeStuff(member);
+			});
+		});
+	}, failure);
 };
 
 

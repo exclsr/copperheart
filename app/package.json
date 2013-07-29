@@ -19,7 +19,7 @@
     "passport": "0.1",
     "passport-google": "0.3",
     "cradle": "0.6",
-    "nano": "3.3",
+    "nano": "3.4",
     "connect-redis": "1.4"
   }
 }

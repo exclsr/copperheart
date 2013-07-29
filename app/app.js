@@ -838,6 +838,26 @@ app.put('/commit/once/:toUsername', function (req, res) {
 	payment.commitOnce(toUsername, stripeToken, things, handleResponse);
 });
 
+app.put('/commit/stop', ensureAuthenticated, function (req, res) {
+	var toUsername = req.body.username;
+	var patronId = req.user.id;
+
+	var params = {
+		patronEmail: patronId,
+		toUsername: toUsername
+	};
+	
+	payment.stopCommit(params, function (err) {
+		if (err) {
+			console.log(err);
+			res.send(500);
+		}
+		else {
+			res.send("<3");
+		}
+	});
+});
+
 app.put('/commit/:toUsername', ensureAuthenticated, function (req, res) {
 	var patronEmail = req.body.patronEmail;
 	var serverSidePatronEmail = req.user.email;
@@ -904,15 +924,6 @@ app.put('/commit/:toUsername/note', ensureAuthenticated, function (req, res) {
 		db.contributions.get(patron.id, member.id, gotContribution, failure);
 	};
 	db.patrons.getByUsername(req.params.toUsername, gotMember, failure);
-});
-
-app.put('/commit/stop', ensureAuthenticated, function (req, res) {
-	var toUsername = req.body.username;
-	// TODO: Stop contributions from req.user to toUsername
-	// 1. Remove from Stripe db.
-	// 2. Remove from our db.
-	console.log(toUsername);
-	res.send("<3");
 });
 
 

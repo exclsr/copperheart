@@ -708,6 +708,57 @@ var db = function (config) {
 		);
 	};
 
+	var deleteContribution = function(backerId, memberId, success, failure) {
+		var removeDatabaseRecords = function (contribution, backer, member) {
+			if (contribution.length < 1) {
+				failure("Could not find contribution in database");
+				return;
+			}
+			var contribution = contribution[0];
+			console.log('removing contribution doc ...');
+			database.destroy(contribution._id, contribution._rev, function (err) {
+				if (err) {
+					failure(err);
+					return;
+				}
+				else {
+					console.log('deleting properties ...');
+					// Update the backer and member patron data, 
+					// to remove the association between the two,
+					// and the Stripe data.
+					delete backer.backing[memberId];
+					delete backer.stripeIds[memberId];
+					delete backer.stripePaymentDays[memberId];
+					delete member.backers[backerId];
+
+					if (member.id === backer.id) {
+						delete backer.backers[backerId];
+						console.log('saving patron ...');
+						savePatron(backer, success, failure);
+					}
+					else {
+						savePatron(backer, function() {
+							savePatron(member, success, failure);
+						}, failure);
+					}
+				}
+			});
+		};
+
+		console.log('getting contribution ...');
+		getContribution(backerId, memberId, function (contribution) {
+			console.log('getting backer ...');
+			getPatronById(backerId, function (backer) {
+				console.log('getting patron ...');
+				getPatronById(memberId, function (member) {
+					console.log('removing records ...');
+					removeDatabaseRecords(contribution, backer, member);
+				}, failure);
+			}, failure);
+		}, failure);
+	};
+
+
 	var streamImageAttachment = function (patron, attachmentName, headers, res, callback) {
 		var docId = patron._id;
 
@@ -897,7 +948,8 @@ var db = function (config) {
 			get : getContribution,
 			getByPatronId : getContributionsByPatron,
 			getToMemberId : getContributionsToMember,
-			save : saveContribution
+			save : saveContribution,
+			'delete': deleteContribution 
 		}
 	};
 };

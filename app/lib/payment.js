@@ -236,7 +236,7 @@ var commit = function (params, callback) {
 			member.backing[patron.id] = patron.id;
 			patron.backers[member.id] = member.id;
 		}
-		
+
 		db.patrons.save(member, function() {
 			db.patrons.save(patron, function() {
 				callback(member, patron, things);
@@ -266,6 +266,85 @@ var commit = function (params, callback) {
 			});
 		});
 	}, failure);
+};
+
+var stopCommit = function (params, callback) {
+	var patron, member, stripe;
+	// TODO: Semantics between email and id
+	var patronEmail = params.patronEmail;
+	var toUsername = params.toUsername;
+	
+	var success = function () {
+		callback(null);
+	};
+
+	var failure = function (err) {
+		callback(err);
+	};
+
+	var deletePlan = function (patron, member, callback) {
+		console.log('deleting plan...');
+		var stripePlanId = getStripePlanId(patron.id, member.id);
+		stripe.plans.del(stripePlanId, function (err, stripeResponse) {
+			if (err || !stripeResponse.deleted) {
+				failure(err);
+			}
+			else {
+				callback();
+			}
+		});
+	};
+
+	var deleteCustomer = function (patron, member, callback) {
+		console.log('deleting customer...');
+		// In order to stop payments from happening, we can
+		// either cancel the subscription or delete the customer record.
+		// Deleting a plan doesn't effect the payment schedule.
+		var stripeId = patron.stripeIds[member.id];
+		stripe.customers.del(stripeId, function (err, stripeResponse) {
+			if (err) {
+				failure(err);
+			}
+			else {
+				callback();
+			}
+		});
+	};
+
+	var deleteDatabaseRecord = function (patron, member) {
+		console.log('deleting database record...');
+		db.contributions['delete'](patron.id, member.id, function() {
+			success();
+		}, failure);
+	};
+
+	var gotPatron = function (patronData) {
+		patron = patronData;
+		if (!patron.stripeIds || !patron.stripeIds[member.id]) {
+			failure("No Stripe ID found in our database for " + 
+				patron.id + " backing " + member.id);
+			return;
+		}
+		// Delete the Stripe customer first, since that is the
+		// thing that actually charges patrons.
+		deleteCustomer(patron, member, function () {
+			deletePlan(patron, member, function () {
+				deleteDatabaseRecord(patron, member);
+			});
+		});
+	};
+
+	var gotMember = function (memberData) {
+		member = memberData;
+		if (!member.stripeToken) {
+			failure("Member doesn't have Stripe token: " + member.id);
+			return;
+		}
+		stripe = require('stripe')(member.stripeToken);
+		db.patrons.get(patronEmail, gotPatron);
+	};
+
+	db.patrons.getByUsername(toUsername, gotMember, failure);
 };
 
 
@@ -462,6 +541,7 @@ exports.initialize = function(database, options) {
 exports.perMonthMultiplier = perMonthMultiplier;
 exports.commit = commit;
 exports.commitOnce = commitOnce;
+exports.stopCommit = stopCommit;
 exports.getContributionDay = getContributionDay;
 exports.stripe = {
 	handleConnectResponse: _handleConnectResponse

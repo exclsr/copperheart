@@ -2,6 +2,7 @@
 
 function EditContributionsCtrl(session, $scope, $http) {
 
+	$scope.isNameSaved = false;
 	// var hasCard = false;
 
 	// $scope.hasCard = function() {
@@ -124,7 +125,7 @@ function EditContributionsCtrl(session, $scope, $http) {
 		who.name = $scope.name;
 		
 		saveWho(who, function() {
-			// TODO: update ui
+			$scope.isNameSaved = true;
 			console.log("<3");
 		});
 	};
@@ -141,5 +142,9 @@ function EditContributionsCtrl(session, $scope, $http) {
 			console.log(data);
 		});
 	};
+
+	$scope.$watch('name', function () {
+		$scope.isNameSaved = false;
+	});
 }
 EditContributionsCtrl.$inject = ['session', '$scope', '$http'];

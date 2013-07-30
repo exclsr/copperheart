@@ -11,13 +11,22 @@ var express = require('express')
 	, payment = require('./lib/payment.js')
 	;
 
-
 var app = express();
+
+var forceHttps = function(req, res, next) {
+	if(req.secure 
+		|| req.headers['x-forwarded-proto'] === 'https' 
+		|| req.host === "localhost") {
+		return next();	
+	}
+	res.redirect('https://' + req.get('Host') + req.url);
+};
 
 app.configure(function(){
 	app.set('port', config.port());
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
+	app.use(forceHttps);
 	app.use(express.compress());
 	app.use(express.static(path.join(__dirname, 'public')));
 	app.use(express.logger('dev'));

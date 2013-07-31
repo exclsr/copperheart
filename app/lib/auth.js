@@ -19,7 +19,7 @@ var hostUrl = function() {
 	}
 	else {
 		// TODO: Assumes we're working on port 80. Fix.
-		return 'http://' + domain;
+		return 'https://' + domain;
 	}
 };
 

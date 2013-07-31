@@ -18,6 +18,11 @@ var entranceUsernames = parseList(process.env.ENTRANCE_USERNAMES);
 
 var port = process.env.PORT || 3000;
 
+var analytics = {
+	domain: process.env.ANALYTICS_DOMAIN,
+	id: process.env.ANALYTICS_ID
+};
+
 var database = {
 	useAuthentication: process.env.DB_USE_AUTH || false,
 	username: process.env.DB_USERNAME || "",
@@ -87,6 +92,10 @@ exports.memberEmailAddresses = function() {
 
 exports.entranceUsernames = function() {
 	return overrides.entranceUsernames || entranceUsernames;
+};
+
+exports.analytics = function() {
+	return overrides.analytics || analytics;
 };
 
 exports.database = function() {

@@ -1,8 +1,12 @@
-
+var config = require('../config.js');
 /*
  * GET home page.
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Copper Heart' });
+	var params = {
+		analytics: config.analytics()
+	};
+
+	res.render('index', params);
 };

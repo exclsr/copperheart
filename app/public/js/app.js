@@ -9,7 +9,7 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
     var hello = { templateUrl: 'partials/hello.html', controller: HelloCtrl };
     var edit = { templateUrl: 'partials/edit.html', controller: EditCtrl };
 
-  	$routeProvider.when('/entrance', {templateUrl: 'partials/entrance.html', controller: EntranceCtrl});
+  	$routeProvider.when('/entrance', {templateUrl: 'partials/entrance', controller: EntranceCtrl});
     $routeProvider.when('/about', {templateUrl: 'partials/about.html', controller: AboutCtrl});
     // Not sure which order is best, so let's do both!
     $routeProvider.when('/:who/hello', hello);

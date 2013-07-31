@@ -1,0 +1,22 @@
+<div class="header">
+	<img class="copperHeartImg" src="/img/copperHeartSmall.png"/>
+	<h3>Welcome to <a href="/#/about/">Copper Heart</a>.</h3>
+</div>
+
+<div class="view">
+<div class="entrance span12">
+	<% for (var i=0; i < profiles.length; i++) { %>
+	<a href="/#/hello/<%= profiles[i].username %>" class="profileLink">
+	<div class="profile span3">
+		<img src="<%= profiles[i].imageUrl %>"/>
+		<h3>{{getProfile(<%= i %>).name}}</h3>
+		<ul>
+			<li ng-repeat="community in getProfile(<%= i %>).communities">
+				{{community.name}}
+			</li>
+		</ul>
+	</div>
+	</a>
+	<% } %>
+</div>
+</div>

@@ -1,14 +1,15 @@
-var express = require('express')
-	, routes  = require('./routes')
-	, user    = require('./routes/user')
-	, http    = require('http')
-	, fs      = require('fs')
-	, path    = require('path')
-	, redis   = require('connect-redis')(express)
-	, config  = require('./config.js')
-	, auth    = require('./lib/auth.js')
-	, db      = require('./lib/database.js').db()
-	, payment = require('./lib/payment.js')
+var express    = require('express')
+	, db       = require('./lib/database.js').db()
+	, routes   = require('./routes')
+	, user     = require('./routes/user')
+	, entrance = require('./routes/entrance')
+	, http     = require('http')
+	, fs       = require('fs')
+	, path     = require('path')
+	, redis    = require('connect-redis')(express)
+	, config   = require('./config.js')
+	, auth     = require('./lib/auth.js')
+	, payment  = require('./lib/payment.js')
 	;
 
 var app = express();
@@ -60,6 +61,7 @@ app.configure(function() {
 		stripeTestClientId: config.stripeTestClientId()
 	}
 	payment.initialize(db, paymentOptions);
+	entrance.initialize(config);
 	app.use(express.methodOverride());
 	app.use(app.router);
 });
@@ -1005,6 +1007,7 @@ app.post('/stripe/webhook', function (req, res) {
 // 	});
 // });
 
+app.get('/partials/entrance', entrance.index);
 
 // Lastly ...
 // This needs to be at the bottom, so things like

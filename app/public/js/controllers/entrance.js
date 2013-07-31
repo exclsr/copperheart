@@ -4,6 +4,10 @@ function EntranceCtrl(session, $scope, $http) {
 
 	var profiles = [];
 
+	$scope.getProfile = function (index) {
+		return profiles[index];
+	};
+
 	$http.get('/entrance/usernames')
 	.success(function (usernames) {
 		angular.forEach(usernames, function (username) {

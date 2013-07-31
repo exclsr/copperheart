@@ -25,7 +25,7 @@ var forceHttps = function(req, res, next) {
 app.configure(function(){
 	app.set('port', config.port());
 	app.set('views', __dirname + '/views');
-	app.set('view engine', 'jade');
+	app.set('view engine', 'ejs');
 	app.use(forceHttps);
 	app.use(express.compress());
 	app.use(express.static(path.join(__dirname, 'public')));
@@ -990,6 +990,7 @@ app.post('/stripe/webhook', function (req, res) {
 // For now, AngularJS in /public. 
 // 
 // app.get('/', routes.index);
+
 // app.get('/users', user.list);
 
 // TODO: Make this dev only
@@ -1012,7 +1013,9 @@ app.get('/:username', function (req, res) {
 	res.redirect("/#/hello/" + req.params.username);
 });
 
-
+// The secret to bridging Angular and Express in a 
+// way that allows us to pass any path to the client.
+app.get('*', routes.index);
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log("Express server listening on port " + app.get('port'));

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta charset="utf-8">
+  <title>Copper Heart</title>
+  <meta name="description" content="Copper Heart makes patronage easy. It's a way for communities to support people doing good work."/>
+
+  <link rel="stylesheet" href="style/app.css"/>  
+  <link rel="stylesheet" href="style/bootstrap.min.css"/>
+  <link rel="stylesheet" href="style/bootstrap-big.css"/>
+  <link rel="stylesheet" href="style/main.css"/>
+
+  <!-- TODO: Make configuring this part of the app -->
+  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
+
+  <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+</head>
+<body>  
+  <div class="container" ng-controller="TopLevelCtrl">
+    <div class="angularView" ng-view></div>
+    <div class="footerContainer">
+      <div class="footer">
+        <!-- <span class="copper heart">♥</span> v<span app-version></span> -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- jQueryUI is required by AngularUI -->
+  <!-- jQuery 1.9.1 is required. jQuery 2.0 causes a defect. 
+       see: https://github.com/angular-ui/angular-ui/issues/547 -->
+  <!-- TODO: Consider what to put in the HEAD. If Angular is in the head,
+       then we don't get flashes from the header expanding. It could take
+       longer for things to first appear, but then again maybe not; so let's
+       figure that out. -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
+  -->
+  <script src="lib/angular/angular.js"></script>
+  <!-- TODO: Loading angular-sanitize.js wasn't working for a while,
+    but now it seems fine; be aware that this might be an intermittent 
+    problem. -->
+  <script src="lib/angular/angular-sanitize.js"></script>
+  <script src="lib/angular-ui/angular-ui.js"></script>
+
+  <script src="lib/store/store.min.js"></script>
+  
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/controllers/topLevel.js"></script>
+  <script src="js/controllers/header.js"></script>
+  <script src="js/controllers/entrance.js"></script>
+  <script src="js/controllers/about.js"></script>
+  <script src="js/controllers/hello.js"></script>
+  <script src="js/controllers/contribute.js"></script>
+  <script src="js/controllers/thanks.js"></script>
+  <script src="js/controllers/edit.js"></script>
+  <script src="js/controllers/editContributions.js"></script>
+  
+  <script src="js/filters.js"></script>
+  <script src="js/directives.js"></script>
+
+  <!-- jQuery-File-Upload -->
+  <script src="lib/upload/vendor/jquery.ui.widget.js"></script>
+  <script src="lib/upload/jquery.iframe-transport.js"></script>
+  <script src="lib/upload/jquery.fileupload.js"></script>
+</body>
+</html>    

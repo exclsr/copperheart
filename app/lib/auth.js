@@ -29,6 +29,8 @@ var initPassport = function() {
 	//   credentials (in this case, an OpenID identifier and profile), and invoke a
 	//   callback with a user object.
 	passport.use(new GoogleStrategy({
+		// TODO: profile: false ... Do this in order to just get the
+		// identifier from Google, as that's all we need.
 		returnURL: hostUrl() + googleReturnUrl,
 		realm: hostUrl() + '/'
 	},

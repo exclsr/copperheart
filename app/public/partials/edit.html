@@ -191,8 +191,8 @@
 
 		<h3 style="clear: left; padding-top: 1.5em">things <small>:: {{things.length}}</h3>
 
-		<div ui-sortable="{ axis: 'y', update: markThingsAsChanged }" ng-model="things">
-			<div  ng-repeat="thing in things" style="user-select: none !important"
+ 		<div ui-sortable="{ axis: 'y', update: markThingsAsChanged }" ng-model="things">
+			<div class="row" ng-repeat="thing in things" style="user-select: none !important"
 				ng-class-odd="'odd'">
 				<div class="editThingContainer span10">
 					<span class="span1 moveThing" style="width: 1ex">
@@ -209,7 +209,7 @@
 				<div class="span1" style="padding: 2ex; padding-left: 0">{{thing.goal}}</div>
 			</div>
 		</div>		
-	</div>
+ 	</div>
 
 	<div ng-show="isEqual(subEdit, 'account')">
 		<h3 style="clear: left;">contribution destination</h3>

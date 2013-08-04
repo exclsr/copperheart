@@ -5,11 +5,12 @@
 // The api is at the bottom.
 //
 var cradle = require('cradle');
-var nano = require('nano');
+var nanoo = require('./nanoo.js');
 var defaultConfig  = require('../config.js').database();
 
 var db = function (config) {
 
+	var database;
 	var dbConfig = config || defaultConfig;
 	var useHttps = dbConfig.useHttps || false;
 
@@ -17,13 +18,6 @@ var db = function (config) {
 	var couchPort = dbConfig.port || 5984;
 	var databaseName = dbConfig.name || 'sandbox';
 	
-	var isUsingAuthentication = dbConfig.username && dbConfig.password;
-
-	var database, cookieToken;
-
-	var dbUrl = couchHost + ':' + couchPort;
-	var nanoDb = nano(dbUrl);
-
 
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.
@@ -31,7 +25,7 @@ var db = function (config) {
 	var cradleDb = function () {
 		// We use cradle for view creation, primarily.
 		var auth = undefined;
-		if (isUsingAuthentication) {
+		if (dbConfig.username && dbConfig.password) {
 			auth = { 
 				username: dbConfig.username, 
 				password: dbConfig.password
@@ -48,132 +42,6 @@ var db = function (config) {
 			).database(databaseName);
 	}(); // closure
 	
-	var initDatabase = function (cookieToken) {
-		var options = {};
-		options.url = dbUrl;
-
-		if (isUsingAuthentication) {
-			options.cookie = cookieToken || "";
-		}
-		database = nano(options).use(databaseName);
-	};
-
-	var setCookieTokenFromHeaders = function (headers) {
-		if (headers && headers['set-cookie']) {
-			cookieToken = headers['set-cookie'];
-			initDatabase(cookieToken);
-		}
-	};
-
-	var getCookieAuthHeaders = function () {
-		var headers = {};
-		if (isUsingAuthentication) {
-			headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
-			headers["cookie"] = (cookieToken || "").toString();			
-		}
-
-		return headers;
-	};
-	
-	var establishAuthorization = function (callback) {
-		nanoDb.auth(dbConfig.username, dbConfig.password, 
-			function (err, body, headers) {
-				if (err) {
-					// TODO: Freak out.
-					console.log("Failed to get cookie token");
-					console.log(err);
-					return;
-				}
-				setCookieTokenFromHeaders(headers);
-				if (callback) {
-					callback();
-				}
-			}
-		);
-	};
-
-	// Connect to the database, callback with the response.
-	// Can be useful for debugging.
-	var refreshDatabaseConnection = function (callback) {
-		var headers = getCookieAuthHeaders();
-		var opts = {
-			db: databaseName,
-			path: '',
-			headers: headers
-		};
-
-		nanoDb.relax(opts, function (error, response, headers) {
-			if (error && error['status-code'] === 401) {
-				// Unauthorized. 
-				// TODO: Review logs to see if we need this.
-				console.log("Called reauth from relax.");
-				establishAuthorization();
-			}
-			else {
-				setCookieTokenFromHeaders(headers);
-			}
-
-			if (callback) {
-				callback(error, response, headers);
-			}
-		});
-	};
-
-	var establishDatabaseConnection = function (callback) {
-		var keepDatabaseServerActive = function() {
-			// So, our database host likes to go to sleep if it feels
-			// there is nothing important to do, resulting in 50-second
-			// response times, or in some cases timing out after a minute,
-			// and giving us 500 errors.
-			var fiveMinutes = 5 * 60 * 1000;
-			setInterval(refreshDatabaseConnection, fiveMinutes);
-
-			// Reauthorize with the server every twelve hours.
-			// TODO: This is obviously a bad design. Get a handle
-			// on what is actually happening.
-			var twelveHours = 12 * 60 * 60 * 1000;
-			setInterval(establishAuthorization, twelveHours);
-		};
-
-		var ready = function() {
-			keepDatabaseServerActive();
-			if (callback) {
-				callback();
-			}
-		}
-
-		if (isUsingAuthentication) {
-			establishAuthorization(ready);
-		}
-		else {
-			initDatabase();
-			ready();
-		}
-	};
-
-	var createDatabase = function (callback) {
-		var headers = getCookieAuthHeaders();
-		var opts = {
-			db: databaseName,
-			method: "PUT",
-			headers: headers
-		};
-
-		nanoDb.relax(opts, callback);
-	};
-
-	var destroyDatabase = function (callback) {
-		var headers = getCookieAuthHeaders();
-		var opts = {
-			db: databaseName,
-			method: "DELETE",
-			headers: headers
-		};
-
-		nanoDb.relax(opts, callback);
-	};
-
-
 	var getContributionId = function (backerId, memberId) {
 		return backerId + "-" + memberId;
 	};
@@ -475,7 +343,7 @@ var db = function (config) {
 				createViews(callback);
 			}
 			else {
-				createDatabase(function (err) {
+				nanoo.createDatabase(function (err) {
 					if (err) {
 						callback(err);
 						return;
@@ -504,7 +372,7 @@ var db = function (config) {
 				return;
 			}
 			
-			setCookieTokenFromHeaders(headers);
+			nanoo.processHeaders(headers);
 			// Return the first row only, if the flag is indicated.
 			if (viewGenerationOptions 
 			&& viewGenerationOptions.firstOnly 
@@ -531,7 +399,7 @@ var db = function (config) {
 				failure(error);
 			}
 			else {
-				setCookieTokenFromHeaders(headers);
+				nanoo.processHeaders(headers);
 				success();
 			}
 		});
@@ -618,7 +486,7 @@ var db = function (config) {
 								failure(error);
 							} 
 							else {
-								setCookieTokenFromHeaders(headers);
+								nanoo.processHeaders(headers);
 								success();
 							}
 						}
@@ -701,7 +569,7 @@ var db = function (config) {
 							failure(error);
 						}
 						else {
-							setCookieTokenFromHeaders(headers);
+							nanoo.processHeaders(headers);
 							success();
 						}
 					});
@@ -764,28 +632,16 @@ var db = function (config) {
 	var streamImageAttachment = function (patron, attachmentName, headers, res, callback) {
 		var docId = patron._id;
 
-		var _headers = getCookieAuthHeaders();
-		// TODO: This works for Chrome. Are there other browser behaviors
-		// that we need to care about?
-		_headers["if-none-match"] = headers["if-none-match"];
-
-		var attName = encodeURIComponent(attachmentName);
-		var opts = {
-			db: databaseName,
-			headers: _headers,
-			method: "GET",
-			doc: docId,
-			params: {},
-			att: attName,
-			encoding: null
-		};
-
-		var readStream = nanoDb.relax(opts, function (err) {
+		var readStream;
+		nanoo.getAttachmentStream(docId, attachmentName, headers, function (err, stream) {
 			if (err) {
 				callback(err);
+				// TODO: return?
 			}
+			else {
+				readStream = stream;
+			}			
 		});
-
 
 		// We access the database via getPatronByUsername right before
 		// making this call, so we don't have to refresh our cookies.
@@ -898,7 +754,18 @@ var db = function (config) {
 	};
 
 	var doInit = function (callback) {
-		establishDatabaseConnection(function () {
+		var nanooConfig = {
+			databaseUrl: couchHost + ':' + couchPort,
+			databaseName: databaseName,
+			username: dbConfig.username,
+			password: dbConfig.password
+		};
+
+		nanoo.init(nanooConfig);
+		nanoo.connect(function (nano) {
+			// TODO: This is a symptom of a design
+			// that can be improved inside nanoo.
+			database = nano;
 			createDatabaseAndViews(function (err) {
 				callback(err);
 			});
@@ -906,10 +773,10 @@ var db = function (config) {
 	};
 
 	return {
-		relax: refreshDatabaseConnection,
+		relax: nanoo.refreshConnection,
 		init : doInit,
 		onlyForTest : {
-			destroy : destroyDatabase
+			destroy : nanoo.destroyDatabase
 		},
 		profileImages : {
 			get : getProfileImageByUsername,

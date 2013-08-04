@@ -19,7 +19,11 @@ var db = function (config) {
 	
 	var isUsingAuthentication = dbConfig.username && dbConfig.password;
 
-	var database;
+	var database, cookieToken;
+
+	var dbUrl = couchHost + ':' + couchPort;
+	var nanoDb = nano(dbUrl);
+
 
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.
@@ -45,46 +49,31 @@ var db = function (config) {
 	}(); // closure
 	
 	var initDatabase = function (cookieToken) {
-		// TODO: http vs https?
-		var dbUrl = couchHost + ':' + couchPort;
-		if ((isUsingAuthentication || dbConfig.useCookies) 
-			&& cookieToken) {
-			database = nano({
-				url: dbUrl,
-				cookie: cookieToken
-			}).use(databaseName);
+		var options = {};
+		options.url = dbUrl;
+
+		if (isUsingAuthentication) {
+			options.cookie = cookieToken || "";
 		}
+		database = nano(options).use(databaseName);
 	};
 
-	var cookieToken;
-	var handleNewCouchCookie = function (headers) {
+	var setCookieTokenFromHeaders = function (headers) {
 		if (headers && headers['set-cookie']) {
 			cookieToken = headers['set-cookie'];
+			initDatabase(cookieToken);
 		}
-		initDatabase(cookieToken);
 	};
 
 	var getCookieAuthHeaders = function () {
 		var headers = {};
-		if (dbConfig.useCookies || isUsingAuthentication) {
+		if (isUsingAuthentication) {
 			headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
 			headers["cookie"] = (cookieToken || "").toString();			
 		}
 
 		return headers;
 	};
-
-	var dbUrl = couchHost + ':' + couchPort;
-	// TODO: Use https when necessary. Most of the data
-	// in our database is meant for the public, but there is 
-	// definitely private data as well, such as email 
-	// addresses ... I guess emails are about it, as the
-	// stripe customer IDs are useless without our api keys. 
-	// 
-	// if (isUsingAuthentication) {
-	// 	dbUrl = dbConfig.secureHost + ':' + dbConfig.securePort;
-	// }
-	var nanoDb = nano(dbUrl);
 	
 	var establishAuthorization = function (callback) {
 		nanoDb.auth(dbConfig.username, dbConfig.password, 
@@ -95,12 +84,71 @@ var db = function (config) {
 					console.log(err);
 					return;
 				}
-				handleNewCouchCookie(headers);
+				setCookieTokenFromHeaders(headers);
 				if (callback) {
 					callback();
 				}
 			}
 		);
+	};
+
+	// Connect to the database, callback with the response.
+	// Can be useful for debugging.
+	var refreshDatabaseConnection = function (callback) {
+		var headers = getCookieAuthHeaders();
+		var opts = {
+			db: databaseName,
+			path: '',
+			headers: headers
+		};
+
+		nanoDb.relax(opts, function (error, response, headers) {
+			if (error && error['status-code'] === 401) {
+				// Unauthorized. 
+				// TODO: Review logs to see if we need this.
+				console.log("Called reauth from relax.");
+				establishAuthorization();
+			}
+			else {
+				setCookieTokenFromHeaders(headers);
+			}
+
+			if (callback) {
+				callback(error, response, headers);
+			}
+		});
+	};
+
+	var establishDatabaseConnection = function (callback) {
+		var keepDatabaseServerActive = function() {
+			// So, our database host likes to go to sleep if it feels
+			// there is nothing important to do, resulting in 50-second
+			// response times, or in some cases timing out after a minute,
+			// and giving us 500 errors.
+			var fiveMinutes = 5 * 60 * 1000;
+			setInterval(refreshDatabaseConnection, fiveMinutes);
+
+			// Reauthorize with the server every twelve hours.
+			// TODO: This is obviously a bad design. Get a handle
+			// on what is actually happening.
+			var twelveHours = 12 * 60 * 60 * 1000;
+			setInterval(establishAuthorization, twelveHours);
+		};
+
+		var ready = function() {
+			keepDatabaseServerActive();
+			if (callback) {
+				callback();
+			}
+		}
+
+		if (isUsingAuthentication) {
+			establishAuthorization(ready);
+		}
+		else {
+			initDatabase();
+			ready();
+		}
 	};
 
 	var createDatabase = function (callback) {
@@ -123,74 +171,6 @@ var db = function (config) {
 		};
 
 		nanoDb.relax(opts, callback);
-	};
-
-	// Connect to the database, callback with the response.
-	// Can be useful for debugging.
-	var doRelax = function (callback) {
-		var headers = getCookieAuthHeaders();
-		var opts = {
-			db: databaseName,
-			path: '',
-			headers: headers
-		};
-
-		nanoDb.relax(opts, function (error, response, headers) {
-			if (error) {
-				if (error['status-code'] === 401) {
-					// Unauthorized. 
-					// TODO: Review logs to see if we need this.
-					console.log("Called reauth from relax.");
-					establishAuthorization();
-				}
-			}
-			else {
-				handleNewCouchCookie(headers);
-			}
-
-			if (callback) {
-				callback(error, response, headers);
-			}
-		});
-	};
-
-	var keepDatabaseServerActive = function() {
-		// So, our database host likes to go to sleep if it feels
-		// there is nothing important to do, resulting in 50-second
-		// response times, or in some cases timing out after a minute,
-		// and giving us 500 errors.
-
-		var fiveMinutes = 5 * 60 * 1000;
-		setInterval(doRelax, fiveMinutes);
-
-		var reauth = function() {
-			establishAuthorization();
-		};
-
-		// Reauthorize with the server every twelve hours.
-		// TODO: This is obviously a bad design. Get a handle
-		// on what is actually happening.
-		var twelveHours = 12 * 60 * 60 * 1000;
-		setInterval(reauth, twelveHours);
-	};
-
-	var establishDatabaseConnection = function (callback) {
-		var ready = function() {
-			keepDatabaseServerActive();
-			if (callback) {
-				callback();
-			}
-		}
-
-		if (isUsingAuthentication || dbConfig.useCookies) {
-			establishAuthorization(ready);
-		}
-		else {
-			database = nano({
-				url: dbUrl
-			}).use(databaseName);
-			ready();
-		}
 	};
 
 
@@ -524,7 +504,7 @@ var db = function (config) {
 				return;
 			}
 			
-			handleNewCouchCookie(headers);
+			setCookieTokenFromHeaders(headers);
 			// Return the first row only, if the flag is indicated.
 			if (viewGenerationOptions 
 			&& viewGenerationOptions.firstOnly 
@@ -551,7 +531,7 @@ var db = function (config) {
 				failure(error);
 			}
 			else {
-				handleNewCouchCookie(headers);
+				setCookieTokenFromHeaders(headers);
 				success();
 			}
 		});
@@ -638,7 +618,7 @@ var db = function (config) {
 								failure(error);
 							} 
 							else {
-								handleNewCouchCookie(headers);
+								setCookieTokenFromHeaders(headers);
 								success();
 							}
 						}
@@ -721,7 +701,7 @@ var db = function (config) {
 							failure(error);
 						}
 						else {
-							handleNewCouchCookie(headers);
+							setCookieTokenFromHeaders(headers);
 							success();
 						}
 					});
@@ -926,7 +906,7 @@ var db = function (config) {
 	};
 
 	return {
-		relax: doRelax,
+		relax: refreshDatabaseConnection,
 		init : doInit,
 		onlyForTest : {
 			destroy : destroyDatabase

@@ -2,13 +2,13 @@
 var assert = require("assert");
 var http = require("http");
 
+
 var testDbConfig = {
-	useCookies: true,
 	useHttps: false,
-	username: "whatever",
-	password: "whatever",
 	host: "localhost",
 	port: 5984,
+	username: "whatever",
+	password: "whatever",
 	name: "sandbox-test"
 };
 

@@ -68,16 +68,11 @@ Configuration is done via environment variables.
 ### CouchDB
 
 + `DB_NAME`
-+ `DB_USE_AUTH` Set to true if you need to log in to your database
-+ `DB_USERNAME`
-+ `DB_PASSWORD`
-+ `DB_SECURE_HOST` (i.e. https://name.iriscouch.com)
-+ `DB_SECURE_PORT` 
-
-For local development:
-
-+ `DB_HOST` (i.e. http://localhost)
++ `DB_HOST` (i.e. localhost)
 + `DB_PORT`
++ `DB_USE_HTTPS` true or false
++ `DB_USERNAME` optional
++ `DB_PASSWORD` optional
 
 ### Redis
 

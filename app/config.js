@@ -24,14 +24,12 @@ var analytics = {
 };
 
 var database = {
-	useAuthentication: process.env.DB_USE_AUTH || false,
 	username: process.env.DB_USERNAME || "",
 	password: process.env.DB_PASSWORD || "",
-	host: process.env.DB_HOST || "http://localhost",
+	host: process.env.DB_HOST || "localhost",
 	port: process.env.DB_PORT || 5984,
-	name: process.env.DB_NAME || "sandbox",
-	secureHost: process.env.DB_SECURE_HOST || "http://localhost",
-	securePort: process.env.DB_SECURE_PORT || 5984
+	useHttps: process.env.DB_USE_HTTPS || false,
+	name: process.env.DB_NAME || "sandbox"
 };
 
 // can be passed directly into connect-redis

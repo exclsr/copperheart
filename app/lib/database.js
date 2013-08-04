@@ -11,49 +11,43 @@ var defaultConfig  = require('../config.js').database();
 var db = function (config) {
 
 	var dbConfig = config || defaultConfig;
-	var couchHost = dbConfig.host || 'http://localhost';
-	var couchPort = dbConfig.port || 5984;
-	var databaseName = dbConfig.name || 'sandbox';
 	var useHttps = dbConfig.useHttps || false;
 
-	var database;
-	var cradleDb;
+	var couchHost = (useHttps ? "https://" : "http://") + (dbConfig.host || 'localhost');
+	var couchPort = dbConfig.port || 5984;
+	var databaseName = dbConfig.name || 'sandbox';
+	
+	var isUsingAuthentication = dbConfig.username && dbConfig.password;
 
-	// Connect to Couch! 
+	var database;
+
 	// TODO: Put retry stuff in here, as we'll be 
 	// connecting to another computer in production.
 	// See https://github.com/cloudhead/cradle#retry-on-connection-issues
-	// TODO: Maybe the 'useAuthentication' flag is silly.
-	if (dbConfig.useAuthentication) {
-		cradleDb = new(cradle.Connection)(
-			dbConfig.secureHost || couchHost, 
-			dbConfig.securePort || couchPort, 
-			{
-				cache: true,
-				raw: false,
-				secure: useHttps ? true : false,
-				auth: { 
-					username: dbConfig.username, 
-					password: dbConfig.password
-				}
-			}
-		).database(databaseName);
-	}
-	else {
-		cradleDb = new(cradle.Connection)(
-			couchHost, 
-			couchPort, 
-			{
-				cache: true,
-				raw: false
-			}
-		).database(databaseName);
-	}
-
+	var cradleDb = function () {
+		// We use cradle for view creation, primarily.
+		var auth = undefined;
+		if (isUsingAuthentication) {
+			auth = { 
+				username: dbConfig.username, 
+				password: dbConfig.password
+			};
+		}
+		var options = {
+			cache: true,
+			raw: false,
+			secure: useHttps ? true : false,
+			auth: auth
+		};
+		return new(cradle.Connection)(
+			couchHost, couchPort, options
+			).database(databaseName);
+	}(); // closure
+	
 	var initDatabase = function (cookieToken) {
 		// TODO: http vs https?
 		var dbUrl = couchHost + ':' + couchPort;
-		if ((dbConfig.useAuthentication || dbConfig.useCookies) 
+		if ((isUsingAuthentication || dbConfig.useCookies) 
 			&& cookieToken) {
 			database = nano({
 				url: dbUrl,
@@ -72,7 +66,7 @@ var db = function (config) {
 
 	var getCookieAuthHeaders = function () {
 		var headers = {};
-		if (dbConfig.useCookies || dbConfig.useAuthentication) {
+		if (dbConfig.useCookies || isUsingAuthentication) {
 			headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
 			headers["cookie"] = (cookieToken || "").toString();			
 		}
@@ -87,7 +81,7 @@ var db = function (config) {
 	// addresses ... I guess emails are about it, as the
 	// stripe customer IDs are useless without our api keys. 
 	// 
-	// if (dbConfig.useAuthentication) {
+	// if (isUsingAuthentication) {
 	// 	dbUrl = dbConfig.secureHost + ':' + dbConfig.securePort;
 	// }
 	var nanoDb = nano(dbUrl);
@@ -181,7 +175,6 @@ var db = function (config) {
 	};
 
 	var establishDatabaseConnection = function (callback) {
-
 		var ready = function() {
 			keepDatabaseServerActive();
 			if (callback) {
@@ -189,7 +182,7 @@ var db = function (config) {
 			}
 		}
 
-		if (dbConfig.useAuthentication || dbConfig.useCookies) {
+		if (isUsingAuthentication || dbConfig.useCookies) {
 			establishAuthorization(ready);
 		}
 		else {

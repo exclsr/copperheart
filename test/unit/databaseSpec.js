@@ -7,12 +7,9 @@ var testDbConfig = {
 	useHttps: false,
 	username: "whatever",
 	password: "whatever",
-	host: "http://localhost",
+	host: "localhost",
 	port: 5984,
-	name: "sandbox-test",
-	useAuthentication: true,
-	secureHost: "http://localhost",
-	securePort: 5984
+	name: "sandbox-test"
 };
 
 var db;
@@ -30,7 +27,7 @@ beforeEach(function() {
 		backers: {},
 		backing: {}
 	};
-	dbUrl = testDbConfig.host + ":" + testDbConfig.port;
+	dbUrl = "http://" + testDbConfig.host + ":" + testDbConfig.port;
 });
 
 afterEach(function (done) {

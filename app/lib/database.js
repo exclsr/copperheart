@@ -14,6 +14,7 @@ var db = function (config) {
 	var couchHost = dbConfig.host || 'http://localhost';
 	var couchPort = dbConfig.port || 5984;
 	var databaseName = dbConfig.name || 'sandbox';
+	var useHttps = dbConfig.useHttps || false;
 
 	var database;
 	var cradleDb;
@@ -30,7 +31,7 @@ var db = function (config) {
 			{
 				cache: true,
 				raw: false,
-				secure: true,
+				secure: useHttps ? true : false,
 				auth: { 
 					username: dbConfig.username, 
 					password: dbConfig.password
@@ -53,6 +54,7 @@ var db = function (config) {
 	// rename the method.
 	var cookieToken;
 	var handleNewCouchCookie = function (headers) {
+		// TODO: http vs https?
 		var dbUrl = couchHost + ':' + couchPort;
 
 		if (headers && headers['set-cookie']) {
@@ -69,6 +71,15 @@ var db = function (config) {
 		}
 	};
 
+	var getCookieAuthHeaders = function () {
+		var headers = {};
+		if (dbConfig.useCookies || dbConfig.useAuthentication) {
+			headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
+			headers["cookie"] = (cookieToken || "").toString();			
+		}
+
+		return headers;
+	};
 
 	var dbUrl = couchHost + ':' + couchPort;
 	// TODO: Use https when necessary. Most of the data
@@ -99,14 +110,32 @@ var db = function (config) {
 		);
 	};
 
+	var createDatabase = function (callback) {
+		var headers = getCookieAuthHeaders();
+		var opts = {
+			db: databaseName,
+			method: "PUT",
+			headers: headers
+		};
+
+		nanoDb.relax(opts, callback);
+	};
+
+	var destroyDatabase = function (callback) {
+		var headers = getCookieAuthHeaders();
+		var opts = {
+			db: databaseName,
+			method: "DELETE",
+			headers: headers
+		};
+
+		nanoDb.relax(opts, callback);
+	};
+
 	// Connect to the database, callback with the response.
 	// Can be useful for debugging.
 	var doRelax = function (callback) {
-		var headers = {
-			"X-CouchDB-WWW-Authenticate": "Cookie",
-			cookie: cookieToken
-		};
-
+		var headers = getCookieAuthHeaders();
 		var opts = {
 			db: databaseName,
 			path: '',
@@ -464,18 +493,22 @@ var db = function (config) {
 	};
 
 	var createDatabaseAndViews = function (callback) {
-		// Create database! We use cradle to create
-		// our database and views, as it's a little
-		// easier than via nano.
+		// Create database! 
 		cradleDb.exists(function (err, exists) {
 			if (err) {
-				throw (err);
+				callback(err);
+				return;
 			}
-			else if (exists) {
+			
+			if (exists) {
 				createViews(callback);
 			}
 			else {
-				nanoDb.db.create(databaseName, function() {
+				createDatabase(function (err) {
+					if (err) {
+						callback(err);
+						return;
+					}
 					createViews(callback);
 				});
 			}
@@ -489,13 +522,12 @@ var db = function (config) {
 		console.log(prefix + ": " + seconds + "." + millisecond);
 	};
 
-	var getView = function(viewUrl, success, failure, viewGenerationOptions) {
-
+	var getView = function(viewUrl, success, failure, viewGenerationOptions) {		
 		var splitViewUrl = viewUrl.split('/');
 		var designName = splitViewUrl[0];
 		var viewName = splitViewUrl[1];
 
-		database.view(designName, viewName, viewGenerationOptions, function (err, body, headers) {
+		database.view(designName, viewName, viewGenerationOptions, function (err, body, headers) {			
 			if (err) {
 				failure(err);
 				return;
@@ -758,15 +790,10 @@ var db = function (config) {
 		}, failure);
 	};
 
-
 	var streamImageAttachment = function (patron, attachmentName, headers, res, callback) {
 		var docId = patron._id;
 
-		var _headers = {};
-		 if (dbConfig.useCookies || dbConfig.useAuthentication) {
-			_headers["X-CouchDB-WWW-Authenticate"] = "Cookie";
-			_headers["cookie"] = cookieToken.toString();			
-		}
+		var _headers = getCookieAuthHeaders();
 		// TODO: This works for Chrome. Are there other browser behaviors
 		// that we need to care about?
 		_headers["if-none-match"] = headers["if-none-match"];
@@ -900,21 +927,18 @@ var db = function (config) {
 	};
 
 	var doInit = function (callback) {
-		createDatabaseAndViews(function() {
-			establishDatabaseConnection(callback);
+		establishDatabaseConnection(function () {
+			createDatabaseAndViews(function (err) {
+				callback(err);
+			});
 		});
-	};
-
-	// TODO: This is only for testing. Where should this code be?
-	var doDestroy = function (callback) {
-		nanoDb.db.destroy(databaseName, callback);
 	};
 
 	return {
 		relax: doRelax,
 		init : doInit,
 		onlyForTest : {
-			destroy : doDestroy
+			destroy : destroyDatabase
 		},
 		profileImages : {
 			get : getProfileImageByUsername,

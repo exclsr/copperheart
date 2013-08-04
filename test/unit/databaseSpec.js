@@ -1,13 +1,16 @@
 'use strict';
 var assert = require("assert");
+var http = require("http");
 
 var testDbConfig = {
-	useAuthentication: false,
+	useCookies: true,
+	useHttps: false,
 	username: "whatever",
 	password: "whatever",
 	host: "http://localhost",
 	port: 5984,
 	name: "sandbox-test",
+	useAuthentication: true,
 	secureHost: "http://localhost",
 	securePort: 5984
 };
@@ -15,6 +18,7 @@ var testDbConfig = {
 var db;
 var patronEmail;
 var patron;
+var dbUrl;
 
 beforeEach(function() {
 	db = require('../../app/lib/database.js').db(testDbConfig);
@@ -25,7 +29,8 @@ beforeEach(function() {
 		username: 'dontcare',
 		backers: {},
 		backing: {}
-	}
+	};
+	dbUrl = testDbConfig.host + ":" + testDbConfig.port;
 });
 
 afterEach(function (done) {
@@ -37,6 +42,15 @@ var error = function (error) {
 }
 
 describe('Database', function(){
+	it('can create itself', function (done) {
+		db.init(function (err) {
+			error(err);
+			http.get(dbUrl + "/" + testDbConfig.name, function (response) {
+				assert.equal(response.statusCode, 200);
+				done();
+			});
+		});
+	});
 
 	it('can save and get patrons', function (done) {
 		db.init(function() {
@@ -56,7 +70,6 @@ describe('Database', function(){
 	});
 
 	it('can update patrons', function (done) {
-
 		var updatePatronAgain = function () {
 			patron.name = "second-update";
 			db.patrons.save(patron,

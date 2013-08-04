@@ -50,18 +50,9 @@ var db = function (config) {
 		).database(databaseName);
 	}
 
-	// TODO: This initializes our database. Should
-	// rename the method.
-	var cookieToken;
-	var handleNewCouchCookie = function (headers) {
+	var initDatabase = function (cookieToken) {
 		// TODO: http vs https?
 		var dbUrl = couchHost + ':' + couchPort;
-
-		if (headers && headers['set-cookie']) {
-			cookieToken = headers['set-cookie'];
-		}
-
-		// TODO: do we want this useAuth flag?
 		if ((dbConfig.useAuthentication || dbConfig.useCookies) 
 			&& cookieToken) {
 			database = nano({
@@ -69,6 +60,14 @@ var db = function (config) {
 				cookie: cookieToken
 			}).use(databaseName);
 		}
+	};
+
+	var cookieToken;
+	var handleNewCouchCookie = function (headers) {
+		if (headers && headers['set-cookie']) {
+			cookieToken = headers['set-cookie'];
+		}
+		initDatabase(cookieToken);
 	};
 
 	var getCookieAuthHeaders = function () {
@@ -93,7 +92,7 @@ var db = function (config) {
 	// }
 	var nanoDb = nano(dbUrl);
 	
-	var getCookieToken = function (callback) {
+	var establishAuthorization = function (callback) {
 		nanoDb.auth(dbConfig.username, dbConfig.password, 
 			function (err, body, headers) {
 				if (err) {
@@ -148,7 +147,7 @@ var db = function (config) {
 					// Unauthorized. 
 					// TODO: Review logs to see if we need this.
 					console.log("Called reauth from relax.");
-					getCookieToken();
+					establishAuthorization();
 				}
 			}
 			else {
@@ -171,7 +170,7 @@ var db = function (config) {
 		setInterval(doRelax, fiveMinutes);
 
 		var reauth = function() {
-			getCookieToken();
+			establishAuthorization();
 		};
 
 		// Reauthorize with the server every twelve hours.
@@ -191,7 +190,7 @@ var db = function (config) {
 		}
 
 		if (dbConfig.useAuthentication || dbConfig.useCookies) {
-			getCookieToken(ready);
+			establishAuthorization(ready);
 		}
 		else {
 			database = nano({
@@ -493,7 +492,6 @@ var db = function (config) {
 	};
 
 	var createDatabaseAndViews = function (callback) {
-		// Create database! 
 		cradleDb.exists(function (err, exists) {
 			if (err) {
 				callback(err);

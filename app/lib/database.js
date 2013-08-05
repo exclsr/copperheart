@@ -4,7 +4,6 @@
 // The thing that knows about our database implementation.
 // The api is at the bottom.
 //
-var cradle = require('cradle');
 var nanoo = require('./nanoo.js');
 var defaultConfig  = require('../config.js').database();
 
@@ -19,33 +18,9 @@ var db = function (config) {
 	var databaseName = dbConfig.name || 'sandbox';
 	
 
-	// TODO: Put retry stuff in here, as we'll be 
-	// connecting to another computer in production.
-	// See https://github.com/cloudhead/cradle#retry-on-connection-issues
-	var cradleDb = function () {
-		// We use cradle for view creation, primarily.
-		var auth = undefined;
-		if (dbConfig.username && dbConfig.password) {
-			auth = { 
-				username: dbConfig.username, 
-				password: dbConfig.password
-			};
-		}
-		var options = {
-			cache: true,
-			raw: false,
-			secure: useHttps ? true : false,
-			auth: auth
-		};
-		return new(cradle.Connection)(
-			couchHost, couchPort, options
-			).database(databaseName);
-	}(); // closure
-	
 	var getContributionId = function (backerId, memberId) {
 		return backerId + "-" + memberId;
 	};
-
 
 	var createViews = function (callback) {
 		var designDocs = [];
@@ -72,6 +47,7 @@ var db = function (config) {
 			body: 
 			{
 				version: "1.0.0",
+				language: "javascript",
 				views: {
 					byUsername: {
 						map: function(doc) {
@@ -99,6 +75,7 @@ var db = function (config) {
 			body: 
 			{
 				version: "1.0.0",
+				language: "javascript",
 				views: {
 					byEmail: {
 						map: function(doc) {
@@ -151,6 +128,7 @@ var db = function (config) {
 			body: 
 			{
 				version: "1.0.0",
+				language: "javascript",
 				views: {
 					byUsername: {
 						map: function(doc) {
@@ -170,6 +148,7 @@ var db = function (config) {
 			body: 
 			{
 				version: "1.0.0",
+				language: "javascript",
 				views: {
 					byPatronToProject: {
 						// What contributions are being given from a specific
@@ -251,9 +230,28 @@ var db = function (config) {
 
 
 		var saveDesignDocs = function () {
+
 			var saveDoc = function (doc) {
-				cradleDb.save(doc.url, doc.body, function() {
-					maybeReady(doc);
+				database.insert(doc.body, doc.url, function (err, body) {
+					if (err && err['status-code'] === 409) {
+						// document conflict (always happens if doc exists)
+						database.get(doc.url, function (err, body) {
+							if (err) {
+								callback(err);
+							}
+							else {
+								doc.body._id = body._id;
+								doc.body._rev = body._rev;
+								saveDoc(doc);
+							}
+						});
+					}
+					else if (err) {
+						callback(err);
+					}
+					else {
+						maybeReady(doc);
+					}
 				});
 			};
 
@@ -284,7 +282,7 @@ var db = function (config) {
 
 
 	var createDatabaseAndViews = function (callback) {
-		cradleDb.exists(function (err, exists) {
+		nanoo.databaseExists(function (err, exists) {
 			if (err) {
 				callback(err);
 				return;
@@ -302,6 +300,7 @@ var db = function (config) {
 					createViews(callback);
 				});
 			}
+
 		});
 	};
 

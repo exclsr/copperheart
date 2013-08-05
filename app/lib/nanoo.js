@@ -144,6 +144,27 @@ var createDatabase = function (callback) {
 	nanoMaster.relax(opts, callback);
 };
 
+var databaseExists = function (callback) {
+	var headers = getCookieAuthHeaders();
+	var opts = {
+		db: _config.databaseName,
+		method: "GET",
+		headers: headers
+	};
+
+	nanoMaster.relax(opts, function (err, body) {
+		if (err && err['status-code'] === 404) {
+			callback(null, false);
+		}
+		else if (err) {
+			callback(err);
+		}
+		else {
+			callback(null, true);
+		}
+	});
+};
+
 var destroyDatabase = function (callback) {
 	var headers = getCookieAuthHeaders();
 	var opts = {
@@ -188,6 +209,7 @@ exports.init = init;
 exports.connect = establishDatabaseConnection;
 exports.refreshConnection = refreshDatabaseConnection;
 
+exports.databaseExists = databaseExists;
 exports.createDatabase = createDatabase;
 exports.destroyDatabase = destroyDatabase;
 

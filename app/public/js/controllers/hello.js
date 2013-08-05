@@ -27,9 +27,6 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		}
 		
 		profile.username = $routeParams.who;
-		profile.imageUrl = "/profile/" + profile.username + "/image";
-		profile.backgroundUrl = "/profile/" + profile.username + "/background/image";
-		profile.futureUrl = "/profile/" + profile.username + "/future/image";
 
 		var isInitialized = function () {
 			return profile
@@ -49,6 +46,13 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 				hadSuccess = true;
 				success();
 			}
+		};
+
+		var onStaticBaseUrlReady = function (baseUrl) {
+			profile.staticBaseUrl = baseUrl;
+			profile.imageUrl = baseUrl + "profile.jpg";
+			profile.backgroundUrl = baseUrl + "background.jpg";
+			profile.futureUrl = baseUrl + "future.jpg";
 		};
 
 		var onWhoReady = function (who) {
@@ -82,7 +86,7 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			});
 			profile.things = defaultThings;
 			maybeSuccess();
-		}
+		};
 
 		var onContributionsReady = function (contributions) {
 			patron.contributions = contributions;
@@ -101,6 +105,13 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 		$http.get('/who/' + profile.username)
 		.success(onWhoReady)
+		.error(function (data, status, headers, config) {
+			// TODO: :-(
+			console.log(data);
+		});
+
+		$http.get('/profile/' + profile.username + '/static-base-url')
+		.success(onStaticBaseUrlReady)
 		.error(function (data, status, headers, config) {
 			// TODO: :-(
 			console.log(data);
@@ -410,27 +421,26 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 
 
 	var getCommunityImagePath = function (community) {
-		if (!community) {
+		if (!community || !profile.staticBaseUrl) {
 			return '';
 		}
-		var path = '/profile/' + profile.username + '/community/';
-		path += profile.communities.indexOf(community);
+		var path = profile.staticBaseUrl + encodeURIComponent(community.name);
 		return path;
 	};
 	$scope.getCommunityImageUrl = function (community) {
-		if (!community) {
+		if (!community || !profile.staticBaseUrl) {
 			return placeholderUrl;
 		}
 		else {
-			return getCommunityImagePath(community) + '/image';
+			return getCommunityImagePath(community) + ".jpg";
 		}
 	};
 	$scope.getCommunityIconUrl = function (community) {
-		if (!community) {
+		if (!community || !profile.staticBaseUrl) {
 			return placeholderUrl;
 		}
 		else {
-			return getCommunityImagePath(community) + '/icon';	
+			return getCommunityImagePath(community) + 'icon.jpg';	
 		}
 	};
 

@@ -62,7 +62,6 @@ var db = function (config) {
 		getStaticView("members/byUsername", success, failure, options);
 	};
 
-
 	var streamImageAttachment = function (username, attachmentName, headers, res, callback) {
 		getStaticMemberByUsername(username, function (member) {
 			var docId = member._id;
@@ -238,6 +237,7 @@ var db = function (config) {
 			destroy: nanoo.destroyDatabase
 		},
 		changeMemberUsername: _changeMemberUsername,
+		getMember: getStaticMemberByUsername,
 		profileImages: {
 			get: getProfileImageByUsername,
 			save: saveProfileImageByUsername,

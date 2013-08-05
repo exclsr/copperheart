@@ -526,6 +526,29 @@ app.get('/profile/:username', function (req, res) {
 //----------------------------------------------------------------
 // Public member images
 //----------------------------------------------------------------
+app.get('/profile/:username/static-base-url', function (req, res) {
+
+	var getImageUrlBase = function(memberId) {
+		var dbConfig = config.database();
+		var protocol = dbConfig.useHttps ? "https://" : "http://";
+		var imageUrlBase = protocol + dbConfig.host + ":" + dbConfig.port + "/" 
+			+ dbConfig.name + "-static/";
+
+		return imageUrlBase + memberId + "/";
+	};
+
+	var gotMember = function (member) {
+		var imageUrlBase = getImageUrlBase(member._id);	
+		// TODO: Do we want to move more to the server side?
+		res.send(imageUrlBase);
+	};
+
+	staticDb.getMember(req.params.username, gotMember, function (err) {
+		console.log(err);
+		res.send(500);
+	})
+});
+
 app.get('/profile/:username/image', function (req, res) {
 	staticDb.profileImages.get(req.params.username, req.headers, res, function (err) {
 		if (err) {

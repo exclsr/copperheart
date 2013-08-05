@@ -30,7 +30,8 @@ var database = {
 	host: process.env.DB_HOST || "localhost",
 	port: process.env.DB_PORT || 5984,
 	useHttps: process.env.DB_USE_HTTPS || false,
-	name: process.env.DB_NAME || "sandbox"
+	name: process.env.DB_NAME || "sandbox",
+	staticName: process.env.DB_STATIC_NAME || ((process.env.DB_NAME || "sandbox") + "-static")
 };
 
 // can be passed directly into connect-redis

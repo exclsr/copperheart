@@ -531,8 +531,8 @@ app.get('/profile/:username/static-base-url', function (req, res) {
 	var getImageUrlBase = function(memberId) {
 		var dbConfig = config.database();
 		var protocol = dbConfig.useHttps ? "https://" : "http://";
-		var imageUrlBase = protocol + dbConfig.host + ":" + dbConfig.port + "/" 
-			+ dbConfig.name + "-static/";
+		var imageUrlBase = protocol + dbConfig.host + ":" + dbConfig.port 
+			+ "/" + dbConfig.staticName + "/";
 
 		return imageUrlBase + memberId + "/";
 	};

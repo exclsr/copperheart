@@ -10,8 +10,7 @@ var db = function (config) {
 
 	var couchHost = (useHttps ? "https://" : "http://") + (dbConfig.host || 'localhost');
 	var couchPort = dbConfig.port || 5984;
-	var databaseName = dbConfig.name || 'sandbox';
-	databaseName += '-static';
+	var databaseName = dbConfig.staticName || 'sandbox-static';
 	
 	var createDatabaseAndViews = function (callback) {
 		nanoo.ensureExists(function (err) {

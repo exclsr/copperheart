@@ -8,8 +8,8 @@ exports.initialize = function (config) {
 	var dbConfig = config.database();
 	var protocol = dbConfig.useHttps ? "https://" : "http://";
 	var imageUrlBase = 
-		protocol + dbConfig.host + ":" + dbConfig.port + "/" + 
-		dbConfig.name + "-static/"
+		protocol + dbConfig.host + ":" + dbConfig.port + 
+		"/" + dbConfig.staticName + "/"
 
 	var usernames = config.entranceUsernames() || [];
 	var staticIds = config.entranceStaticIds() || [];
@@ -17,10 +17,10 @@ exports.initialize = function (config) {
 		// Performance: In order to parallelize getting
 		// the profile image and the profile data, just
 		// go for it and set the imageUrl based on the
-		// username.
+		// supplied static ids.
 		//
 		// The trade off doing it this way is that we
-		// assume all the usernames are valid, for the
+		// assume all the ids are valid, for the
 		// benefit of twice-as-fast load times.
 		var profile = {};
 		profile.username = username;

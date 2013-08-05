@@ -15,6 +15,7 @@ var parseList = function (envVar) {
 var adminEmailAddresses = parseList(process.env.ADMIN_EMAIL_ADDRESSES);
 var memberEmailAddresses = parseList(process.env.MEMBER_EMAIL_ADDRESSES);
 var entranceUsernames = parseList(process.env.ENTRANCE_USERNAMES);
+var entranceStaticIds = parseList(process.env.ENTRANCE_STATIC_IDS);
 
 var port = process.env.PORT || 3000;
 
@@ -90,6 +91,10 @@ exports.memberEmailAddresses = function() {
 
 exports.entranceUsernames = function() {
 	return overrides.entranceUsernames || entranceUsernames;
+};
+
+exports.entranceStaticIds = function() {
+	return overrides.entranceStaticIds || entranceStaticIds;
 };
 
 exports.analytics = function() {

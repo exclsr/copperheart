@@ -4,9 +4,16 @@ var profiles = [];
 // TODO: How best to do dependency injection?
 exports.initialize = function (config) {
 	config = config;
+	
+	var dbConfig = config.database();
+	var protocol = dbConfig.useHttps ? "https://" : "http://";
+	var imageUrlBase = 
+		protocol + dbConfig.host + ":" + dbConfig.port + "/" + 
+		dbConfig.name + "-static/"
 
 	var usernames = config.entranceUsernames() || [];
-	usernames.forEach(function (username) {
+	var staticIds = config.entranceStaticIds() || [];
+	usernames.forEach(function (username, index) {
 		// Performance: In order to parallelize getting
 		// the profile image and the profile data, just
 		// go for it and set the imageUrl based on the
@@ -17,7 +24,7 @@ exports.initialize = function (config) {
 		// benefit of twice-as-fast load times.
 		var profile = {};
 		profile.username = username;
-		profile.imageUrl = "/profile/" + username + "/image";
+		profile.imageUrl = imageUrlBase + staticIds[index] + "/profile.jpg";
 		profiles.push(profile);
 	});
 };

@@ -537,16 +537,27 @@ app.get('/profile/:username/static-base-url', function (req, res) {
 		return imageUrlBase + memberId + "/";
 	};
 
-	var gotMember = function (member) {
-		var imageUrlBase = getImageUrlBase(member._id);	
-		// TODO: Do we want to move more to the server side?
-		res.send(imageUrlBase);
-	};
+	// Performance: Avoid a database trip if we can find the
+	// static id in our entrance configuration.
+	var entranceUsernames = config.entranceUsernames() || [];
+	var entranceStaticIds = config.entranceStaticIds() || [];
+	var index = entranceUsernames.indexOf(req.params.username);
+	if (index >= 0 && entranceStaticIds.length > index) {
+		res.send(getImageUrlBase(entranceStaticIds[index]));
+	}
+	else {
+		// Slower but more robust way of doing this
+		var gotMember = function (member) {
+			var imageUrlBase = getImageUrlBase(member._id);	
+			// TODO: Do we want to move more to the server side?
+			res.send(imageUrlBase);
+		};
 
-	staticDb.getMember(req.params.username, gotMember, function (err) {
-		console.log(err);
-		res.send(500);
-	})
+		staticDb.getMember(req.params.username, gotMember, function (err) {
+			console.log(err);
+			res.send(500);
+		});
+	}
 });
 
 app.get('/profile/:username/image', function (req, res) {

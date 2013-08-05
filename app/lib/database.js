@@ -24,33 +24,14 @@ var db = function (config) {
 	};
 
 	var createDatabaseAndViews = function (callback) {
-		nanoo.databaseExists(function (err, exists) {
+		nanoo.ensureExists(function (err) {
 			if (err) {
 				callback(err);
-				return;
-			}
-			
-			if (exists) {
-				views.create(database, callback);
 			}
 			else {
-				nanoo.createDatabase(function (err) {
-					if (err) {
-						callback(err);
-						return;
-					}
-					views.create(database, callback);
-				});
+				views.create(database, callback);
 			}
-
 		});
-	};
-
-	// For performance testing, for the time being
-	var log = function (d, prefix) {
-		var seconds = d.getSeconds();
-		var millisecond = d.getMilliseconds();
-		console.log(prefix + ": " + seconds + "." + millisecond);
 	};
 
 	var getView = function(viewUrl, success, failure, viewGenerationOptions) {		
@@ -106,10 +87,10 @@ var db = function (config) {
 	};
 
 	var getProfileByUsername = function (username, success, failure) {
-		var options = {}
+		var options = {};
 		options.key = username;
 		options.firstOnly = true;
-		// options.attachments = true;
+		// No: options.attachments = true;
 		profilesByUsername(success, failure, options);
 	};
 
@@ -278,14 +259,12 @@ var db = function (config) {
 				return;
 			}
 			var contribution = contribution[0];
-			console.log('removing contribution doc ...');
 			database.destroy(contribution._id, contribution._rev, function (err) {
 				if (err) {
 					failure(err);
 					return;
 				}
 				else {
-					console.log('deleting properties ...');
 					// Update the backer and member patron data, 
 					// to remove the association between the two,
 					// and the Stripe data.
@@ -296,7 +275,6 @@ var db = function (config) {
 
 					if (member.id === backer.id) {
 						delete backer.backers[backerId];
-						console.log('saving patron ...');
 						savePatron(backer, success, failure);
 					}
 					else {
@@ -308,13 +286,9 @@ var db = function (config) {
 			});
 		};
 
-		console.log('getting contribution ...');
 		getContribution(backerId, memberId, function (contribution) {
-			console.log('getting backer ...');
 			getPatronById(backerId, function (backer) {
-				console.log('getting patron ...');
 				getPatronById(memberId, function (member) {
-					console.log('removing records ...');
 					removeDatabaseRecords(contribution, backer, member);
 				}, failure);
 			}, failure);

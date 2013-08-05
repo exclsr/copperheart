@@ -165,6 +165,22 @@ var databaseExists = function (callback) {
 	});
 };
 
+var ensureExists = function (callback) {
+	databaseExists(function (err, exists) {
+		if (err) {
+			callback(err);
+		}
+		else if (!exists) {
+			createDatabase(function (err) {
+				callback(err);
+			});
+		}
+		else {
+			callback();
+		}
+	});
+};
+
 var destroyDatabase = function (callback) {
 	var headers = getCookieAuthHeaders();
 	var opts = {
@@ -209,8 +225,7 @@ exports.init = init;
 exports.connect = establishDatabaseConnection;
 exports.refreshConnection = refreshDatabaseConnection;
 
-exports.databaseExists = databaseExists;
-exports.createDatabase = createDatabase;
+exports.ensureExists = ensureExists;
 exports.destroyDatabase = destroyDatabase;
 
 exports.processHeaders = setCookieTokenFromHeaders;

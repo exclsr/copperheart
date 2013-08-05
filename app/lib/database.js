@@ -48,22 +48,21 @@ var db = function (config) {
 
 
 	var createViews = function (callback) {
+		var designDocs = [];
 
-		var isDesignDocReady = {
-			profiles: false,
-			patrons: false,
-			things: false,
-			contributions: false
-		};
-
-		var maybeReady = function (readyDocName) {
-			isDesignDocReady[readyDocName] = true;
-			for (doc in isDesignDocReady) {
-				if (!isDesignDocReady[doc]) {
-					return;
+		var maybeReady = function (designDoc) {
+			var areAllDocsReady = true;
+			
+			designDoc.isReady = true;
+			designDocs.forEach(function (doc) {
+				if (!doc.isReady) {
+					areAllDocsReady = false;
 				}
+			});
+
+			if (areAllDocsReady) {
+				callback();
 			}
-			callback();
 		};
 
 		// TODO: 'profiles' isn't quite right, maybe.
@@ -72,265 +71,217 @@ var db = function (config) {
 			url: '_design/profiles',
 			body: 
 			{
-				byUsername: {
-					map: function(doc) {
-						if (doc.username) {
-							var profile = {};
-							profile.name = doc.name;
-							profile.communities = doc.communities || [];
-							profile.username = doc.username;
-							if (doc._attachments && doc._attachments["profile.jpg"]) {
-								profile.image = doc._attachments["profile.jpg"];
-							} 
-							
-							emit(doc.username, profile);
-						}
-					}
-				}
-			}
-      	};
-
-		var forceProfilesDesignDocSave = false;
-
-		cradleDb.get(profilesDesignDoc.url, function (err, doc) {
-			if (err || !doc.views 
-				|| !doc.views.byUsername
-				|| forceProfilesDesignDocSave) {
-				// TODO: Add a mechanism for knowing when views
-				// themselves have updated, to save again at the
-				// appropriate times.
-				cradleDb.save(profilesDesignDoc.url, profilesDesignDoc.body, 
-					function() {
-						maybeReady("profiles");
-					}); 
-			}
-			else {
-				maybeReady("profiles");
-			}
-		});
-
-
-		var patronsDesignDoc = {
-			url: '_design/patrons',
-			body: 
-			{
-				byEmail: {
-					map: function(doc) {
-						if (doc.email) {
-							// TODO: Be explicit about the data
-							// we return -- don't just return the
-							// entire document -- or maybe just
-							// don't return the things that could
-							// be large, like the list of backers?
-							emit(doc.email, doc);
-						}
-					}
-				},
-				byId: {
-					map: function(doc) {
-						if (doc.id) {
-							emit(doc.id, doc);
-						}
-					}
-				},
-				byUsername: {
-					map: function(doc) {
-						if (doc.username) {
-							emit(doc.username, doc);
-						}
-					}
-				},
-				backing: {
-					map: function(doc) {
-						var backer = doc;
-						var displayName;
-
-						if (doc.backing) {
-							// TODO: Obviously localization implications
-							displayName = backer.name || "anonymous";
-							for (var memberId in doc.backing) {
-								emit([memberId, displayName], displayName);
+				version: "1.0.0",
+				views: {
+					byUsername: {
+						map: function(doc) {
+							if (doc.username) {
+								var profile = {};
+								profile.name = doc.name;
+								profile.communities = doc.communities || [];
+								profile.username = doc.username;
+								if (doc._attachments && doc._attachments["profile.jpg"]) {
+									profile.image = doc._attachments["profile.jpg"];
+								} 
+								
+								emit(doc.username, profile);
 							}
 						}
 					}
 				}
 			}
 		};
+		designDocs.push(profilesDesignDoc);
 
-		// Create or update the design doc if something we 
-		// want is missing.
-		// TODO: This is lame.
-		var forceDesignDocSave = false;
 
-		cradleDb.get(patronsDesignDoc.url, function (err, doc) {
-			if (err || !doc.views 
-				|| !doc.views.byEmail
-				|| !doc.views.byId
-				|| !doc.views.byUsername
-				|| !doc.views.backing
-				|| forceDesignDocSave) {
-				// TODO: Add a mechanism for knowing when views
-				// themselves have updated, to save again at the
-				// appropriate times.
-				cradleDb.save(patronsDesignDoc.url, patronsDesignDoc.body, 
-					function() {
-						maybeReady("patrons");
+		var patronsDesignDoc = {
+			url: '_design/patrons',
+			body: 
+			{
+				version: "1.0.0",
+				views: {
+					byEmail: {
+						map: function(doc) {
+							if (doc.email) {
+								// TODO: Be explicit about the data
+								// we return -- don't just return the
+								// entire document -- or maybe just
+								// don't return the things that could
+								// be large, like the list of backers?
+								emit(doc.email, doc);
+							}
+						}
+					},
+					byId: {
+						map: function(doc) {
+							if (doc.id) {
+								emit(doc.id, doc);
+							}
+						}
+					},
+					byUsername: {
+						map: function(doc) {
+							if (doc.username) {
+								emit(doc.username, doc);
+							}
+						}
+					},
+					backing: {
+						map: function(doc) {
+							var backer = doc;
+							var displayName;
+
+							if (doc.backing) {
+								// TODO: Obviously localization implications
+								displayName = backer.name || "anonymous";
+								for (var memberId in doc.backing) {
+									emit([memberId, displayName], displayName);
+								}
+							}
+						}
 					}
-				); 
+				}
 			}
-			else {
-				maybeReady("patrons");
-			}
-		});
+		};
+		designDocs.push(patronsDesignDoc);
 
 
 		var thingsDesignDoc = {
 			url: '_design/things',
 			body: 
 			{
-				byUsername: {
-					map: function(doc) {
-						if (doc.username) {
-							emit(doc.username, doc.things || []);
+				version: "1.0.0",
+				views: {
+					byUsername: {
+						map: function(doc) {
+							if (doc.username) {
+								emit(doc.username, doc.things || []);
+							}
 						}
 					}
 				}
 			}
-      	};
-
-      	// Create or update the design doc if something we 
-      	// want is missing.
-      	// TODO: This is lame.
-      	// TODO: This is lame AND it is duplicate code with 
-      	// that stuff above.
-      	var forceThingsDesignDocSave = false;
-
-		cradleDb.get(thingsDesignDoc.url, function (err, doc) {
-			if (err || !doc.views 
-				|| !doc.views.byUsername
-				|| forceThingsDesignDocSave) {
-				// TODO: Add a mechanism for knowing when views
-				// themselves have updated, to save again at the
-				// appropriate times.
-				cradleDb.save(thingsDesignDoc.url, thingsDesignDoc.body,
-					function() {
-						maybeReady("things");
-					}
-				); 
-			}
-			else {
-				maybeReady("things");
-			}
-		});
+		};
+		designDocs.push(thingsDesignDoc);
 
 
 		var contributionsDesignDoc = {
 			url: '_design/contributions',
 			body: 
 			{
-				byPatronToProject: {
-					// What contributions are being given from a specific
-					// patron to a specific project?
-					map: function(doc) {
-						var getContributionId = function (backerId, memberId) {
-							return backerId + "-" + memberId;
-						};
+				version: "1.0.0",
+				views: {
+					byPatronToProject: {
+						// What contributions are being given from a specific
+						// patron to a specific project?
+						map: function(doc) {
+							var getContributionId = function (backerId, memberId) {
+								return backerId + "-" + memberId;
+							};
 
-						// TODO: Change this key to an array like so
-						// [backerId, memberId]
-						if (doc.type 
-						 && doc.backerId
-						 && doc.memberId
-						 && doc.type === "contribution") { 
-						 	var id = getContributionId(doc.backerId, doc.memberId);
-							emit(id, doc);
-						}
-					}
-				},
-
-				byPatron: {
-					// What are all the contributions that a specific 
-					// patron is providing?
-					map: function(doc) {
-						if (doc.id) {
-							// the patron we're looking for
-							// emit([doc.id, 0], doc);
-
-							// doc === the profiles of the projects we're backing
-							// TODO: We don't really need the entire profile
-							// here. Probably just the name.
-							//
-							// TODO: Maybe have a 'basic info' section in the doc
-							// that contains name and username, and can be expanded
-							// with messing with the view.
-							for (var backerId in doc.backers) {
-								emit([backerId, doc.id, 0], doc);
+							// TODO: Change this key to an array like so
+							// [backerId, memberId]
+							if (doc.type 
+							 && doc.backerId
+							 && doc.memberId
+							 && doc.type === "contribution") { 
+								var id = getContributionId(doc.backerId, doc.memberId);
+								emit(id, doc);
 							}
 						}
+					},
 
-						// the patron's contributions
-						if (doc.type === "contribution") { 
-							emit([doc.backerId, doc.memberId, 1], doc);
+					byPatron: {
+						// What are all the contributions that a specific 
+						// patron is providing?
+						map: function(doc) {
+							if (doc.id) {
+								// the patron we're looking for
+								// emit([doc.id, 0], doc);
+
+								// doc === the profiles of the projects we're backing
+								// TODO: We don't really need the entire profile
+								// here. Probably just the name.
+								//
+								// TODO: Maybe have a 'basic info' section in the doc
+								// that contains name and username, and can be expanded
+								// with messing with the view.
+								for (var backerId in doc.backers) {
+									emit([backerId, doc.id, 0], doc);
+								}
+							}
+
+							// the patron's contributions
+							if (doc.type === "contribution") { 
+								emit([doc.backerId, doc.memberId, 1], doc);
+							}
 						}
-					}
-				},
+					},
 
-				toMember: {
-					// What are all the contributions that a specific 
-					// member is receiving?
-					map: function(doc) {
-						// if (doc.id) {
-						// 	// for each backer, we want to know his or her name.
+					toMember: {
+						// What are all the contributions that a specific 
+						// member is receiving?
+						map: function(doc) {
+							// if (doc.id) {
+							// 	// for each backer, we want to know his or her name.
 
-						// 	// doc === the profiles of the projects we're backing
-						// 	// TODO: We don't really need the entire profile
-						// 	// here. Probably just the name.
-						// 	//
-						// 	// TODO: Maybe have a 'basic info' section in the doc
-						// 	// that contains name and username, and can be expanded
-						// 	// with messing with the view.
-						// 	for (var backerId in doc.backers) {
-						// 		emit([backerId, doc.id, 0], doc);
-						// 	}
-						// }
+							// 	// doc === the profiles of the projects we're backing
+							// 	// TODO: We don't really need the entire profile
+							// 	// here. Probably just the name.
+							// 	//
+							// 	// TODO: Maybe have a 'basic info' section in the doc
+							// 	// that contains name and username, and can be expanded
+							// 	// with messing with the view.
+							// 	for (var backerId in doc.backers) {
+							// 		emit([backerId, doc.id, 0], doc);
+							// 	}
+							// }
 
 
-						// the contributions to the member
-						if (doc.type === "contribution") { 
-							emit([doc.memberId, doc.backerId], doc);
+							// the contributions to the member
+							if (doc.type === "contribution") { 
+								emit([doc.memberId, doc.backerId], doc);
+							}
 						}
 					}
 				}
 			}
-      	};
+		};
+		designDocs.push(contributionsDesignDoc)
 
-      	// Create or update the design doc if something we 
-      	// want is missing.
-      	// TODO: This is lame.
-      	// TODO: This is lame AND it is triplicate code with 
-      	// that stuff above.
-      	var forceContributionsDesignDocSave = false;
 
-		cradleDb.get(contributionsDesignDoc.url, function (err, doc) {
-			if (err || !doc.views 
-				|| !doc.views.byPatronToProject
-				|| !doc.views.byPatron
-				|| !doc.views.toMember
-				|| forceContributionsDesignDocSave) {
-				// TODO: Add a mechanism for knowing when views
-				// themselves have updated, to save again at the
-				// appropriate times.
-				cradleDb.save(contributionsDesignDoc.url, contributionsDesignDoc.body, 
-					function() {
-						maybeReady("contributions");
+		var saveDesignDocs = function () {
+			var saveDoc = function (doc) {
+				cradleDb.save(doc.url, doc.body, function() {
+					maybeReady(doc);
+				});
+			};
+
+			// Save our design doc if it doesn't exist or if
+			// the version in the database is different from
+			// the one we have in the code.
+			designDocs.forEach(function (doc) {
+				database.get(doc.url, function (err, body) {
+					if (err && err['status-code'] === 404) {
+						saveDoc(doc);	
 					}
-				); 
-			}
-			else {
-				maybeReady("contributions");
-			}
-		});
+					else if (err) {
+						callback(err);
+					}
+					else {
+						if (body.version === doc.body.version) {
+							// Up to date.
+							maybeReady(doc);
+						}
+						else {
+							saveDoc(doc);
+						}
+					}
+				});
+			});
+		}(); // closure
 	};
+
 
 	var createDatabaseAndViews = function (callback) {
 		cradleDb.exists(function (err, exists) {

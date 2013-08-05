@@ -1,5 +1,6 @@
-// Something a little bigger than nano 
 // nanoo.js
+//
+// Something a little bigger than nano.
 //
 var nano = require('nano');
 

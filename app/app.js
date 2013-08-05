@@ -1,5 +1,6 @@
 var express    = require('express')
 	, db       = require('./lib/database.js').db()
+	, staticDb = require('./lib/staticDatabase.js').db()
 	, routes   = require('./routes')
 	, user     = require('./routes/user')
 	, entrance = require('./routes/entrance')
@@ -526,7 +527,7 @@ app.get('/profile/:username', function (req, res) {
 // Public member images
 //----------------------------------------------------------------
 app.get('/profile/:username/image', function (req, res) {
-	db.profileImages.get(req.params.username, req.headers, res, function (err) {
+	staticDb.profileImages.get(req.params.username, req.headers, res, function (err) {
 		if (err) {
 			// We don't have to do anything, here, as the db
 			// pipe takes care of it. Log if you want.
@@ -537,26 +538,31 @@ app.get('/profile/:username/image', function (req, res) {
 
 var noop = function () { };
 app.get('/profile/:username/background/image', function (req, res) {
-	db.profileImages.getBackground(req.params.username, req.headers, res, noop);
+	staticDb.profileImages.getBackground(req.params.username, req.headers, res, noop);
 });
 
 app.get('/profile/:username/future/image', function (req, res) {
-	db.profileImages.getFuture(req.params.username, req.headers, res, noop);
+	staticDb.profileImages.getFuture(req.params.username, req.headers, res, noop);
 });
 
 var getCommunityImage = function (username, communityId, getImageFn, headers, res) {
 	var success = function (profile) {
-		var community = profile.communities[communityId];
-		if (community) {
-			getImageFn(username, community.name, headers, res,
-				function (err) {
-					// We use pipes to transfer stuff, so we don't really
-					// care about this error at the moment.
-				}
-			);
+		if (!profile.communities) {
+			res.send(404);
 		}
 		else {
-			res.send(404); // not found
+			var community = profile.communities[communityId];
+			if (community) {
+				getImageFn(username, community.name, headers, res,
+					function (err) {
+						// We use pipes to transfer stuff, so we don't really
+						// care about this error at the moment.
+					}
+				);
+			}
+			else {
+				res.send(404); // not found
+			}
 		}
 	};
 
@@ -572,7 +578,7 @@ app.get('/profile/:username/community/:communityId/image', function (req, res) {
 	getCommunityImage(
 		req.params.username, 
 		req.params.communityId, 
-		db.communityImages.get, 
+		staticDb.communityImages.get, 
 		req.headers,
 		res
 	);
@@ -582,7 +588,7 @@ app.get('/profile/:username/community/:communityId/icon', function (req, res) {
 	getCommunityImage(
 		req.params.username, 
 		req.params.communityId, 
-		db.communityImages.getIcon,
+		staticDb.communityImages.getIcon,
 		req.headers,
 		res
 	);
@@ -657,7 +663,7 @@ app.post('/member/profileImage', ensureIsMember, function (req, res) {
 	saveProfileImage(
 		req.user, 
 		req.files.profileImage.path,
-		db.profileImages.save,
+		staticDb.profileImages.save,
 		res);
 });
 
@@ -665,7 +671,7 @@ app.post('/member/backgroundImage', ensureIsMember, function (req, res) {
 	saveProfileImage(
 		req.user, 
 		req.files.backgroundImage.path,
-		db.profileImages.saveBackground,
+		staticDb.profileImages.saveBackground,
 		res);
 });
 
@@ -673,7 +679,7 @@ app.post('/member/futureImage', ensureIsMember, function (req, res) {
 	saveProfileImage(
 		req.user, 
 		req.files.futureImage.path,
-		db.profileImages.saveFuture,
+		staticDb.profileImages.saveFuture,
 		res);
 });
 
@@ -717,7 +723,7 @@ app.post('/member/community/:communityId/image', ensureIsMember, function (req, 
 	var patron = req.user;
 	var communityId = req.params.communityId
 	var filepath = req.files.communityImage.path;
-	var saveImageFn = db.communityImages.save;
+	var saveImageFn = staticDb.communityImages.save;
 
 	saveCommunityImage(patron, communityId, filepath, saveImageFn, function (response) {
 		res.send(response);
@@ -728,7 +734,7 @@ app.post('/member/community/:communityId/icon', ensureIsMember, function (req, r
 	var patron = req.user;
 	var communityId = req.params.communityId
 	var filepath = req.files.communityIcon.path;
-	var saveImageFn = db.communityImages.saveIcon;
+	var saveImageFn = staticDb.communityImages.saveIcon;
 
 	saveCommunityImage(patron, communityId, filepath, saveImageFn, function (response) {
 		res.send(response);
@@ -811,8 +817,17 @@ app.put('/member/communities', ensureIsMember, function (req, res) {
 app.put('/member/username', ensureIsMember, function (req, res) {
 	var member = req.user;
 	// TODO: Need to check for dups.
-	member.username = req.body.username;
-	saveMember(member, req, res);
+	// TODO: This messes up the entrance list, so be aware of that.
+	staticDb.changeMemberUsername(member.username, req.body.username, function (err) {
+		if (err) {
+			console.log(err);
+			res.send(500);
+		}
+		else {
+			member.username = req.body.username;
+			saveMember(member, req, res);	
+		}
+	});
 });
 
 app.put('/member/photo-credits', ensureIsMember, function (req, res) {
@@ -1030,5 +1045,8 @@ http.createServer(app).listen(app.get('port'), function(){
 	db.init(function () {
 		// TODO: Maybe show an error if things failed.
 		console.log("Database: Ready");
+	});
+	staticDb.init(function () {
+		console.log("Static Database: Ready");
 	});
 });

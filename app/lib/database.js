@@ -4,7 +4,7 @@
 // The thing that knows about our database implementation.
 // The api is at the bottom.
 //
-var nanoo = require('./nanoo.js');
+var nanoo = require('./nanoo.js')();
 var views = require('./views.js');
 var defaultConfig  = require('../config.js').database();
 
@@ -295,130 +295,6 @@ var db = function (config) {
 		}, failure);
 	};
 
-	var streamImageAttachment = function (patron, attachmentName, headers, res, callback) {
-		var docId = patron._id;
-
-		var readStream;
-		nanoo.getAttachmentStream(docId, attachmentName, headers, function (err, stream) {
-			if (err) {
-				callback(err);
-				// TODO: return?
-			}
-			else {
-				readStream = stream;
-			}			
-		});
-
-		// We access the database via getPatronByUsername right before
-		// making this call, so we don't have to refresh our cookies.
-		// TODO: We should check anyway. Check the docs to see if headers
-		// are returned in this callback, or what.
-		// readStream = database.attachment.get(docId, attachmentName, function (err) {
-		// 	if (err) {
-		// 		callback(err);
-		// 	}
-		// });
-
-		// TODO: Consider setting 'end' to false so we can
-		// maybe send an error code if we mess up.
-
-		// Stream the image to 'res'
-		res.type("image/jpeg");
-		readStream.pipe(res);
-	};
-
-	var getImageByUsername = function (username, attachmentName, headers, res, callback) {
-		var gotPatron = function (patron) {
-			streamImageAttachment(patron, attachmentName, headers, res, callback);
-		};
-
-		var failure = function (err) {
-			callback(err);
-		};
-
-		getPatronByUsername(username, gotPatron, failure);
-	};
-
-	var getProfileImageByUsername = function (username, headers, res, callback) {
-		getImageByUsername(username, "profile.jpg", headers, res, callback);
-	};
-
-	var saveImageByUsername = function (username, attachmentName, imageData, callback) {
-		var gotPatron = function (patron) {
-			var docId  = patron._id;
-			var docRev = patron._rev;
-			var contentType = "image/jpeg";
-
-			var options = {
-				rev: docRev
-			};
-
-			database.attachment.insert(docId, attachmentName, imageData, 
-				contentType, options, function (err) {
-				if (err) {
-					callback(err);
-				}
-				else {
-					callback();
-				}
-			});
-		};
-
-		var failure = function (err) {
-			callback(err);
-		};
-
-		getPatronByUsername(username, gotPatron, failure);
-	};
-
-	var saveProfileImageByUsername = function(username, imageData, callback) {
-		saveImageByUsername(username, "profile.jpg", imageData, callback);
-	};
-
-
-	var getBackgroundImageByUsername = function (username, headers, res, callback) {
-		getImageByUsername(username, "background.jpg", headers, res, callback);
-	};
-
-	var saveBackgroundImageByUsername = function(username, imageData, callback) {
-		saveImageByUsername(username, "background.jpg", imageData, callback);
-	};
-
-
-	var getFutureImageByUsername = function (username, headers, res, callback) {
-		getImageByUsername(username, "future.jpg", headers, res, callback);
-	};
-
-	var saveFutureImageByUsername = function(username, imageData, callback) {
-		saveImageByUsername(username, "future.jpg", imageData, callback);
-	};
-
-
-	var sanitizeName = function (name) {
-		// TODO: sanitize name.
-		return name;
-	}
-
-	var getCommunityImageByUsername = function (username, communityName, headers, res, callback) {
-		var name = sanitizeName(communityName);
-		getImageByUsername(username, name + ".jpg", headers, res, callback);
-	};
-
-	var saveCommunityImageByUsername = function (username, communityName, imageData, callback) {
-		var name = sanitizeName(communityName);
-		saveImageByUsername(username, name + ".jpg", imageData, callback);
-	};
-
-	var getCommunityIconByUsername = function (username, communityName, headers, res, callback) {
-		var name = sanitizeName(communityName);
-		getImageByUsername(username, name + "icon.jpg", headers, res, callback);
-	};
-
-	var saveCommunityIconByUsername = function (username, communityName, imageData, callback) {
-		var name = sanitizeName(communityName);
-		saveImageByUsername(username, name + "icon.jpg", imageData, callback);
-	};
-
 	var doInit = function (callback) {
 		var nanooConfig = {
 			databaseUrl: couchHost + ':' + couchPort,
@@ -444,22 +320,8 @@ var db = function (config) {
 		onlyForTest : {
 			destroy : nanoo.destroyDatabase
 		},
-		profileImages : {
-			get : getProfileImageByUsername,
-			save : saveProfileImageByUsername,
-			getBackground : getBackgroundImageByUsername,
-			saveBackground : saveBackgroundImageByUsername,
-			getFuture : getFutureImageByUsername,
-			saveFuture : saveFutureImageByUsername
-		},
 		profiles : {
 			getByUsername : getProfileByUsername
-		},
-		communityImages : {
-			get : getCommunityImageByUsername,
-			save: saveCommunityImageByUsername,
-			getIcon : getCommunityIconByUsername,
-			saveIcon : saveCommunityIconByUsername
 		},
 		patrons : {
 			get : getPatron,

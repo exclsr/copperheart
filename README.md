@@ -67,7 +67,8 @@ Configuration is done via environment variables.
 
 ### CouchDB
 
-+ `DB_NAME`
++ `DB_NAME` (stores patron and member data)
++ `DB_STATIC_NAME` (stores images)
 + `DB_HOST` (i.e. localhost)
 + `DB_PORT`
 + `DB_USE_HTTPS` true or false
@@ -98,6 +99,15 @@ Copper Heart uses OpenID through Google for authentication.
 
 + `NODE_ENV` production or development
 
+CouchDB configuration
+----------------------
++ Create the main and static databases.
++ Add users to your CouchDB instance. 
++ Assign the "app" role to your database user. 
++ Grant the "app" role "admin" permissions on the static database. 
++ Grant your database user "admin" and "member" permissions on the main database.
+
+It's a minor goal to have the code take care of this in the future.
 
 authors
 -------

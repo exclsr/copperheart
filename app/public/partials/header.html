@@ -5,16 +5,20 @@
 
 	<span ng-show="!isSignedIn()">Welcome to <a href="#/about">Copper Heart</a>.</span>
 	<span ng-show="isSignedIn()">
-		{{patron.getUsername()}}</a> | 
+		<div>Welcome, {{patron.getUsername()}}</div> 
+		<a href="/#/entrance">entrance</a> .
 		<a href="/#/edit/contributions">contributions</a>
+		
 	</span>
-	<span ng-show="isMember()"> |
+	<span ng-show="isMember()"> .
 		<a href="/#/hello/{{patron.getUsername()}}">profile</a> : 
 		<a href="/#/edit">edit</a>
+	</span>
+	<span ng-show="isSignedIn()"> .
+		<a ng-show="isSignedIn()" ng-click="signOut()" style="cursor:pointer">sign out</a>
 	</span>
 
 	<h6 id="login">
 		<a ng-show="!isSignedIn()" href="/auth/google?from=%23/{{getPageName()}}">sign in with Google</a>
-		<a ng-show="isSignedIn()" ng-click="signOut()" style="cursor:pointer">sign out</a>
 	</h6>
 </div>

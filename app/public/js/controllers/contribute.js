@@ -1,6 +1,6 @@
 'use strict';
 
-function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
+function ContributeCtrl(session, $scope, $http, httpOptions, $location, $routeParams) {
 
 	var contributionTo = undefined;
 	var patron = undefined;
@@ -26,7 +26,7 @@ function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 
 	var initialize = function() {
 
-		$http.get('/config/stripe-api-key')
+		$http.get('/config/stripe-api-key', httpOptions)
 		.success(function (data) {
 			var stripeApiKey = data;
 			// Identifies our website in the createToken call below
@@ -434,4 +434,4 @@ function ContributeCtrl(session, $scope, $http, $location, $routeParams) {
 		Stripe.createToken(creditCard, stripeResponseHandler);
 	};
 }
-ContributeCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams'];
+ContributeCtrl.$inject = ['session', '$scope', '$http', 'httpOptions', '$location', '$routeParams'];

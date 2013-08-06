@@ -6,7 +6,7 @@
 
 	<div class="whatContainer">
 		<div class="helloContainer projectContainer span11 row" ng-show="isShowingCommunity()">
-			<div class="span6" style="margin: 0; box-sizing: border-box;
+			<div class="span6" style="margin: 0; box-sizing: border-box; -moz-box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
 				<h3>{{getCommunity().name}}</h3>
 				<div ng-bind-html="getCommunity().description"></div>
@@ -51,6 +51,7 @@
 					padding-right: 2em;
 					position: absolute;
 					box-sizing: border-box;
+					-moz-box-sizing: border-box;
 					bottom: 6.1em;
 					width: 100%;
 				">
@@ -60,7 +61,7 @@
 		</div>
 
 		<div class="helloContainer background span11 row" ng-show="showBackground()">
-			<div class="span6" style="margin: 0; box-sizing: border-box;
+			<div class="span6" style="margin: 0; box-sizing: border-box; -moz-box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
 				<h3>Background</h3>
 				<div ng-bind-html="profile.getBackground()"></div>
@@ -93,7 +94,7 @@
 					ng-show="profile.getPhotoCredit('future')"
 					style="text-align: left">photo credit: {{profile.getPhotoCredit('future')}}</div>
 			</div>
-			<div class="span5" style="margin: 0; box-sizing: border-box;
+			<div class="span5" style="margin: 0; box-sizing: border-box; -moz-box-sizing: border-box;
 				padding-left: 1.4em; padding-right: 1.4em">
 				<h3>Future plans</h3>
 				<div ng-bind-html="profile.getFuture()"></div>

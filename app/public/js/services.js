@@ -4,6 +4,14 @@
 
 angular.module('myApp.services', []).
 	value('version', '0.9').
+	factory('httpOptions', function($cacheFactory) {
+		var cacheSize = 100;
+		var cache = $cacheFactory("copperheart", cacheSize);
+		var httpOptions = {
+			cache: cache
+		};
+		return httpOptions;
+	}).
 	factory('session', function() {
 		// session: use localStorage to maintain session
 		// state across visits to the page and refreshes.

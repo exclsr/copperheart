@@ -1,6 +1,6 @@
 'use strict';
 
-function HelloCtrl(session, $scope, $http, $location, $routeParams) {
+function HelloCtrl(session, $scope, $http, httpOptions, $location, $routeParams) {
 
 	var profile = {};
 	var community = undefined;
@@ -103,14 +103,14 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 			maybeSuccess();
 		}
 
-		$http.get('/who/' + profile.username)
+		$http.get('/who/' + profile.username, httpOptions)
 		.success(onWhoReady)
 		.error(function (data, status, headers, config) {
 			// TODO: :-(
 			console.log(data);
 		});
 
-		$http.get('/profile/' + profile.username + '/static-base-url')
+		$http.get('/profile/' + profile.username + '/static-base-url', httpOptions)
 		.success(onStaticBaseUrlReady)
 		.error(function (data, status, headers, config) {
 			// TODO: :-(
@@ -118,27 +118,27 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 		});
 
 		// TODO: Make a config object for DI to set n=4
-		$http.get('/things/' + profile.username + '?n=4')
+		$http.get('/things/' + profile.username + '?n=4', httpOptions)
 		.success(onThingsReady)
 		.error(function (data, status, headers, config) {
 			// TODO: Something terrible went wrong. Deal with it.
 			console.log(data);
 		});
 
-		$http.get('/contributions/' + profile.username)
+		$http.get('/contributions/' + profile.username, httpOptions)
 		.success(onContributionsReady)
 		.error(function (data, status, headers, config) {
 			// TODO: Once again, need an error handling scheme.
 			console.log(data);
 		});
 
-		$http.get('/support/' + profile.username)
+		$http.get('/support/' + profile.username, httpOptions)
 		.success(onSupportReady)
 		.error(function (data, status, headers, config) {
 			console.log(data);
 		});
 
-		$http.get('/support/' + profile.username + '/names')
+		$http.get('/support/' + profile.username + '/names', httpOptions)
 		.success(onBackersReady)
 		.error(function (data, status, headers, config) {
 			console.log(data);
@@ -558,4 +558,4 @@ function HelloCtrl(session, $scope, $http, $location, $routeParams) {
 	};
 
 }
-HelloCtrl.$inject = ['session', '$scope', '$http', '$location', '$routeParams'];
+HelloCtrl.$inject = ['session', '$scope', '$http', 'httpOptions', '$location', '$routeParams'];

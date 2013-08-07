@@ -170,9 +170,7 @@
 			<div class="backers span7" style="clear: left; padding-top: 1em">
 				<h3>Backed by the following people</h3>
 				<div class="backersContent">
-					<span ng-repeat="backer in profile.getBackers()">
-						<span ng-show="$middle || $last && !$first">,</span> {{backer}} 
-					</span>
+					<span ng-repeat="backer in profile.getBackers()"><span ng-show="$middle || $last && !$first">,</span> {{backer}}</span>
 				</div>
 			</div>	
 		</div>

@@ -27,6 +27,23 @@ function TopLevelCtrl(session, $scope, $http) {
 		});
 	}
 
+
+	// HACK: This is a workaround for Safari not scrolling to 
+	// the top of the page when we change location / views.
+	var scrollToTop = function () {
+		console.log('scrollToTop');
+		$('html, body').animate({
+			scrollTop: $("#topLevel").offset().top
+		}, 100);
+	};
+
+	// This is very brittle. Please feel free to create
+	// a better solution.
+	$scope.$on('$viewContentLoaded', function() {
+		scrollToTop();
+	});
+
+
 	$scope.patron = {};
 
 	$scope.patron.getUsername = function () {

@@ -2,6 +2,23 @@
 
 /* Services */
 
+// Added to make dates format to ISO8601 across browsers
+// h/t: http://stackoverflow.com/a/2218874/124487
+Date.prototype.toJSON = function (key) {
+    function f(n) {
+        // Format integers to have at least two digits.
+        return n < 10 ? '0' + n : n;
+    }
+
+    return this.getUTCFullYear()   + '-' +
+         f(this.getUTCMonth() + 1) + '-' +
+         f(this.getUTCDate())      + 'T' +
+         f(this.getUTCHours())     + ':' +
+         f(this.getUTCMinutes())   + ':' +
+         f(this.getUTCSeconds())   + '.' +
+         f(this.getUTCMilliseconds())   + 'Z';
+};
+
 angular.module('myApp.services', []).
 	value('version', '0.9').
 	factory('httpOptions', function($cacheFactory) {
@@ -51,8 +68,18 @@ angular.module('myApp.services', []).
 			}
 		}(); // closure
 
-		// TODO: Need a way to expire session state.
-		var session = store.get(sessionKey);
+		var getSession = function() {
+			var session = store.get(sessionKey);
+			// Dates are stored as strings in JSON. That's cool,
+			// but we want to have actual Date objects.
+			if (session.expirationDate) {
+				session.expirationDate = new Date(session.expirationDate);
+			}
+
+			return session;
+		};
+
+		var session = getSession();
 		if (!session 
 		 || !session.expirationDate
 		 || session.expirationDate < today) {
@@ -72,11 +99,11 @@ angular.module('myApp.services', []).
 
 		// Add our functions back, since JSON.stringify stripped them out.
 		if (!session.save) {
-				session.save = function() {
-					var now = new Date();
-					session.expirationDate = getExpirationDate(now);
-					store.set(sessionKey, session);
-				};
+			session.save = function() {
+				var now = new Date();
+				session.expirationDate = getExpirationDate(now);
+				store.set(sessionKey, session);
+			};
 		}
 
 		return session;

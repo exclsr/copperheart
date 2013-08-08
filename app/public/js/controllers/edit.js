@@ -177,54 +177,54 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 	};
 
 
-	$scope.isAtPassionLimit = function() {
-		var passions = $scope.passions || [];
-		return passions.length >= 3;
-	};
+	// $scope.isAtPassionLimit = function() {
+	// 	var passions = $scope.passions || [];
+	// 	return passions.length >= 3;
+	// };
 
-	var savePassions = function (passions, callback) {
-		var putPassions = $http.put('/member/passions', passions);
-		putPassions.success(function (data) {
-			$scope.passions = passions;
-			console.log("<3");
-			callback();
-		});
-		putPassions.error(function (data, status, headers, config) { 
-			// TODO: Oh ... no.
-			console.log(data);
-		});
-	};
+	// var savePassions = function (passions, callback) {
+	// 	var putPassions = $http.put('/member/passions', passions);
+	// 	putPassions.success(function (data) {
+	// 		$scope.passions = passions;
+	// 		console.log("<3");
+	// 		callback();
+	// 	});
+	// 	putPassions.error(function (data, status, headers, config) { 
+	// 		// TODO: Oh ... no.
+	// 		console.log(data);
+	// 	});
+	// };
 
-	$scope.savePassion = function() {
-		var passions = [];
-		// Prepare passions for the server, while keeping our
-		// UI the same. TODO: What do we want to do -- wait
-		// to hear from the server before updating the UI,
-		// or to be "responsive." Let's start with being
-		// honest about what is happening, then go from there.
-		angular.forEach($scope.passions, function (passion) {
-			passions.push(passion);
-		});
-		passions.push($scope.newPassion);
+	// $scope.savePassion = function() {
+	// 	var passions = [];
+	// 	// Prepare passions for the server, while keeping our
+	// 	// UI the same. TODO: What do we want to do -- wait
+	// 	// to hear from the server before updating the UI,
+	// 	// or to be "responsive." Let's start with being
+	// 	// honest about what is happening, then go from there.
+	// 	angular.forEach($scope.passions, function (passion) {
+	// 		passions.push(passion);
+	// 	});
+	// 	passions.push($scope.newPassion);
 
-		savePassions(passions, function() {
-			$scope.newPassion = "";
-		});
-	};
+	// 	savePassions(passions, function() {
+	// 		$scope.newPassion = "";
+	// 	});
+	// };
 
-	$scope.deletePassion = function(passionToDelete) {
-		var passionsToKeep = [];
-		// TODO: Rumor is that animations are coming in the next
-		// release of AngularJS for this sort of thing, so hold
-		// tight for now.
-		angular.forEach($scope.passions, function (passion) {
-			if (passion !== passionToDelete) {
-				passionsToKeep.push(passion);
-			}
-		});
+	// $scope.deletePassion = function(passionToDelete) {
+	// 	var passionsToKeep = [];
+	// 	// TODO: Rumor is that animations are coming in the next
+	// 	// release of AngularJS for this sort of thing, so hold
+	// 	// tight for now.
+	// 	angular.forEach($scope.passions, function (passion) {
+	// 		if (passion !== passionToDelete) {
+	// 			passionsToKeep.push(passion);
+	// 		}
+	// 	});
 
-		savePassions(passionsToKeep);
-	};
+	// 	savePassions(passionsToKeep);
+	// };
 
 
 	var saveThings = function (things) {

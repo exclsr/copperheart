@@ -30,7 +30,7 @@
 					<h3>Communities</h3>
 					<ul style="margin-bottom: 0">
 						<li ng-repeat="community in communities" class="communityContainer">
-							<span class=""><a href="{{community.url}}">{{community.name}}</a></span>
+							<span>{{community.name}}</span>
 							<span class="thingTrashIcon" ng-click="deleteCommunity(community)">
 								<i class="icon-trash" 
 								style="margin-left: 1.5ex; margin-bottom: 2px; vertical-align: bottom"></i>
@@ -43,19 +43,20 @@
 							<form ng-submit="saveCommunity()">
 								<input ng-model="newCommunity.name" type="text" style="margin-top: 10px"
 								placeholder="community name" />
-								<input ng-model="newCommunity.url" type="text" style="margin-top: -8px" 
-								placeholder="web address (url)" />
+								<!--
+								TODO: A community url could have a place in the future, but not at the moment.
+ 								<input ng-model="newCommunity.url" type="text" style="margin-top: -8px" 
+								placeholder="web address (url)" /> -->
 								<button type="submit" class="btn" style="margin-top: -18px">Add</button>
 							</form>
 						</li>
 					</ul>
 				</div>
 
+
 				<!--
-				TODO: Soon ...
-	 			<input type="text"/>
-				<input class="span4" type="text"/>
-	 			-->
+				TODO: Passions could play a role in a future design of Copper Heart, but
+				I think for the time being we need to finish other parts first.
 	 			<div class="span3">
 					<h3>Passions</h3>
 					<ul style="margin-bottom: 0">
@@ -77,6 +78,7 @@
 						</li>
 					</ul>
 				</div>
+				-->
 			</div>
 		</div>
 

@@ -8,6 +8,10 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 	$scope.communityImageUrlTimestamps = {};
 	$scope.communityIconUrlTimestamps = {};
 
+	var placeholderUrl = "/img/placeholder.png";
+	$scope.profileImageUrl = placeholderUrl;
+
+
 	var patron = {};
 	var icons = [
 		'glass', 'music', 'heart', 'star', 'film',
@@ -24,10 +28,22 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 		patron = session.patron;
 	};
 
-	var getNewProfileImageUrl = function(username) {
+	var getImageUrl = function(url, callback) {
+		$http.head(url)
+		.success(function() {
+			console.log(url);
+			callback(url);
+		}) 
+		.error(function() {
+			console.log(placeholderUrl);
+			callback(placeholderUrl);
+		});
+	};
+
+	var getNewProfileImageUrl = function(username, callback) {
 		// Use a timestamp to convince everyone we need a new
 		// image from the server when a new file is uploaded.
-		return '/profile/' + username + '/image?' + Date.now();
+		getImageUrl('/profile/' + username + '/image?' + Date.now(), callback);
 	};
 	var getNewBackgroundImageUrl = function(username) {
 		// Use a timestamp to convince everyone we need a new
@@ -43,7 +59,9 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 	// TODO: Refactor
 	$scope.profileImageUploaded = function () {
 		$scope.$apply(function () {
-			$scope.profileImageUrl = getNewProfileImageUrl($scope.username);
+			getNewProfileImageUrl($scope.username, function (url) {
+				$scope.profileImageUrl = url;
+			});
 		});
 	};
 	$scope.backgroundImageUploaded = function () {
@@ -350,7 +368,9 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 			$scope.photoCredits = member.photoCredits;
 			$scope.hasStripeAccount = member.hasStripeAccount;
 
-			$scope.profileImageUrl = getNewProfileImageUrl(member.username);
+			getNewProfileImageUrl(member.username, function (url) {
+				$scope.profileImageUrl = url;
+			});
 			$scope.backgroundImageUrl = getNewBackgroundImageUrl(member.username);
 			$scope.futureImageUrl = getNewFutureImageUrl(member.username);
 			for (var i=0; i < member.communities.length; i++) {

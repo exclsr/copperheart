@@ -14,9 +14,14 @@
 
 			<h3>who are you, what are you working on?</h3>
 			<div class="span3">
-				<img ng-src="{{profileImageUrl}}"/>
-				<input uploader type="file" data-url="member/profileImage" name="profileImage"		
-					onUpload="profileImageUploaded()"/>
+				<div style="background-color: #999"><img ng-src="{{profileImageUrl}}" style="width: 270px; height: 200px"/></div>
+				<div style="margin: 1ex; margin-right: 0; margin-left: 0; margin-top: 1.4ex">Main profile image
+					<div class="btn fileinput-button" style="float: right; margin-top: -5px">
+						Upload ...
+						<input uploader type="file" data-url="member/profileImage" name="profileImage"		
+						onUpload="profileImageUploaded()" />
+					</div>
+				</div>
 			</div>
 
 			<div class="who span6" style="height: 315px">

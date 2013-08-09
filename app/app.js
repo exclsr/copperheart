@@ -8,6 +8,7 @@ var express    = require('express')
 	, fs       = require('fs')
 	, path     = require('path')
 	, redis    = require('connect-redis')(express)
+	, gm       = require('gm')
 	, config   = require('./config.js')
 	, auth     = require('./lib/auth.js')
 	, payment  = require('./lib/payment.js')
@@ -666,7 +667,7 @@ app.get('/member', ensureIsMember, function (req, res) {
 	db.patrons.get(req.user.email, gotMember, failure);
 });
 
-var saveProfileImage = function (patron, filepath, saveImageFn, res) {
+var saveProfileImage = function (patron, filepath, saveImageFn, imageSize, res) {
 	var jsonError = {
 		ok: false,
 		error: {
@@ -674,23 +675,38 @@ var saveProfileImage = function (patron, filepath, saveImageFn, res) {
 		}
 	};
 
-	fs.readFile(filepath, function (err, data) {
-		if (err) {
-			console.log(err);
-			res.send(jsonError);
-		}
-		else {
-			saveImageFn(patron.username, data, function (err) {
-				if (err) {
-					console.log(err);
-					res.send(jsonError);
-				}
-				else {
-					res.send({ok: true});
-				}
-			});
-		}
-	});
+	var imageWidth = imageSize.width ? imageSize.width : null;
+	var imageHeight = imageSize.height ? imaegSize.height : null;
+
+	// TODO: Figure out how to just use streams 
+	var newPath = filepath + '-new';
+	var imageData = gm(filepath)
+		.resize(imageWidth, imageHeight)
+		.write(newPath, function (err) {
+			if (err) {
+				console.log(err);
+				res.send(jsonError);
+			}
+			else {
+				fs.readFile(newPath, function (err, data) {
+					if (err) {
+						console.log(err);
+						res.send(jsonError);
+					}
+					else {
+						saveImageFn(patron.username, data, function (err) {
+							if (err) {
+								console.log(err);
+								res.send(jsonError);
+							}
+							else {
+								res.send({ok: true});
+							}
+						});
+					}
+				});
+			}
+		});
 };
 
 app.post('/member/profileImage', ensureIsMember, function (req, res) {	
@@ -698,6 +714,7 @@ app.post('/member/profileImage', ensureIsMember, function (req, res) {
 		req.user, 
 		req.files.profileImage.path,
 		staticDb.profileImages.save,
+		{width: 300},
 		res);
 });
 
@@ -706,6 +723,7 @@ app.post('/member/backgroundImage', ensureIsMember, function (req, res) {
 		req.user, 
 		req.files.backgroundImage.path,
 		staticDb.profileImages.saveBackground,
+		{width: 480, height: 270},
 		res);
 });
 
@@ -714,10 +732,11 @@ app.post('/member/futureImage', ensureIsMember, function (req, res) {
 		req.user, 
 		req.files.futureImage.path,
 		staticDb.profileImages.saveFuture,
+		{width: 580, height: 270},
 		res);
 });
 
-var saveCommunityImage = function (patron, communityId, filepath, saveImageFn, callback) {
+var saveCommunityImage = function (patron, communityId, filepath, saveImageFn, imageSize, callback) {
 	var community = patron.communities[communityId];
 	var jsonError = {
 		ok: false,
@@ -759,7 +778,7 @@ app.post('/member/community/:communityId/image', ensureIsMember, function (req, 
 	var filepath = req.files.communityImage.path;
 	var saveImageFn = staticDb.communityImages.save;
 
-	saveCommunityImage(patron, communityId, filepath, saveImageFn, function (response) {
+	saveCommunityImage(patron, communityId, filepath, saveImageFn, {width: 480, height: 270}, function (response) {
 		res.send(response);
 	});
 });
@@ -770,7 +789,7 @@ app.post('/member/community/:communityId/icon', ensureIsMember, function (req, r
 	var filepath = req.files.communityIcon.path;
 	var saveImageFn = staticDb.communityImages.saveIcon;
 
-	saveCommunityImage(patron, communityId, filepath, saveImageFn, function (response) {
+	saveCommunityImage(patron, communityId, filepath, saveImageFn, {width: 50, height: 50}, function (response) {
 		res.send(response);
 	});
 });

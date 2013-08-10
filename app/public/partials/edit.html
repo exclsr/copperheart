@@ -4,7 +4,7 @@
 <div class="span12">
 
 	<ul class="nav nav-tabs" style="padding-top: 1em">
-		<li ng-class="{ active: isEqual(subEdit, 'profile') }"><a href="#/edit">profile</a></li>
+		<li ng-class="{ active: isEqual(subEdit, 'profile') }"><a href="#/edit">about</a></li>
 		<li ng-class="{ active: isEqual(subEdit, 'things') }"><a href="#/edit/things">things</a></li>
 		<li ng-class="{ active: isEqual(subEdit, 'account') }"><a href="#/edit/account">account</a></li>
 	</ul>
@@ -12,23 +12,34 @@
 	<div ng-hide="!isEqual(subEdit, 'profile')">
 		<div class="currentlyDoing">
 
-			<h3>who are you, what are you working on?</h3>
-			<div class="span3">
-				<div style="background-color: #999"><img ng-src="{{profileImageUrl}}" style="width: 270px; height: 200px"/></div>
-				<div style="margin: 1ex; margin-right: 0; margin-left: 0; margin-top: 1.4ex">Main profile image
-					<div class="btn fileinput-button" style="float: right; margin-top: -5px">
-						Upload ...
-						<input uploader type="file" data-url="member/profileImage" name="profileImage"		
-						onUpload="profileImageUploaded()" />
+
+			<h3>what's your name?</h3>
+			<input ng-model="name" class="name" type="text"/>
+			<button class="btn saveNameBtn" ng-click="saveProfile()">Save</button>
+
+			<div class="row">
+				<div class="span3">
+					<h3>have a picture?</h3>
+					
+					<div style="background-color: #999"><img ng-src="{{profileImageUrl}}" style="width: 270px; height: 200px"/></div>
+					<div style="margin: 1ex; margin-right: 0; margin-left: 0; margin-top: 1.4ex">Main profile image
+						<div class="btn fileinput-button" style="float: right; margin-top: -5px">
+							Upload ...
+							<input uploader type="file" data-url="member/profileImage" name="profileImage"		
+							onUpload="profileImageUploaded()" />
+						</div>
+					</div>
+				</div>
+
+				<div class="who span6" style="height: 315px">
+					<h3>what are you working on?</h3>
+					<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
+					<div style="text-align: right">
+						<button class="btn" ng-click="saveProfile()">Save</button>
 					</div>
 				</div>
 			</div>
 
-			<div class="who span6" style="height: 315px">
-				<input ng-model="name" class="name" type="text"/>
-				<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
-				<button class="btn" ng-click="saveProfile()">Save</button>
-			</div>
 
 			<div class="projects span8" style="clear: left; float: left; margin-top: 2em">
 				<div class="span4">

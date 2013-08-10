@@ -50,7 +50,7 @@ a:hover {
 	font-family: "Source Sans Pro", sans-serif;
 	font-size: 13pt;
 }
-h3, h4, .name {
+h3, h4 {
 	font-family: "Bree Serif", serif;
 	font-weight: normal;
 	font-size: 18pt;
@@ -806,8 +806,11 @@ select.paymentDay {
 }
 
 .name {
-	font-size: 18pt !important;
-	height: 26px !important;
+	font-size: 12pt !important;
+	height: 20px !important;
+}
+.saveNameBtn {
+	vertical-align: top;
 }
 
 .passionContainer:hover, .communityContainer:hover {

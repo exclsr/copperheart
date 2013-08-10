@@ -667,7 +667,14 @@ app.get('/member', ensureIsMember, function (req, res) {
 	db.patrons.get(req.user.email, gotMember, failure);
 });
 
-var saveProfileImage = function (patron, filepath, saveImageFn, imageSize, res) {
+
+var saveMemberImage = function (options, callback) {
+	var patron      = options.patron;
+	var communityId = options.communityId;
+	var filepath    = options.filepath;
+	var saveImageFn = options.saveImageFn;
+	var imageSize   = options.imageSize;
+
 	var jsonError = {
 		ok: false,
 		error: {
@@ -675,34 +682,53 @@ var saveProfileImage = function (patron, filepath, saveImageFn, imageSize, res) 
 		}
 	};
 
+	var community;
+	if (communityId) {
+		community = patron.communities[communityId];
+		if (!community) {
+			jsonError.error.status = 404;
+			callback(jsonError);
+			return;
+		}
+	}
+
+
 	var imageWidth = imageSize.width ? imageSize.width : null;
-	var imageHeight = imageSize.height ? imaegSize.height : null;
+	var imageHeight = imageSize.height ? imageSize.height : null;
+
+	var saveCallback = function (err) {
+		if (err) {
+			console.log(err);
+			callback(jsonError);
+		}
+		else {
+			callback({ok: true});
+		}
+	};
 
 	// TODO: Figure out how to just use streams 
 	var newPath = filepath + '-new';
 	var imageData = gm(filepath)
 		.resize(imageWidth, imageHeight)
 		.write(newPath, function (err) {
+
 			if (err) {
 				console.log(err);
-				res.send(jsonError);
+				callback(jsonError);
 			}
 			else {
 				fs.readFile(newPath, function (err, data) {
 					if (err) {
 						console.log(err);
-						res.send(jsonError);
+						callback(jsonError);
 					}
 					else {
-						saveImageFn(patron.username, data, function (err) {
-							if (err) {
-								console.log(err);
-								res.send(jsonError);
-							}
-							else {
-								res.send({ok: true});
-							}
-						});
+						if (community) {
+							saveImageFn(patron.username, community.name, data, saveCallback);
+						}
+						else {
+							saveImageFn(patron.username, data, saveCallback);
+						}
 					}
 				});
 			}
@@ -710,86 +736,66 @@ var saveProfileImage = function (patron, filepath, saveImageFn, imageSize, res) 
 };
 
 app.post('/member/profileImage', ensureIsMember, function (req, res) {	
-	saveProfileImage(
-		req.user, 
-		req.files.profileImage.path,
-		staticDb.profileImages.save,
-		{width: 300},
-		res);
+	var options = {
+		patron: req.user,
+		filepath: req.files.profileImage.path,
+		saveImageFn: staticDb.profileImages.save,
+		imageSize: {width: 300}
+	};
+	saveMemberImage(options, function (response) {
+		res.send(response);
+	});
 });
 
 app.post('/member/backgroundImage', ensureIsMember, function (req, res) {	
-	saveProfileImage(
-		req.user, 
-		req.files.backgroundImage.path,
-		staticDb.profileImages.saveBackground,
-		{width: 480, height: 270},
-		res);
+	var options = {
+		patron: req.user, 
+		filepath: req.files.backgroundImage.path,
+		saveImageFn: staticDb.profileImages.saveBackground,
+		imageSize: {width: 480, height: 270}
+	};
+	saveMemberImage(options, function (response) {
+		res.send(response);
+	});
 });
 
 app.post('/member/futureImage', ensureIsMember, function (req, res) {	
-	saveProfileImage(
-		req.user, 
-		req.files.futureImage.path,
-		staticDb.profileImages.saveFuture,
-		{width: 580, height: 270},
-		res);
-});
-
-var saveCommunityImage = function (patron, communityId, filepath, saveImageFn, imageSize, callback) {
-	var community = patron.communities[communityId];
-	var jsonError = {
-		ok: false,
-		error: {
-			status: 500
-		}
+	var options = {
+		patron: req.user, 
+		filepath: req.files.futureImage.path,
+		saveImageFn: staticDb.profileImages.saveFuture,
+		imageSize: {width: 580, height: 270}
 	};
-
-	if (!community) {
-		jsonError.error.status = 404;
-		callback(jsonError);
-	}
-	else {
-		fs.readFile(filepath, function (err, data) {
-
-			if (err) {
-				console.log(err);
-				callback(jsonError);
-			}
-			else {
-				saveImageFn(patron.username, community.name, data, function (err) {
-					if (err) {
-						console.log(err);
-						callback(jsonError);
-					}
-					else {
-						callback({ok: true});
-					}
-				});
-			}
-		});
-	}
-};
+	saveMemberImage(options, function (response) {
+		res.send(response);
+	});
+});
 
 // TODO: Refactor to be community/:id/image
 app.post('/member/community/:communityId/image', ensureIsMember, function (req, res) {
-	var patron = req.user;
-	var communityId = req.params.communityId
-	var filepath = req.files.communityImage.path;
-	var saveImageFn = staticDb.communityImages.save;
+	var options = {
+		patron: req.user,
+		communityId: req.params.communityId,
+		filepath: req.files.communityImage.path,
+		saveImageFn: staticDb.communityImages.save,
+		imageSize: {width: 480, height: 270}
+	};
 
-	saveCommunityImage(patron, communityId, filepath, saveImageFn, {width: 480, height: 270}, function (response) {
+	saveMemberImage(options, function (response) {
 		res.send(response);
 	});
 });
 
 app.post('/member/community/:communityId/icon', ensureIsMember, function (req, res) {
-	var patron = req.user;
-	var communityId = req.params.communityId
-	var filepath = req.files.communityIcon.path;
-	var saveImageFn = staticDb.communityImages.saveIcon;
+	var options = {
+		patron: req.user,
+		communityId: req.params.communityId,
+		filepath: req.files.communityIcon.path,
+		saveImageFn: staticDb.communityImages.saveIcon,
+		imageSize: {width: 50, height: 50}
+	};
 
-	saveCommunityImage(patron, communityId, filepath, saveImageFn, {width: 50, height: 50}, function (response) {
+	saveMemberImage(options, function (response) {
 		res.send(response);
 	});
 });

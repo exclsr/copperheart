@@ -41,8 +41,13 @@ var nanoo = function () {
 	var setCookieTokenFromHeaders = function (headers) {
 		if (headers && headers['set-cookie']) {
 			cookieToken = headers['set-cookie'];
-			initDatabase(cookieToken);
 		}		
+		// TODO: If we simply rely on the set-cookie headers,
+		// we'll eventually fail to authenticate. In other words,
+		// this doesn't work as expected. It would be cool if
+		// this initDatabase call were inside the conditional 
+		// above. Figure out what is going on.
+		initDatabase(cookieToken);
 	};
 
 	var getCookieAuthHeaders = function () {

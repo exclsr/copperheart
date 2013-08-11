@@ -5,10 +5,11 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 
 	$scope.thing = {};
 	// TODO: Refactor this ugliness.
-	$scope.communityImageUrlTimestamps = {};
-	$scope.communityIconUrlTimestamps = {};
+	var communityImageUrlTimestamps = {};
+	var communityIconUrlTimestamps = {};
 
 	var placeholderUrl = "/img/placeholder.png";
+	var staticBaseUrl;
 	$scope.profileImageUrl = placeholderUrl;
 
 
@@ -29,31 +30,47 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 	};
 
 	var getImageUrl = function(url, callback) {
-		$http.head(url)
-		.success(function() {
-			console.log(url);
-			callback(url);
-		}) 
-		.error(function() {
-			console.log(placeholderUrl);
-			callback(placeholderUrl);
-		});
+		callback(url);
+		// TODO: This doesn't work on localhost due to CORS
+		// $http.head(url)
+		// .success(function() {
+		// 	console.log(url);
+		// 	callback(url);
+		// }) 
+		// .error(function() {
+		// 	console.log(placeholderUrl);
+		// 	callback(placeholderUrl);
+		// });
 	};
 
 	var getNewProfileImageUrl = function(username, callback) {
 		// Use a timestamp to convince everyone we need a new
 		// image from the server when a new file is uploaded.
-		getImageUrl('/profile/' + username + '/image?' + Date.now(), callback);
+		getImageUrl(staticBaseUrl + 'profile.jpg?' + Date.now(), callback);
 	};
 	var getNewBackgroundImageUrl = function(username) {
 		// Use a timestamp to convince everyone we need a new
 		// image from the server when a new file is uploaded.
-		return '/profile/' + username + '/background/image?' + Date.now();
+		return staticBaseUrl + 'background.jpg?' + Date.now();
 	};
 	var getNewFutureImageUrl = function(username) {
 		// Use a timestamp to convince everyone we need a new
 		// image from the server when a new file is uploaded.
-		return '/profile/' + username + '/future/image?' + Date.now();
+		return staticBaseUrl + 'future.jpg?' + Date.now();
+	};
+
+	$scope.getCommunityImageUrl = function(community, index) {
+		if (!staticBaseUrl) {
+			return undefined;
+		}
+		return staticBaseUrl + community.name + ".jpg?" + communityImageUrlTimestamps[index];
+	};
+
+	$scope.getCommunityIconUrl = function(community, index) {
+		if (!staticBaseUrl) {
+			return undefined;
+		}
+		return staticBaseUrl + community.name + "icon.jpg?" + communityImageUrlTimestamps[index];
 	};
 
 	// TODO: Refactor
@@ -78,12 +95,12 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 	// hack ...
 	$scope.communityImageUploaded = function (index) {
 		$scope.$apply(function () {
-			$scope.communityImageUrlTimestamps[index] = Date.now();
+			communityImageUrlTimestamps[index] = Date.now();
 		});
 	};
 	$scope.communityIconUploaded = function (index) {
 		$scope.$apply(function () {
-			$scope.communityIconUrlTimestamps[index] = Date.now();
+			communityIconUrlTimestamps[index] = Date.now();
 		});
 	};
 	// end? hack.
@@ -357,11 +374,23 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 
 
 	var initialize = function() {
+
+		var member;
+		var ready = function () {
+			if (member && staticBaseUrl) {
+				getNewProfileImageUrl(member.username, function (url) {
+					$scope.profileImageUrl = url;
+				});
+				$scope.backgroundImageUrl = getNewBackgroundImageUrl(member.username);
+				$scope.futureImageUrl = getNewFutureImageUrl(member.username);
+			}
+		};
 		
 		$scope.subEdit = $routeParams.subEdit || 'profile';
 		
 		var memberRes = $http.get('/member');
-		memberRes.success(function (member) {
+		memberRes.success(function (memberData) {
+			member = memberData;
 			$scope.email = member.email;
 			$scope.username = member.username;
 			$scope.things = member.things;
@@ -374,15 +403,17 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 			$scope.photoCredits = member.photoCredits;
 			$scope.hasStripeAccount = member.hasStripeAccount;
 
-			getNewProfileImageUrl(member.username, function (url) {
-				$scope.profileImageUrl = url;
-			});
-			$scope.backgroundImageUrl = getNewBackgroundImageUrl(member.username);
-			$scope.futureImageUrl = getNewFutureImageUrl(member.username);
 			for (var i=0; i < member.communities.length; i++) {
-				$scope.communityImageUrlTimestamps[i] = Date.now();
-				$scope.communityIconUrlTimestamps[i] = Date.now();
+				communityImageUrlTimestamps[i] = Date.now();
+				communityIconUrlTimestamps[i] = Date.now();
 			}
+
+			$http.get('/profile/' + member.username + '/static-base-url')
+			.success(function (url) {
+				staticBaseUrl = url;
+				$scope.staticBaseUrl = staticBaseUrl;
+				ready();
+			});
 		});
 
 		memberRes.error(function(data, status, headers, config) {

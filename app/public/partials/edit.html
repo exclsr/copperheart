@@ -183,12 +183,12 @@
 					</div>
 				</div>
 				<div class="span3">
-					<img ng-src="/profile/{{username}}/community/{{$index}}/image?{{communityImageUrlTimestamps[$index]}}"/>
+					<img ng-src="{{getCommunityImageUrl(community, $index)}}"/>
 					<input uploader type="file" data-url="member/community/{{$index}}/image" 
 					name="communityImage"		
 					onUpload="communityImageUploaded($index)">
 
-					<img ng-src="/profile/{{username}}/community/{{$index}}/icon?{{communityIconUrlTimestamps[$index]}}"/>
+					<img ng-src="{{getCommunityIconUrl(community, $index)}}"/>
 					<input uploader type="file" data-url="member/community/{{$index}}/icon" 
 					name="communityIcon"		
 					onUpload="communityIconUploaded($index)">

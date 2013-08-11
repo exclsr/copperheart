@@ -3,18 +3,20 @@
 <div class="view">
 <div class="span12">
 
-	<ul class="nav nav-tabs" style="padding-top: 1em">
-		<li ng-class="{ active: isEqual(subEdit, 'profile') }"><a href="#/edit">about</a></li>
-		<li ng-class="{ active: isEqual(subEdit, 'communities') }"><a href="#/edit/communities">communities</a></li>
-		<li ng-class="{ active: isEqual(subEdit, 'things') }"><a href="#/edit/things">things</a></li>
-		<li ng-class="{ active: isEqual(subEdit, 'account') }"><a href="#/edit/account">account</a></li>
-	</ul>
+	<div class="row">
+		<ul class="nav nav-tabs" style="padding-top: 1em">
+			<li ng-class="{ active: isEqual(subEdit, 'profile') }"><a href="#/edit">about</a></li>
+			<li ng-class="{ active: isEqual(subEdit, 'communities') }"><a href="#/edit/communities">communities</a></li>
+			<li ng-class="{ active: isEqual(subEdit, 'things') }"><a href="#/edit/things">things</a></li>
+			<li ng-class="{ active: isEqual(subEdit, 'account') }"><a href="#/edit/account">account</a></li>
+		</ul>
+	</div>
 
 	<div ng-hide="!isEqual(subEdit, 'profile')">
 		<div class="currentlyDoing">
 			<h3>what's your name?</h3>
 			<input ng-model="name" class="name" type="text"/>
-			<button class="btn saveNameBtn" ng-click="saveProfile()">Save</button>
+			<button class="btn saveNameBtn" ng-click="saveWho()">Save</button>
 
 			<div class="row">
 				<div class="span3">
@@ -30,45 +32,82 @@
 					</div>
 				</div>
 
-				<div class="who span6" style="height: 315px">
+				<div class="span6">
 					<h3>what are you working on?</h3>
-					<textarea ng-model="present" class="span6" style="height: 225px;"></textarea>
+					<textarea ng-model="present" class="span6" style="height: 225px; margin-bottom: 0.7ex" ></textarea>
 					<div style="text-align: right">
-						<button class="btn" ng-click="saveProfile()">Save</button>
+						<button class="btn" ng-click="saveWho()">Save</button>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<h3 style="clear: left">Background</h3>
-		<div class="span3">
-			<img ng-src="{{backgroundImageUrl}}"/>
-			<input uploader type="file" data-url="member/backgroundImage" name="backgroundImage"
-				onUpload="backgroundImageUploaded()"/>
+		<h3 style="clear: left; padding-top: 1.4em">what's your background?</h3>		
+		<div style="float: left">
+			<div style="background-color: #999; float: left;">
+				<img 
+					ng-src="{{backgroundImageUrl}}"
+					style="width: 480px; height: 270px"
+				/>
+			</div>
+			<div style="clear: left; padding: 0.7ex 0 1ex 0">
+				<div style="float: left">
+					<div class="btn fileinput-button">
+						Upload ...
+						<input uploader type="file" 
+							data-url="member/backgroundImage" name="backgroundImage"
+							onUpload="backgroundImageUploaded()"/>
+					</div>
+				</div>
+				<div style="float: right">
+					<div style="text-align: right">
+						<label>
+							photo credit
+							<input ng-model="photoCredits['background']" class="span3" type="text"/>
+						</label>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="who span6" style="height: 315px">
-			<textarea ng-model="background" class="span6" style="height: 225px;"></textarea>
+		<div class="span6" style="margin-left: 0.3ex">
+			<textarea ng-model="background" class="span6" style="height: 260px; margin-bottom: 0.7ex"></textarea>
 			<div style="text-align: right">
-				<label>
-					photo credit
-					<input ng-model="photoCredits['background']" class="span3" type="text"/>
-				</label>
+				<button class="btn" ng-click="saveWho()">Save</button>
 			</div>
 		</div>
 
-		<h3 style="clear: left">Future plans</h3>
-		<div class="span3">
-			<img ng-src="{{futureImageUrl}}"/>
-			<input uploader type="file" data-url="member/futureImage" name="futureImage"
-				onUpload="futureImageUploaded()"/>
+
+		<h3 style="clear: left; padding-top: 1.4em">what are your future plans?</h3>
+		<div style="float: left">
+			<div style="background-color: #999; float: left;">
+				<img 
+					ng-src="{{futureImageUrl}}"
+					style="width: 580px; height: 270px"
+				/>
+			</div>
+			<div style="clear: left; padding: 0.7ex 0 1ex 0">
+				<div style="float: left">
+					<div class="btn fileinput-button">
+						Upload ...
+						<input uploader type="file" 
+							data-url="member/futureImage" name="futureImage"
+							onUpload="futureImageUploaded()"/>
+					</div>
+				</div>
+				<div style="float: right">
+					<div style="text-align: right;">
+						<label>
+							photo credit
+							<input ng-model="photoCredits['future']" class="span3" type="text"/>
+						</label>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="who span6" style="height: 315px">
-			<textarea ng-model="future" class="span6" style="height: 225px;"></textarea>
+		<div class="span5" style="margin-left: 0.3ex">
+			<textarea ng-model="future" class="span5" style="height: 260px; margin-bottom: 0.7ex"></textarea>
 			<div style="text-align: right">
-				<label>
-					photo credit
-					<input ng-model="photoCredits['future']" class="span3" type="text"/>
-				</label>
+				<button class="btn" ng-click="saveWho()">Save</button>
 			</div>
 		</div>
 	</div>
@@ -237,7 +276,7 @@
 
 		<h3 style="clear: left; padding-top: 1.5em">profile name</h3>
 		<div class="span7">
-			<form ng-submit="saveProfile()">
+			<form ng-submit="saveUsername()">
 				<input ng-model="username" class="name" type="text"/> 
 				<h3 style="display: inline"><small>:: {{email}}</small></h3>
 				<div style="margin-bottom: 1.5em">

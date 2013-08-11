@@ -98,7 +98,9 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 
 		var putWho = $http.put('/member/who', who);
 		putWho.success(function (data) {
-			success();
+			if (success) {
+				success();
+			}
 		});
 		putWho.error(function (data, status, headers, config) { 
 			// TODO: Oh ... no.
@@ -121,8 +123,12 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 		});
 	};
 
-	$scope.saveProfile = function() {
-		saveWho(saveUsername);
+	$scope.saveUsername = function() {
+		saveUsername();
+	};
+
+	$scope.saveWho = function() {
+		saveWho();
 	}
 
 
@@ -423,22 +429,6 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 				// like this is great for stress testing, though.
 				if (oldValue !== undefined) {
 					saveCommunities(newValue);
-				}
-			},
-			true
-		);
-		$scope.$watch('background', 
-			function (newValue, oldValue) {
-				if (oldValue !== undefined) {
-					saveWho(function() {});
-				}
-			},
-			true
-		);
-		$scope.$watch('future', 
-			function (newValue, oldValue) {
-				if (oldValue !== undefined) {
-					saveWho(function() {});
 				}
 			},
 			true

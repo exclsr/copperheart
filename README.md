@@ -44,6 +44,7 @@ Copper Heart uses Node.js, CouchDB, Redis, and Stripe. To begin:
 
     1. Open an account on Stripe.com
     2. Set up a Node, CouchDB, and Redis server (e.g. Nodejitsu)
+    3. Install Graphics Magick for development (Nodejitsu provides this)
 
 configuration
 -----------------

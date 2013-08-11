@@ -5,6 +5,8 @@
 var nanoo = function () {
 	var self = this;
 	var nano = require('nano');
+	var EventEmitter = require('events').EventEmitter;
+	var ee = new EventEmitter();
 
 	var nanoMaster, database, isUsingAuth, cookieToken;
 	var _config = {
@@ -92,7 +94,9 @@ var nanoo = function () {
 				// Unauthorized. 
 				// TODO: Review logs to see if we need this.
 				console.log("Called reauth from relax.");
-				establishAuthorization();
+				establishAuthorization(function() {
+					ee.emit('nanoo-refresh', database);
+				});
 			}
 			else {
 				setCookieTokenFromHeaders(headers);
@@ -127,7 +131,7 @@ var nanoo = function () {
 				// but this is how nano is passed back to the 
 				// nanoo user. Make it more obvious (probably by
 				// changing how this is done).
-				callback(database);
+				callback(database, ee);
 			}
 		}
 

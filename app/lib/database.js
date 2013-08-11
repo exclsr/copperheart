@@ -304,14 +304,18 @@ var db = function (config) {
 		};
 
 		nanoo.init(nanooConfig);
-		nanoo.connect(function (nano) {
+		nanoo.connect(function (nano, nanooEvents) {
 			// TODO: This is a symptom of a design
 			// that can be improved inside nanoo.
 			database = nano;
+			nanooEvents.on('nanoo-refresh', function (nano) {
+				database = nano;
+			});
 			createDatabaseAndViews(function (err) {
 				callback(err);
 			});
 		});
+		
 	};
 
 	return {

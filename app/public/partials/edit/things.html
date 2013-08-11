@@ -1,0 +1,64 @@
+<h3>add a thing</h3>
+
+<div class="newThingContainer span10">
+	<div class="span10" style="clear: left">
+		<div style="padding-left: 1.5em">
+			<span class="glyph-choice" ng-repeat="icon in getIcons()">
+				<span class="glyph-choice-inner" ng-click="setNewThingGlyph(icon)">
+					<i class="icon-{{icon}} passive"
+					ng-class="{ selected: isEqual(icon, thing.glyph) }"></i>
+					<i class="icon-{{icon}} icon-white active" 
+					ng-class="{ selected: isEqual(icon, thing.glyph) }"></i>
+				</span>
+			</span>
+		</div>
+	</div>
+	<div style="padding-top: 1em; clear: left">
+		<label class="span3">
+			A <input ng-model="thing.unit" class="span2" placeholder="(unit of measure)" type="text" /> 
+		</label>
+		<label class="span3">
+			of <input ng-model="thing.name" placeholder="(thing I would appreciate)" type="text" />, 
+		</label>
+		<label class="span2">
+			for <input ng-model="thing.price" class="span1" type="text" /> dollars.
+		</label>
+	</div>
+</div>
+
+<div class="newThingContainer span10" 
+	style="margin-top: 2px; background-color: #f6f6f6; color: #333;">
+	<div style="clear: left; padding-top: 1ex">
+		<label class="span3">
+			Goal is
+			<input ng-model="thing.goal" placeholder="(e.g. 30)" type="text" class="span1"/> 
+			every month.
+		</label>
+		<div class="span3">
+			<button class="btn" ng-click="addThing()">Add thing</button>
+		</div>
+
+	</div>
+</div>
+
+
+<h3 style="clear: left; padding-top: 1.5em">things <small>:: {{things.length}}</h3>
+
+	<div ui-sortable="{ axis: 'y', update: markThingsAsChanged }" ng-model="things">
+	<div class="row" ng-repeat="thing in things" style="user-select: none !important"
+		ng-class-odd="'odd'">
+		<div class="editThingContainer span10">
+			<span class="span1 moveThing" style="width: 1ex">
+				<i class="icon-resize-vertical"></i>
+			</span>
+			<span class="span3">A {{thing.unit}}</span>
+			<span class="span3">of {{thing.name}},</span>
+			<span class="span1" style="width: 1ex"><i class="icon-{{thing.glyph}}"> </i></span>
+			<span class="span2">for {{thing.price}} dollars.</span> 
+			<span class="span1 thingTrashIcon" style="text-align: right; width: 1ex">
+				<i class="icon-trash" ng-click="deleteThing(thing)" style="padding-right: 1.1em"></i>
+			</span>
+		</div>
+		<div class="span1" style="padding: 2ex; padding-left: 0">{{thing.goal}}</div>
+	</div>
+</div>

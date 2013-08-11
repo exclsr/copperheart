@@ -325,10 +325,6 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 		}
 	};
 
-	$scope.areEqual = function (x, y) {
-		return x === y;
-	};
-
 
 	$scope.setNewThingGlyph = function (glyphName) {
 		$scope.thing.glyph = glyphName;
@@ -386,7 +382,7 @@ function EditCtrl(session, $scope, $http, $routeParams) {
 			}
 		};
 		
-		$scope.subEdit = $routeParams.subEdit || 'profile';
+		$scope.subEdit = $routeParams.subEdit || 'about';
 		
 		var memberRes = $http.get('/member');
 		memberRes.success(function (memberData) {

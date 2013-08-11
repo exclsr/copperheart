@@ -1,0 +1,22 @@
+<h3 style="clear: left;">contribution destination</h3>
+<div class="span4" ng-show="hasStripeAccount">
+	<p>Connected to your Stripe account.</p>
+</div>
+<div class="span4" ng-hide="hasStripeAccount">
+	<a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id={{stripeConnectClientId}}&scope=read_write" class="stripe-connect light-blue"><span>Connect with Stripe</span></a>
+</div>
+
+<h3 style="clear: left; padding-top: 1.5em">profile name</h3>
+<div class="span7">
+	<form ng-submit="saveUsername()">
+		<input ng-model="username" class="name" type="text"/> 
+		<h3 style="display: inline"><small>:: {{email}}</small></h3>
+		<div style="margin-bottom: 1.5em">
+			<button type="submit" class="btn">Save</button>
+		</div>
+	</form>
+</div>
+
+<div style="margin-bottom: 2em">
+	&nbsp;
+</div>

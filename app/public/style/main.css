@@ -782,8 +782,9 @@ select.paymentDay {
 	opacity: 0.5;
 }
 
-
-/* Edit page */
+/********************************************************
+ * Edit page 
+ ********************************************************/
 .fileinput-button {
   position: relative;
   overflow: hidden;
@@ -805,13 +806,63 @@ select.paymentDay {
 	background-color: #eee;
 }
 
-.name {
+/* About */
+.name, .edit-name {
 	font-size: 12pt !important;
 	height: 20px !important;
 }
-.saveNameBtn {
+.edit-saveNameBtn {
 	vertical-align: top;
 }
+
+.edit-img-container {
+	background-color: #999;
+}
+.edit-profile-img {
+	width: 270px; height: 200px;
+}
+.edit-profile-img-footer {
+	margin: 1ex; 
+	margin-right: 0; 
+	margin-left: 0; 
+	margin-top: 1.4ex;
+}
+.edit-img-footer {
+	clear: left; 
+	padding: 0.7ex 0 1ex 0;
+}
+.edit-profile-btn {
+	float: right; 
+	margin-top: -5px;
+}
+.edit-present-area {
+	height: 225px; 
+	margin-bottom: 0.7ex
+}
+.edit-save-container {
+	text-align: right;
+}
+.edit-about-h3 {
+	clear: left; 
+	padding-top: 1.4em;
+}
+.edit-background-img {
+	width: 480px; height: 270px;
+}
+.edit-future-img {
+	width: 580px; height: 270px;
+}
+.edit-photocredit-container {
+	text-align: right;
+}
+.edit-desc-container {
+	margin-left: 0.3ex;
+}
+.edit-desc-textarea {
+	height: 260px; 
+	margin-bottom: 0.7ex;
+}
+
 
 .passionContainer:hover, .communityContainer:hover {
 	background: #bbb;

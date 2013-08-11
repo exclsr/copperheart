@@ -1,15 +1,17 @@
 <div class="currentlyDoing">
 	<h3>what's your name?</h3>
-	<input ng-model="name" class="name" type="text"/>
-	<button class="btn saveNameBtn" ng-click="saveWho()">Save</button>
+	<input ng-model="name" class="edit-name" type="text"/>
+	<button class="btn edit-saveNameBtn" ng-click="saveWho()">Save</button>
 
 	<div class="row">
 		<div class="span3">
 			<h3>have a picture?</h3>
-			
-			<div style="background-color: #999"><img ng-src="{{profileImageUrl}}" style="width: 270px; height: 200px"/></div>
-			<div style="margin: 1ex; margin-right: 0; margin-left: 0; margin-top: 1.4ex">Main profile image
-				<div class="btn fileinput-button" style="float: right; margin-top: -5px">
+			<div class="edit-img-container"><img 
+				ng-src="{{profileImageUrl}}" 
+				class="edit-profile-img"/>
+			</div>
+			<div class="edit-profile-img-footer">Main profile image
+				<div class="btn fileinput-button edit-profile-btn">
 					Upload ...
 					<input uploader type="file" data-url="member/profileImage" name="profileImage"		
 					onUpload="profileImageUploaded()" />
@@ -19,24 +21,24 @@
 
 		<div class="span6">
 			<h3>what are you working on?</h3>
-			<textarea ng-model="present" class="span6" style="height: 225px; margin-bottom: 0.7ex" ></textarea>
-			<div style="text-align: right">
+			<textarea ng-model="present" class="span6 edit-present-area"></textarea>
+			<div class="edit-save-container">
 				<button class="btn" ng-click="saveWho()">Save</button>
 			</div>
 		</div>
 	</div>
 </div>
 
-<h3 style="clear: left; padding-top: 1.4em">what's your background?</h3>		
-<div style="float: left">
-	<div style="background-color: #999; float: left;">
+<h3 class="edit-about-h3">what's your background?</h3>		
+<div class="pull-left">
+	<div class="edit-img-container pull-left">
 		<img 
-			ng-src="{{backgroundImageUrl}}"
-			style="width: 480px; height: 270px"
+			ng-src="{{backgroundImageUrl}}" 
+			class="edit-background-img"
 		/>
 	</div>
-	<div style="clear: left; padding: 0.7ex 0 1ex 0">
-		<div style="float: left">
+	<div class="edit-img-footer">
+		<div class="pull-left">
 			<div class="btn fileinput-button">
 				Upload ...
 				<input uploader type="file" 
@@ -44,8 +46,8 @@
 					onUpload="backgroundImageUploaded()"/>
 			</div>
 		</div>
-		<div style="float: right">
-			<div style="text-align: right">
+		<div class="pull-right">
+			<div class="edit-photocredit-container">
 				<label>
 					photo credit
 					<input ng-model="photoCredits['background']" class="span3" type="text"/>
@@ -54,24 +56,24 @@
 		</div>
 	</div>
 </div>
-<div class="span6" style="margin-left: 0.3ex">
-	<textarea ng-model="background" class="span6" style="height: 260px; margin-bottom: 0.7ex"></textarea>
-	<div style="text-align: right">
+<div class="span6 edit-desc-container">
+	<textarea ng-model="background" class="span6 edit-desc-textarea"></textarea>
+	<div class="edit-save-container">
 		<button class="btn" ng-click="saveWho()">Save</button>
 	</div>
 </div>
 
 
-<h3 style="clear: left; padding-top: 1.4em">what are your future plans?</h3>
-<div style="float: left">
-	<div style="background-color: #999; float: left;">
+<h3 class="edit-about-h3">what are your future plans?</h3>
+<div class="pull-left">
+	<div class="edit-img-container pull-left">
 		<img 
 			ng-src="{{futureImageUrl}}"
-			style="width: 580px; height: 270px"
+			class="edit-future-img"
 		/>
 	</div>
-	<div style="clear: left; padding: 0.7ex 0 1ex 0">
-		<div style="float: left">
+	<div class="edit-img-footer">
+		<div class="pull-left">
 			<div class="btn fileinput-button">
 				Upload ...
 				<input uploader type="file" 
@@ -79,8 +81,8 @@
 					onUpload="futureImageUploaded()"/>
 			</div>
 		</div>
-		<div style="float: right">
-			<div style="text-align: right;">
+		<div class="pull-right">
+			<div class="edit-photocredit-container">
 				<label>
 					photo credit
 					<input ng-model="photoCredits['future']" class="span3" type="text"/>
@@ -89,9 +91,9 @@
 		</div>
 	</div>
 </div>
-<div class="span5" style="margin-left: 0.3ex">
-	<textarea ng-model="future" class="span5" style="height: 260px; margin-bottom: 0.7ex"></textarea>
-	<div style="text-align: right">
+<div class="span5 edit-desc-container">
+	<textarea ng-model="future" class="span5 edit-desc-textarea"></textarea>
+	<div class="edit-save-container">
 		<button class="btn" ng-click="saveWho()">Save</button>
 	</div>
 </div>

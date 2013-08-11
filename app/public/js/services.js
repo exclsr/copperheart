@@ -70,6 +70,10 @@ angular.module('myApp.services', []).
 
 		var getSession = function() {
 			var session = store.get(sessionKey);
+			
+			if (!session) {
+				return session;
+			}
 			// Dates are stored as strings in JSON. That's cool,
 			// but we want to have actual Date objects.
 			if (session.expirationDate) {

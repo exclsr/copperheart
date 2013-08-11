@@ -11,19 +11,19 @@
 		</ul>
 	</div>
 
-	<div ng-hide="!isEqual(subEdit, 'about')" 
+	<div ng-hide="!isEqual(subEdit, 'about')" ng-controller="EditAboutCtrl"
 		ng-include src="'/partials/edit/about.html'">
 	</div>
 
-	<div ng-show="isEqual(subEdit, 'communities')"
+	<div ng-show="isEqual(subEdit, 'communities')" ng-controller="EditCommunitiesCtrl"
 		ng-include src="'/partials/edit/communities.html'">
 	</div>
 
-	<div ng-show="isEqual(subEdit, 'things')"
+	<div ng-show="isEqual(subEdit, 'things')" ng-controller="EditThingsCtrl"
 		ng-include src="'/partials/edit/things.html'">
  	</div>
 
-	<div ng-show="isEqual(subEdit, 'account')"
+	<div ng-show="isEqual(subEdit, 'account')" ng-controller="EditAccountCtrl"
 		ng-include src="'/partials/edit/account.html'">
 	</div>
 </div>

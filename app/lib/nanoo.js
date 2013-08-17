@@ -38,6 +38,7 @@ var nanoo = function () {
 			options.cookie = cookieToken || "";
 		}
 		database = nano(options).use(_config.databaseName);
+		ee.emit('nanoo-refresh', database);
 	};
 
 	var setCookieTokenFromHeaders = function (headers) {
@@ -94,9 +95,7 @@ var nanoo = function () {
 				// Unauthorized. 
 				// TODO: Review logs to see if we need this.
 				console.log("Called reauth from relax.");
-				establishAuthorization(function() {
-					ee.emit('nanoo-refresh', database);
-				});
+				establishAuthorization();
 			}
 			else {
 				setCookieTokenFromHeaders(headers);
